@@ -1,6 +1,6 @@
 # RocketDownload
 
-![RocketDownload Logo](/favicon.png)
+![RocketDownload Logo](https://raw.githubusercontent.com/bonalybob/RocketDownload/master/favicon.ico)
 
 A simple application to read punches from a SportIdent station to create results for Orienteering Events.
 
