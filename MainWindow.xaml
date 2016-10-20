@@ -1,0 +1,69 @@
+﻿<Window x:Name="MainWindow1" x:Class="RocketDownload.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RocketDownload"
+        mc:Ignorable="d"
+        Title="RocketDownload"  Icon="favicon.ico" Foreground="#FF2D2020" Height="495.833" Width="658.333">
+    <Grid Margin="0,0,0,0">
+
+        <GroupBox x:Name="Download" Header="Download" HorizontalAlignment="Left" Height="215" Margin="10,5,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid>
+                <ComboBox x:Name="comboboxPortsList" HorizontalAlignment="Left" Height="25" Margin="5,5,0,0" VerticalAlignment="Top" Width="280" ToolTip="Port" Panel.ZIndex="1" FontWeight="Normal" />
+                <Button x:Name="buttonRefresh" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="5,35,0,0" VerticalAlignment="Top" Width="135" Click="buttonRefresh_Click" Panel.ZIndex="1" FontWeight="Normal" ToolTip="Refresh Ports List"/>
+                <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Height="25" Margin="150,35,0,0"  VerticalAlignment="Top" Click="buttonConnect_Click" Width="135" Panel.ZIndex="1" FontWeight="Normal" ToolTip="Connect to Station" />
+                <RichTextBox x:Name="listboxLog" HorizontalAlignment="Left" Height="123" Margin="5,65,0,0"  VerticalAlignment="Top" Width="280" Panel.ZIndex="1" FontWeight="Normal"/>
+
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Entries" Header="Entries" HorizontalAlignment="Left" Height="235" Margin="330,5,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid Margin="0,0,0,-8">
+                <TextBox x:Name="textName" HorizontalAlignment="Left" Height="20" Margin="85,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Name" FontWeight="Normal"/>
+                <TextBox x:Name="textSI" HorizontalAlignment="Left" Height="20" Margin="85,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="SI Card Number" FontWeight="Normal"/>
+                <TextBox x:Name="textCourse" HorizontalAlignment="Left" Height="20" Margin="85,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Course" FontWeight="Normal"/>
+                <TextBox x:Name="textClub" HorizontalAlignment="Left" Height="20" Margin="85,80,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Club" FontWeight="Normal"/>
+                <TextBox x:Name="textClass" HorizontalAlignment="Left" Height="20" Margin="85,105,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Class" FontWeight="Normal" />
+                <TextBox x:Name="textStart" HorizontalAlignment="Left" Height="20" Margin="85,130,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Start" FontWeight="Normal"/>
+                <TextBox x:Name="textTime" HorizontalAlignment="Left" Height="20" Margin="85,155,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Start" FontWeight="Normal" IsEnabled="False"/>
+                <Label x:Name="labelName" Content="Name:" HorizontalAlignment="Left" Height="25" Margin="5,3,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelSI" Content="SI Card:" HorizontalAlignment="Left" Height="25" Margin="5,28,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelCourse" Content="Course:" HorizontalAlignment="Left" Height="25" Margin="5,53,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelClub" Content="Club:" HorizontalAlignment="Left" Height="25" Margin="5,78,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelClass" Content="Class:" HorizontalAlignment="Left" Height="25" Margin="5,103,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelStart" Content="Start Time:" HorizontalAlignment="Left" Height="25" Margin="5,127,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+                <Label x:Name="labelTime" Content="Time Taken:" HorizontalAlignment="Left" Height="25" Margin="5,153,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal"/>
+
+                <Button x:Name="Enter" Content="Enter" HorizontalAlignment="Left" Height="25" Margin="5,185,0,0" VerticalAlignment="Top" Width="137.5" FontWeight="Normal" Click="Enter_Click" RenderTransformOrigin="0.495,0.693" />
+                <Button x:Name="Search" Content="Search" HorizontalAlignment="Left" Height="25" Margin="147,185,0,0" VerticalAlignment="Top" Width="137.5" FontWeight="Normal" Click="Search_Click" RenderTransformOrigin="0.406,-1.48" />
+
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Results" Header="Results" HorizontalAlignment="Left" Height="230" Margin="10,220,0,5" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid>
+                <TextBox x:Name="textResults" HorizontalAlignment="Left" Height="163" Margin="5,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontWeight="Normal" />
+                <Button x:Name="refresh" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="4,173,0,-1.333" VerticalAlignment="Top" Width="280" Click="refresh_Click" FontWeight="Normal"/>
+
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Database" Header="Database" HorizontalAlignment="Left" Height="50" Margin="330,400,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid Margin="0,0,0,0">
+                <Button x:Name="DatabaseConnect" Content="Browse" HorizontalAlignment="Left" Height="20" Margin="205,5,0,0" VerticalAlignment="Top" Width="81" Click="browse_Click" FontWeight="Normal" ToolTip="Database Location" />
+                <TextBox x:Name="textDatabase" HorizontalAlignment="Left" Height="20" Margin="5,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="195" IsEnabled="False" FontWeight="Normal" ToolTip="Browse for Database"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox x:Name="Courses" Header="Courses" HorizontalAlignment="Left" Height="150" Margin="330,245,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid Margin="0,0,0,0">
+                <TextBox x:Name="textCourseNos" AcceptsReturn="True" HorizontalAlignment="Left" Height="120" Margin="147.5,5,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="135" ToolTip="Control Numbers" FontWeight="Normal"/>
+                <TextBox x:Name="CourseName" HorizontalAlignment="Left" Height="20" Margin="5,5,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="137.5" ToolTip="Course Name" FontWeight="Normal"/>
+                <Button x:Name="AddCourse" Content="Add Course" HorizontalAlignment="Left" Height="25" Margin="5,30,0,0" VerticalAlignment="Top" Width="137.5" ToolTip="Add Course" Click="AddCourse_Click" FontWeight="Normal"/>
+                <Button x:Name="SearchCourse" Content="Search" HorizontalAlignment="Left" Height="25" Margin="5,60,0,0" VerticalAlignment="Top" Width="137.5" ToolTip="Search for Course" Click="SearchCourse_Click" FontWeight="Normal"/>
+
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+
+</Window>
+
+
