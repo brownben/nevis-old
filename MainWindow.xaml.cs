@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Documents;
 using System.Windows.Controls;
+using System.Xml;
 
 namespace RocketDownload
 {
@@ -55,23 +56,25 @@ namespace RocketDownload
         {
             public int Id { get; set; }
             public string Name { get; set; }
+            public string Distance { get; set; }
+            public string Climb { get; set; }
             public string[] ControlCodes { get; set; }
 
         }
         private void reader_DeviceConfigurationRead(object sender, StationConfigurationEventArgs e)
         {
-            writeLogColor(listboxLog, "-----  Connected to Station  -----", "#0000ff");
+           writeLogColor(listboxLog, "-----  Connected to Station  -----", "#0000ff");
 
         }
 
         private void reader_InputDeviceStateChanged(object sender, ReaderDeviceStateChangedEventArgs e)
         {
-            //writeLog("InputDeviceStateChanged: " + e.PreviousState + " => " + e.CurrentState);
+           // writeLogColorNL(listboxLog, "InputDeviceStateChanged: " + e.PreviousState + " => " + e.CurrentState, "#0000ff");
         }
 
         private void reader_InputDeviceChanged(object sender, ReaderDeviceChangedEventArgs e)
         {
-            //writeLog("InputDeviceChanged: " + e.PreviousDevice + " => " + e.CurrentDevice);
+            //writeLogColorNL(listboxLog, "InputDeviceChanged: " + e.PreviousDevice + " => " + e.CurrentDevice, "#0000ff");
         }
 
 
@@ -88,11 +91,11 @@ namespace RocketDownload
             foreach (ReaderDeviceInfo device in ReaderDeviceInfo.AvailableDevices)
             {
                 comboboxPortsList.Items.Add(device);
-                //writeLog("Adding device:" + device.DeviceName);
+            
             }
             if (comboboxPortsList.Items.Count > 0)
             {
-                //writeLog("Found " + comboboxPortsList.Items.Count + " devices");
+                
                 comboboxPortsList.SelectedIndex = 0;
             }
             else
@@ -497,14 +500,25 @@ namespace RocketDownload
         {
             using (var db = new LiteDatabase(@databaselocation))
             {
+                var course = "";
                 resultsClear();
                 var entries = db.GetCollection<Entry>("entries");
-                var results = entries.Find(Query.EQ("Downloaded", true));
+                var results = entries.Find(Query.EQ("Downloaded", true)).OrderBy(x => x.Course);
                 var resultlist = from result in results select result;
 
                 foreach (var result in resultlist)
                 {
-                    resultsLog(Convert.ToString(result.Sicard + " - " + result.Name + " - " + result.Course + " - " + result.Time));
+                    if(result.Course != course)
+                    {
+                        resultsLog(result.Course+":");
+                        resultsLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Course + " - " + result.Time));
+                        course = result.Course;
+                    }
+                    else
+                    {
+                        resultsLog(Convert.ToString("    "+result.Sicard + " - " + result.Name +" - " + result.Time));
+
+                    }
                 }
             }
         }
@@ -562,6 +576,8 @@ namespace RocketDownload
                     {
                         Name = name,
                         ControlCodes = controls.ToArray(),
+                        Climb = CourseClimb.Text,
+                        Distance = CourseDistance.Text,
                     };
 
                     course1.Id = result.Id;
@@ -575,6 +591,8 @@ namespace RocketDownload
                     {
                         Name = name,
                         ControlCodes = controls.ToArray(),
+                        Climb = CourseClimb.Text,
+                        Distance = CourseDistance.Text,
                     };
                     courses.Insert(course1);
 
@@ -582,43 +600,108 @@ namespace RocketDownload
                 }
 
                 CourseName.Text = "";
+                CourseDistance.Text = "";
+                CourseClimb.Text = "";
                 textCourseNos.Text = "";
             }
         }
 
         private void SearchCourse_Click(object sender, RoutedEventArgs e)
         {
+            CourseDistance.Text = "";
+            CourseClimb.Text = "";
+            textCourseNos.Text = "";
             using (var db = new LiteDatabase(@databaselocation))
             {
 
                 var courses = db.GetCollection<Course>("courses");
+
                 var results = courses.Find(Query.EQ("Name", CourseName.Text));
                 var resultlist = from result in results select result;
+                var text = "";
+
                 foreach (var result in resultlist)
                 {
                     CourseName.Text = result.Name;
+                    CourseClimb.Text = result.Climb;
+                    CourseDistance.Text = result.Distance;
+
+                      
                     textCourseNos.Text = "";
                     foreach (var control in result.ControlCodes)
                     {
-                        textCourseNos.AppendText(control + "\n");
+                        text+=control + "\n";
+
                     }
+                    
+                    textCourseNos.Text = text;
+                    break;
                 }
+                
 
 
 
             }
         }
-
-        private void writeLog(string text)
+        private void AddXMLCourse_Click(object sender, RoutedEventArgs e)
         {
-            comboboxPortsList.Dispatcher.Invoke(() =>
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.CheckFileExists = true;
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Title = "Open Courses from IOF 3.0 XML";
+            openFileDialog.Filter = "XML File (*.xml)|*.xml|All files (*.*)|*.*";
+            if (openFileDialog.ShowDialog() == true)
             {
-                listboxLog.AppendText(text + "\n");
-                listboxLog.ScrollToEnd();
+                using (var db = new LiteDatabase(@databaselocation))
+                {
+                    var courses = db.GetCollection<Course>("courses");
+                    var xmlfile = openFileDialog.FileName;
+                XmlDocument doc = new XmlDocument();
+                doc.Load(xmlfile);
 
-            });
+                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                {
+                        if (node.Name == "RaceCourseData")
+                        {
+                            foreach (XmlNode node1 in node.ChildNodes)
+                            {
+                                if (node1.Name == "Course")
+                                {
+                                    var course2 = new Course { };
+                                    List<string> controls = new List<string>();
+                                    course2.Name = node1["Name"].InnerText;
+                                    var thousand = Convert.ToInt32(node1["Length"].InnerText) / 1000;
+                                    CourseDistance.Text = Convert.ToString(thousand) + "." + Convert.ToString(Convert.ToInt32(node1["Length"].InnerText) - thousand * 1000);
 
+                                    course2.Climb = node1["Climb"].InnerText;
+                                    foreach (XmlNode node2 in node1.ChildNodes)
+                                    {
+
+                                        if (node2.Name == "CourseControl")
+                                        {
+                                            if (node2["Control"].InnerText != "S" )
+                                            {
+                                                if (node2["Control"].InnerText != "F")
+                                                {
+                                                    controls.Add(node2["Control"].InnerText);
+                                                }
+
+                                            }
+
+                                        }
+                                    };
+                                    course2.ControlCodes = controls.ToArray();
+                                    courses.Insert(course2);
+                                    textCourseNos.AppendText("Added Course: "+course2.Name+"\n");
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
+
         private void writeLogColorNL(RichTextBox box, string text, string color)
         {
             listboxLog.Dispatcher.Invoke(() =>
