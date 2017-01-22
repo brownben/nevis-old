@@ -48,8 +48,8 @@
 
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Database" Header="Database" HorizontalAlignment="Left" Height="85" Margin="320,475,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" BorderThickness="1">
-            <Grid Margin="0,0,10,10" >
+        <GroupBox x:Name="Database" Header="Database" HorizontalAlignment="Left" Height="85" Margin="320,475,10,10" VerticalAlignment="Top" Width="300" FontWeight="Bold" BorderThickness="1">
+            <Grid Margin="0,0,0,-2.66" >
                 <TextBox x:Name="textDatabase" HorizontalAlignment="Left" Height="20" Margin="10,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="172" IsEnabled="False" FontWeight="Normal" ToolTip="Browse for Database"/>
                 <Button x:Name="DatabaseConnect" Content="Browse " HorizontalAlignment="Center" Height="23" Margin="188,4,5,0" VerticalAlignment="Top" Width="95" Click="browse_Click" FontWeight="Normal" ToolTip="Database Location" />
 
