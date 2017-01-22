@@ -5,20 +5,20 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RocketDownload"
         mc:Ignorable="d"
-        Title="RocketDownload"  Icon="favicon.ico" Foreground="#FF2D2020" Height="556" Width="653.333" WindowStyle="ThreeDBorderWindow">
+        Title="RocketDownload"  Icon="favicon.ico"  Height="621" Width="653.333" SizeToContent="WidthAndHeight">
+
     <Grid Margin="0,0,0,0">
 
-        <GroupBox x:Name="Download" Header="Download" HorizontalAlignment="Left" Height="215" Margin="10,5,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" Grid.Column="1">
+        <GroupBox x:Name="Download" Header="Download" HorizontalAlignment="Left" Height="215" Margin="10,10,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" Grid.Column="1">
             <Grid>
                 <ComboBox x:Name="comboboxPortsList" HorizontalAlignment="Left" Height="25" Margin="5,5,0,0" VerticalAlignment="Top" Width="280" ToolTip="Port" Panel.ZIndex="1" FontWeight="Normal" />
                 <Button x:Name="buttonRefresh" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="5,35,0,0" VerticalAlignment="Top" Width="135" Click="buttonRefresh_Click" Panel.ZIndex="1" FontWeight="Normal" ToolTip="Refresh Ports List"/>
                 <Button x:Name="buttonConnect" Content="Connect" HorizontalAlignment="Left" Height="25" Margin="150,35,0,0"  VerticalAlignment="Top" Click="buttonConnect_Click" Width="135" Panel.ZIndex="1" FontWeight="Normal" ToolTip="Connect to Station" />
                 <RichTextBox x:Name="listboxLog" HorizontalAlignment="Left" Height="123" Margin="5,65,0,0"  VerticalAlignment="Top" Width="280" Panel.ZIndex="1" FontWeight="Normal"/>
-
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Entries" Header="Entries" HorizontalAlignment="Left" Height="235" Margin="330,5,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" Grid.Column="2">
-            <Grid Margin="0,0,0,-8">
+        <GroupBox x:Name="Entries" Header="Entries" HorizontalAlignment="Left" Height="235" Margin="320,10,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" Grid.Column="2">
+            <Grid >
                 <TextBox x:Name="textName" HorizontalAlignment="Left" Height="20" Margin="85,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Name" FontWeight="Normal"/>
                 <TextBox x:Name="textSI" HorizontalAlignment="Left" Height="20" Margin="85,30,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="SI Card Number" FontWeight="Normal"/>
                 <TextBox x:Name="textCourse" HorizontalAlignment="Left" Height="20" Margin="85,55,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="200" ToolTip="Course" FontWeight="Normal"/>
@@ -39,20 +39,27 @@
 
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Results" Header="Results" HorizontalAlignment="Left" Height="265" Margin="10,220,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
-            <Grid>
+        <GroupBox x:Name="Results" Header="Results" HorizontalAlignment="Left" Height="260" Margin="10,225,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+            <Grid Margin="0,0,0,-8.333">
                 <TextBox x:Name="textResults" HorizontalAlignment="Left" Height="203" Margin="5,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="280" FontWeight="Normal" />
-                <Button x:Name="refresh" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="4,213,0,0" VerticalAlignment="Top" Width="280" Click="refresh_Click" FontWeight="Normal"/>
+                <Button x:Name="refresh" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="147,213,0,0" VerticalAlignment="Top" Width="137" Click="refresh_Click" FontWeight="Normal"/>
+                <Button x:Name="refresh_Copy" Content="Refresh" HorizontalAlignment="Left" Height="25" Margin="147,213,0,0" VerticalAlignment="Top" Width="137" Click="refresh_Click" FontWeight="Normal"/>
+                <Button x:Name="htmlresults" Content="Create HTML Results" HorizontalAlignment="Left" Height="25" Margin="5,213,0,0" VerticalAlignment="Top" Width="137.5" FontWeight="Normal" Click="htmlresults_Click" ToolTip="Make sure everyone has a course"/>
 
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Database" Header="Database" HorizontalAlignment="Left" Height="50" Margin="330,245,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
-            <Grid Margin="0,0,0,0">
-                <Button x:Name="DatabaseConnect" Content="Browse" HorizontalAlignment="Left" Height="20" Margin="205,5,0,0" VerticalAlignment="Top" Width="81" Click="browse_Click" FontWeight="Normal" ToolTip="Database Location" />
-                <TextBox x:Name="textDatabase" HorizontalAlignment="Left" Height="20" Margin="5,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="195" IsEnabled="False" FontWeight="Normal" ToolTip="Browse for Database"/>
+        <GroupBox x:Name="Database" Header="Database" HorizontalAlignment="Left" Height="85" Margin="320,475,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold" BorderThickness="1">
+            <Grid Margin="0,0,0,-2.667" >
+                <TextBox x:Name="textDatabase" HorizontalAlignment="Left" Height="20" Margin="10,5,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="172" IsEnabled="False" FontWeight="Normal" ToolTip="Browse for Database"/>
+                <Button x:Name="DatabaseConnect" Content="Browse " HorizontalAlignment="Center" Height="23" Margin="188,4,5,0" VerticalAlignment="Top" Width="95" Click="browse_Click" FontWeight="Normal" ToolTip="Database Location" />
+
+                <TextBox x:Name="backupNo" HorizontalAlignment="Left" Height="20" Margin="74,36,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="108" FontWeight="Normal" ToolTip="Backup Database" IsEnabled="False"/>
+                <Button x:Name="backupButton" Content="Backup Database" HorizontalAlignment="Center" Height="23" Margin="188,35,5,0" VerticalAlignment="Top" Width="95" Click="backupButton_Click" FontWeight="Normal" />
+                <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,36,0,0" TextWrapping="Wrap" Text="Backup ID:" VerticalAlignment="Top" FontWeight="Normal"/>
+
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="Courses" Header="Courses" HorizontalAlignment="Left" Height="220" Margin="330,295,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
+        <GroupBox x:Name="Courses" Header="Courses" HorizontalAlignment="Left" Height="220" Margin="320,250,0,0" VerticalAlignment="Top" Width="300" FontWeight="Bold">
             <Grid>
                 <TextBox x:Name="textCourseNos" AcceptsReturn="True" HorizontalAlignment="Left" Height="178" Margin="149,15,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="135" ToolTip="Control Numbers" FontWeight="Normal"/>
                 <TextBox x:Name="CourseName" HorizontalAlignment="Left" Height="20" Margin="5,15,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="138" ToolTip="Course Name" FontWeight="Normal" AutomationProperties.IsRequiredForForm="True"/>

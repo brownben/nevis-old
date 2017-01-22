@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Documents;
 using System.Windows.Controls;
 using System.Xml;
+using System.IO;
+
 
 namespace RocketDownload
 {
@@ -29,6 +31,8 @@ namespace RocketDownload
                 WriteBackupFile = true,
                 BackupFileName = System.IO.Path.Combine(Environment.CurrentDirectory, $@"backup\{DateTime.Now:yyyy-MM-dd}_stamps.bak")
             };
+            backupNo.IsEnabled = false;
+            backupButton.IsEnabled = false;
             Download.IsEnabled = false;
             Results.IsEnabled = false;
             Entries.IsEnabled = false;
@@ -61,6 +65,8 @@ namespace RocketDownload
             public string[] ControlCodes { get; set; }
 
         }
+
+
         private void reader_DeviceConfigurationRead(object sender, StationConfigurationEventArgs e)
         {
            writeLogColor(listboxLog, "-----  Connected to Station  -----", "#0000ff");
@@ -119,6 +125,7 @@ namespace RocketDownload
 
 
 
+
         }
 
         private void disconnect()
@@ -162,8 +169,7 @@ namespace RocketDownload
             complete = 0;
             var i = 0;
             var j = 0;
-
-
+            
             using (var db = new LiteDatabase(@databaselocation))
             {
                 var done = 0;
@@ -191,8 +197,7 @@ namespace RocketDownload
                                 {
                                     if (Convert.ToString(card.ControlPunchList.ElementAtOrDefault(j)).Split(';')[1] == controllist[i])
                                     {
-
-                                    }
+                                     }
 
                                     else if (Convert.ToString(card.ControlPunchList.ElementAtOrDefault(j)).Split(';')[1] == controllist[i + 1])
                                     {
@@ -368,7 +373,7 @@ namespace RocketDownload
                     var entry1 = new Entry
                     {
                         Name = card.PersonalData.FirstName + ' ' + card.PersonalData.LastName,
-                        Course = "",
+                        Course = "Unknown",
                         Class = "",
                         Club = "",
                         Start = "",
@@ -503,13 +508,16 @@ namespace RocketDownload
                 var course = "";
                 resultsClear();
                 var entries = db.GetCollection<Entry>("entries");
-                var results = entries.Find(Query.EQ("Downloaded", true)).OrderBy(x => x.Course);
+                var results = entries.Find(Query.EQ("Downloaded", true)).OrderBy(x => x.Course).ThenBy(x => x.Time);
                 var resultlist = from result in results select result;
 
                 foreach (var result in resultlist)
                 {
                     if(result.Course != course)
                     {
+                        if (result.Course == "") {
+                            result.Course = "Unknown";
+                        };
                         resultsLog(result.Course+":");
                         resultsLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Course + " - " + result.Time));
                         course = result.Course;
@@ -539,10 +547,96 @@ namespace RocketDownload
                 Results.IsEnabled = true;
                 Entries.IsEnabled = true;
                 Courses.IsEnabled = true;
-            }
+                backupNo.IsEnabled = true;
+                backupButton.IsEnabled = true;
 
+
+            }
         }
 
+        private void htmlresults_Click(object sender, RoutedEventArgs e)
+        {
+
+            var eventname = Path.GetFileNameWithoutExtension(databaselocation);
+            var style = "<style>footer,header{width:100%;box-shadow:rgba(0,0,0,.156863) 0 2px 5px 0,rgba(0,0,0,.117647) 0 2px 10px 0;text-align:center}*{margin:0}header{background-color:#1e88e5;top:0;padding-top:.5%;padding-bottom:.5%}body,html{margin:0;padding:0;height:100%;width:100%;font-family:Roboto,Segoe-UI,San-Francisco,sans-serif}footer{background-color:#1976d2;bottom:0}footer p{padding:10px;color:#fff}#course-info{margin-top:.5%}@media(max-width:550px){#page-title,h1{font-weight:500}main{width:90%;margin-left:5%}td,th,tr{border-bottom:1px solid #d0d0d0;padding:3%;text-align:left!important}h1{margin-top:3%}#page-title{color:#fff;margin:0;padding:0}}@media(min-width:550px){#page-title,h1{font-weight:500}main{width:90%;margin-left:5%}td,th,tr{border-bottom:1px solid #d0d0d0;padding:1%;text-align:left!important}h1{margin-top:1%}#page-title{color:#fff;margin:0;padding:0}}table{width:98%;margin-top:1%;margin-bottom:3%;border-collapse:collapse;border-spacing:0;border-radius:5px;margin-left:1%}tr{transition:background-color .5s ease}th{font-weight:700;text-align:left}tr:hover{background-color:#e8e8e8}th{border-bottom:1.25px solid #d0d0d0}</style>";
+            DateTime date = DateTime.Now;
+            var head = $"<!DOCTYPE HTML><html lang=\"en\"><head> <title>{eventname} - Results</title> <meta charset=\"utf - 8\"> <meta name=\"description\" content=\"Results for {eventname}\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1,minimum-scale=1\">  {style}</head><body> <header> <h1 id=\"page-title\">{eventname} - Results</h1> </header> <main>";
+            var footer = $"</table></div></main> <footer> <p>Results compiled on {date.ToString("dd/MM/yyyy")} at {date.ToString("H:mm")} using RocketDownload</p></footer></body></html>";
+            var resultswrite = "";
+            using (var db = new LiteDatabase(@databaselocation))
+            {
+                var course = "";
+                var entries = db.GetCollection<Entry>("entries");
+                var results = entries.Find(Query.EQ("Downloaded", true)).OrderBy(x => x.Course).ThenBy(x => x.Time);
+                var resultlist = from result in results select result;
+                var a = 1;
+                var distance = "";
+                var climb = "";
+                foreach (var result in resultlist)
+                {
+                    if (result.Course == "") { }
+                    else if (result.Course != course)
+                    {
+                        if (a == 1)
+                        {
+                            var courses = db.GetCollection<Course>("courses");
+
+                            var results1 = courses.Find(Query.EQ("Name", result.Course));
+                            var resultlist1 = from result1 in results1 select result1;
+
+                            foreach (var result1 in resultlist1)
+                            {
+                                distance = result1.Distance;
+                                climb = result1.Climb;
+                                break;
+                            }
+                            resultswrite += $" <div class=\"course\"> <h1 id=\"course-title\">{result.Course}</h1> <p id=\"course-info\"> {distance}km {climb}m</p><table><tr> <th>Pos.</th> <th>Name</th> <th>Club</th> <th>Class</th> <th>Time</th> </tr> ";
+                            resultswrite += $"<tr> <td> {a}</td><td> {result.Name}</td><td> {result.Club} </td><td> {result.Class} </td><td>{result.Time} </td></tr>";
+                        }
+                        else
+                        {
+                            var courses = db.GetCollection<Course>("courses");
+
+                            var results1 = courses.Find(Query.EQ("Name", result.Course));
+                            var resultlist1 = from result1 in results1 select result1;
+                            if (result.Course != "Unknown") {
+                                foreach (var result1 in resultlist1)
+                                {
+                                    distance = result1.Distance;
+                                    climb = result1.Climb;
+                                    break;
+                                }
+                                a = 1;
+                                resultswrite += $" </table></div><div class=\"course\"> <h1 id=\"course-title\">{result.Course}</h1> <p id=\"course-info\"> {distance}km {climb}m</p><table><tr> <th>Pos.</th> <th>Name</th> <th>Club</th> <th>Class</th> <th>Time</th> </tr> ";
+                                resultswrite += $"<tr> <td> {a}</td><td> {result.Name}</td><td> {result.Club} </td><td> {result.Class} </td><td>{result.Time} </td></tr>";
+
+
+                            }
+                            else
+                            {
+                                resultswrite += $" </table></div><div class=\"course\"> <h1 id=\"course-title\">{result.Course}</h1><table><tr> <th>Pos.</th> <th>Name</th> <th>Club</th> <th>Class</th> <th>Time</th> </tr> ";
+                                resultswrite += $"<tr> <td> {a}</td><td> {result.Name}</td><td> {result.Club} </td><td> {result.Class} </td><td>{result.Time} </td></tr>";
+                            }
+
+                        }
+                        course = result.Course;
+                        a += 1;
+                    }
+                    else
+                    {       
+                        resultswrite += $"<tr> <td> {a}</td><td> {result.Name}</td><td> {result.Club} </td><td> {result.Class} </td><td>{result.Time} </td></tr>";
+                        a += 1;
+                    }
+                }
+            }
+            var text = head + resultswrite + footer;
+            File.WriteAllText(@databaselocation.Split('.')[0] + ".html", text);
+            resultsLog("\nFile Written to: " + databaselocation.Split('.')[0] + ".html");
+
+
+
+
+        }
         private void AddCourse_Click(object sender, RoutedEventArgs e)
         {
             var name = CourseName.Text;
@@ -738,7 +832,7 @@ namespace RocketDownload
             comboboxPortsList.Dispatcher.Invoke(() =>
             {
                 textResults.AppendText(text + "\n");
-                textResults.ScrollToEnd();
+
 
             });
 
@@ -753,8 +847,16 @@ namespace RocketDownload
 
         }
 
-
-
+        private void backupButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (backupNo.Text == null)
+            {
+                backupNo.Text = "-backup";
+            }
+            var newloc = databaselocation.Split('.')[0]+"-backup"+backupNo.Text+".db";
+            File.Copy(databaselocation, newloc);
+            backupNo.Text = "-- Backed Up --";
+        }
     }
 }
 
