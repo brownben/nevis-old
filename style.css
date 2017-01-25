@@ -56,6 +56,7 @@ padding-right:.5rem;
             color: white;
             background-image: url(sky.png);
             text-align: center;
+		font-family:Roboto, Segoe Ui, Sans-Serif;
         }
         a {color:white;  vertical-align:center;text-decoration:underline;margin-right:20px;margin-bottom:20px;  font-weight: normal;
   font-style: normal;
