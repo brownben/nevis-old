@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/master/favicon.ico" width="100">
+<img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/gh-pages/favicon.ico" width="100">
 # RocketDownload
 
 A simple application to read punches from a SportIdent station to create results for Orienteering Events.
