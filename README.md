@@ -1,3 +1,5 @@
+  <link rel="stylesheet" href="./style.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 <img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/gh-pages/favicon.ico" width="100">
 # RocketDownload
 
