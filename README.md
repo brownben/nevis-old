@@ -1,7 +1,7 @@
 <img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/gh-pages/favicon.ico" width="100">
 # RocketDownload
 
-### A Simple, Fast, Easy Results Program for the SportIdent Timing System
+#### A Simple, Fast, Easy Results Program for the SportIdent Timing System
 
 A simple application to read punches from a SportIdent station to create results for Orienteering Events built for Windows.
 
