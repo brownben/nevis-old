@@ -1,5 +1,5 @@
-  <link rel="stylesheet" href="./style.css">
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 ## MIT License
 
 > Copyright (c) 2016 Bonalybob
