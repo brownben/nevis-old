@@ -32,8 +32,9 @@
 body {
     width: 100%;
     height: 100%;
-    font-family: Roboto, Segoe Ui, Sans-Serif;
+    font-family: Roboto, Segoe UI, Sans-Serif;
 	box-sizing:border-box;
+	margin:0px;
 }
 #space {
     background-color: #150f49;
@@ -44,7 +45,7 @@ body {
     color: white;
     background-image: url(sky.png);
     text-align: center;
-    font-family: Roboto, Segoe Ui, Sans-Serif;
+    font-family: Roboto, Segoe UI, Sans-Serif;
     box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.3)
 }
 .btn {
@@ -159,4 +160,4 @@ main{margin-top:3%; margin-bottom:2%;}
 .rd i {display:block;width:100%;line-height:100px;margin-bottom:5px;}
 .rd p{font-size:16px;line-height:20px;}
 @media(max-width:650px){.rd{width:92%;padding-left:4%;padding-right:4%;}footer p{padding:2%;}}
-
+.l{ height:100%;background-color:#150f49; color: white; background-image: url(sky.png);font-family: Roboto, Segoe UI, Sans-Serif;text-align:center;padding:4%;}
