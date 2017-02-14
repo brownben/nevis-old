@@ -1102,7 +1102,7 @@ namespace RocketDownload
                 if (textName.Text == "")
                 {
                     var archives = db.GetCollection<Archive>("archive");
-                    var results = archives.Find(Query.Contains("Sicard", textSI.Text));
+                    var results = archives.Find(Query.EQ("Sicard", textSI.Text));
                     var resultlist = from result in results select result;
                     foreach (var result in resultlist)
                     {
@@ -1116,7 +1116,7 @@ namespace RocketDownload
                 else if (textSI.Text == "")
                 {
                     var entries = db.GetCollection<Archive>("archive");
-                    var results = entries.Find(Query.EQ("Name", textName.Text));
+                    var results = entries.Find(Query.Contains("Name", textName.Text));
                     var resultlist = from result in results select result;
                     foreach (var result in resultlist)
                     {
