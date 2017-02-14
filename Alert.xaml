@@ -1,0 +1,15 @@
+﻿<Window x:Class="RocketDownload.Alert"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RocketDownload"
+        mc:Ignorable="d"
+        Title="Alert" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Icon="favicon.ico" Topmost="True" FontSize="14" Height="113.333" ShowInTaskbar="False">
+    <Grid>
+        <Button x:Name="OK" Content="OK" Height="25" Margin="0,35,10,10" Width="97" Click="OK_Click" HorizontalAlignment="Right" ClickMode="Press" IsDefault="True" FontSize="12" VerticalAlignment="Top" IsCancel="True"/>
+
+        <TextBlock x:Name="textBlock" Margin="10,10,10,0" TextWrapping="Wrap" Text="Backed database up to: c:\\Hello\file\location" VerticalAlignment="Top" FontSize="12"/>
+        
+    </Grid>
+</Window>

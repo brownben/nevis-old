@@ -24,6 +24,7 @@ namespace RocketDownload
         public int complete = 0;
         public MainWindow()
         {
+
             InitializeComponent();
             reader = new Reader
             {
@@ -38,7 +39,17 @@ namespace RocketDownload
             Courses.IsEnabled = false;
             SafetyCheck.IsEnabled = false;
             backupidlabel.IsEnabled = false;
-
+            archive.IsEnabled = false;
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UIMessage.Visibility = Visibility.Visible;
+            UIMessage.Text = "Please go to Settings to select your database";
+            UITitle.Text = "Welcome to RocketDownload!";
+ 
             comboboxPortsList.Items.Add("Ports List");
             comboboxPortsList.SelectedIndex = 0;
             reader.DeviceConfigurationRead += new DeviceConfigurationReadEventHandler(reader_DeviceConfigurationRead);
@@ -46,6 +57,7 @@ namespace RocketDownload
             reader.InputDeviceStateChanged += new ReaderDeviceStateChangedEventHandler(reader_InputDeviceStateChanged);
             reader.CardRead += new SPORTident.DataReadCompletedEventHandler(reader_CardRead);
         }
+
         public class Entry
         {
             public int Id { get; set; }
@@ -68,6 +80,15 @@ namespace RocketDownload
             public string Distance { get; set; }
             public string Climb { get; set; }
             public string[] ControlCodes { get; set; }
+
+        }
+        public class Archive
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Sicard { get; set; }
+            public string Club { get; set; }
+            public string Class { get; set; }
 
         }
 
@@ -127,7 +148,7 @@ namespace RocketDownload
             comboboxPortsList.IsEnabled = false;
             buttonRefresh.IsEnabled = false;
             buttonConnect.IsEnabled = false;
-
+            
 
 
 
@@ -451,8 +472,8 @@ namespace RocketDownload
                         Sicard = si,
                         Time = "",
                         Downloaded = false,
-                        LastSeenAt="",
-                        LastSeenTime=""
+                        LastSeenAt = "",
+                        LastSeenTime = ""
                     };
 
                     entries.Insert(entry1);
@@ -555,7 +576,8 @@ namespace RocketDownload
             openFileDialog.Filter = "Database File (*.db)|*.db|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                textDatabase.Text = openFileDialog.FileName;
+                textDatabase.ToolTip = "Database: "+openFileDialog.FileName;
+                databaselocation1.Text = openFileDialog.FileName;
                 databaselocation = openFileDialog.FileName;
                 Download.IsEnabled = true;
                 Results.IsEnabled = true;
@@ -565,6 +587,7 @@ namespace RocketDownload
                 backupButton.IsEnabled = true;
                 SafetyCheck.IsEnabled = true;
                 backupidlabel.IsEnabled = true;
+                archive.IsEnabled = true;
 
 
 
@@ -770,7 +793,7 @@ namespace RocketDownload
                     var xmlfile = openFileDialog.FileName;
                     XmlDocument doc = new XmlDocument();
                     doc.Load(xmlfile);
-
+                    var courseno = 0;
                     foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                     {
                         if (node.Name == "RaceCourseData")
@@ -804,12 +827,17 @@ namespace RocketDownload
                                     };
                                     course2.ControlCodes = controls.ToArray();
                                     courses.Insert(course2);
+                                    courseno = courseno + 1;
                                     textCourseNos.AppendText("Added Course: " + course2.Name + "\n");
 
                                 }
                             }
                         }
                     }
+                    Alert alert = new Alert();
+                    alert.Title = "";
+                    alert.textBlock.Text = courseno.ToString() + " Courses imported";
+                    alert.Show();
                 }
             }
         }
@@ -907,11 +935,15 @@ namespace RocketDownload
         {
             if (backupNo.Text == null)
             {
-                backupNo.Text = "-backup";
+                backupNo.Text = "1";
             }
-            var newloc = databaselocation.Split('.')[0] + "-backup" + backupNo.Text + ".db";
+            var newloc = databaselocation.Split('.')[0] + "-backup-" + backupNo.Text + ".db";
             File.Copy(databaselocation, newloc);
-            backupNo.Text = "-- Backed Up --";
+            Alert alert = new Alert();
+            alert.Title = "";
+            alert.textBlock.Text = "Database backed up to: " + newloc;
+            alert.Show();
+
         }
 
         private void EntriesRefresh_Click(object sender, RoutedEventArgs e)
@@ -929,12 +961,12 @@ namespace RocketDownload
                     if (result.Course != course)
                     {
                         entriesLog(result.Course + ":\n");
-                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + "\n"));
+                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + " - "+result.Club+"\n"));
                         course = result.Course;
                     }
                     else
                     {
-                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + "\n"));
+                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " +  result.Class + " - "+result.Club + "\n"));
 
                     }
                 }
@@ -944,6 +976,7 @@ namespace RocketDownload
         private void importsafety_Click(object sender, RoutedEventArgs e)
         {
             string line;
+            var counter = 0;
             safetyClear();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.CheckFileExists = true;
@@ -962,7 +995,7 @@ namespace RocketDownload
                             var entriesdata = db.GetCollection<Entry>("entries");
                             var results = entriesdata.Find(Query.EQ("Sicard", line.Split(',')[1]));
                             var resultlist = from result in results select result;
-                            
+
                             if (resultlist.ToArray().Length < 1)
                             {
                                 var entry = new Entry { };
@@ -970,6 +1003,7 @@ namespace RocketDownload
                                 entry.LastSeenAt = System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName);
                                 entry.LastSeenTime = Regex.Split(line.Split(',')[2], "   ")[1];
                                 entriesdata.Insert(entry);
+                                counter = counter + 1;
                                 safetyLog(System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName) + " - " + line.Split(',')[1] + " - " + Regex.Split(line.Split(',')[2], "   ")[1]);
 
                             }
@@ -988,6 +1022,7 @@ namespace RocketDownload
                                 entry.LastSeenTime = Regex.Split(line.Split(',')[2], "   ")[1];
                                 entry.Id = result.Id;
                                 entriesdata.Update(entry);
+                                counter = counter + 1;
                                 safetyLog(System.IO.Path.GetFileNameWithoutExtension(openFileDialog.FileName) + " - " + line.Split(',')[1] + " - " + Regex.Split(line.Split(',')[2], "   ")[1]);
                             }
 
@@ -996,6 +1031,10 @@ namespace RocketDownload
                 }
 
                 file.Close();
+                Alert alert = new Alert();
+                alert.Title = "";
+                alert.textBlock.Text = counter + " Punches imported as safety data";
+                alert.Show();
             };
         }
 
@@ -1009,7 +1048,7 @@ namespace RocketDownload
                 var resultlist = from result in results select result;
                 foreach (var result in resultlist)
                 {
-                    safetyLog(result.Name + " - " + result.Course + " - " + result.LastSeenAt + " - " + result.LastSeenTime);
+                    safetyLog(result.Name + " - " + result.Sicard + " - " + result.Course + " - " + result.LastSeenAt + " - " + result.LastSeenTime);
 
                 }
             }
@@ -1020,7 +1059,193 @@ namespace RocketDownload
             LiveResults liveresults = new LiveResults();
             liveresults.Show();
         }
+        private void archive_Click(object sender, RoutedEventArgs e)
+        {
+            using (var db = new LiteDatabase(@databaselocation))
+            {
+                string line;
+                var counter = 0;
+                safetyClear();
+                var archive = db.GetCollection<Archive>("archive");
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.CheckFileExists = true;
+                openFileDialog.CheckPathExists = true;
+                openFileDialog.Title = "Open SiCard Archive";
+                openFileDialog.Filter = "CSV File(*.csv)|*.csv|All files (*.*)|*.*";
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line != "\"CardNumber\",\"CardLabel\",\"CardStatus\",\"Name\",\"Sex\",\"DateOfBirth\",\"MembershipNo\",\"Club\"")
+                        {
+                            var archives = new Archive();
+                            archives.Sicard = line.Split(',')[0];
+                            archives.Name = line.Split(',')[3];
+                            archives.Club = line.Split(',')[7];
+                            archive.Insert(archives);
+                            counter = counter + 1;
+                        }
+
+                    }
+                    Alert alert = new Alert();
+                    alert.Title = "";
+                    alert.textBlock.Text = counter + " Cards imported from Archive";
+                    alert.Show();
+                }
+            }
+        }
+        private void ArchiveSearch_Click(object sender, RoutedEventArgs e)
+        {
+            using (var db = new LiteDatabase(databaselocation))
+            {
+                if (textName.Text == "")
+                {
+                    var archives = db.GetCollection<Archive>("archive");
+                    var results = archives.Find(Query.Contains("Sicard", textSI.Text));
+                    var resultlist = from result in results select result;
+                    foreach (var result in resultlist)
+                    {
+                        textName.Text = result.Name;
+                        textSI.Text = result.Sicard;
+                        textClub.Text = result.Club;
+                        textClass.Text = result.Class;
+
+                    }
+                }
+                else if (textSI.Text == "")
+                {
+                    var entries = db.GetCollection<Archive>("archive");
+                    var results = entries.Find(Query.EQ("Name", textName.Text));
+                    var resultlist = from result in results select result;
+                    foreach (var result in resultlist)
+                    {
+                        textName.Text = result.Name;
+                        textSI.Text = result.Sicard;
+                        textClub.Text = result.Club;
+                        textClass.Text = result.Class;
+
+                    }
+                }
+
+
+            }
+        }
+        private void downloadButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Visible;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UITitle.Text = "Download";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255,35,35,162));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+           resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+        }
+
+        private void entriesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Visible;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UITitle.Text = "Entries";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+        }
+
+        private void resultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Visible;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UITitle.Text = "Results";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+        }
+
+        private void coursesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Visible;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UITitle.Text = "Courses";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+        }
+
+        private void safetyButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Hidden;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Visible;
+            UITitle.Text = "Safety Check";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+        }
+
+        private void settingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Download.Visibility = Visibility.Hidden;
+            Entries.Visibility = Visibility.Hidden;
+            Results.Visibility = Visibility.Hidden;
+            Database.Visibility = Visibility.Visible;
+            Courses.Visibility = Visibility.Hidden;
+            SafetyCheck.Visibility = Visibility.Hidden;
+            UITitle.Text = "Settings";
+            UIMessage.Visibility = Visibility.Hidden;
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+        }
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri));
+            e.Handled = true;
+        }
 
     }
-}
+    }
+
+        
 

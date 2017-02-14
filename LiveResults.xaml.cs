@@ -54,10 +54,11 @@ namespace RocketDownload
         }
         private void Startliveresults_Click(object sender, RoutedEventArgs e)
         {
+            this.Title = Courseentry.Text+" - Results";
             Startliveresults.Visibility = Visibility.Hidden;
             CourseName.Visibility = Visibility.Visible;
             Courseentry.Visibility = Visibility.Hidden;
-            databaselocation = ((MainWindow)Application.Current.MainWindow).textDatabase.Text;
+            databaselocation = ((MainWindow)Application.Current.MainWindow).databaselocation1.Text;
             CourseName.Text = Courseentry.Text;
             var myTimer = new Timer();
             // Tell the timer what to do when it elapses

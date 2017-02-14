@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <PublishUrlHistory>C:\Users\Ben\Dropbox\RocketDownload\Publish\|publish\</PublishUrlHistory>
-    <InstallUrlHistory>https://bonalybob.github.io/RocketDownload/</InstallUrlHistory>
+    <InstallUrlHistory>https://bonalybob.github.io/RocketDownload/|\\localhost\Users\Ben\Dropbox\RocketDownload\Publish\</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />
     <BootstrapperUrlHistory />
