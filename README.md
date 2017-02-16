@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/favicon.ico" width="100">
+<img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/master/favicon.ico" width="100">
 # RocketDownload
 
 #### A Simple, Fast, Easy Results Program for the SportIdent Timing System
