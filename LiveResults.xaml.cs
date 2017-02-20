@@ -5,7 +5,7 @@ using LiteDB;
 using System.Timers;
 
 
-namespace RocketDownload
+namespace Nevis
 {
     /// <summary>
     /// Interaction logic for LiveResults.xaml

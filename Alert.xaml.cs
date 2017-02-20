@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace RocketDownload
+namespace Nevis
 {
     /// <summary>
     /// Interaction logic for Alert.xaml

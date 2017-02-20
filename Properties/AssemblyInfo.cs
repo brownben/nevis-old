@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RocketDownload")]
+[assembly: AssemblyTitle("Nevis")]
 [assembly: AssemblyDescription("A Simple, Fast, Easy Results Program for the SportIdent Timing System")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RocketDownload.Properties")]
+[assembly: AssemblyProduct("Nevis.Properties")]
 [assembly: AssemblyCopyright("(c) 2017 Bonalybob")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

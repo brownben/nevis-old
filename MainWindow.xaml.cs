@@ -12,11 +12,9 @@ using LiteDB;
 using Microsoft.Win32;
 using System.Xml;
 using System.IO;
-namespace RocketDownload
+
+namespace Nevis
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public Reader reader;
@@ -47,9 +45,10 @@ namespace RocketDownload
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
             UIMessage.Visibility = Visibility.Visible;
+            textDatabase.ToolTip = "Please select a Database";
             UIMessage.Text = "Please go to Settings to select your database";
-            UITitle.Text = "Welcome to RocketDownload!";
- 
+            UITitle.Text = "Welcome to Nevis";
+
             comboboxPortsList.Items.Add("Ports List");
             comboboxPortsList.SelectedIndex = 0;
             reader.DeviceConfigurationRead += new DeviceConfigurationReadEventHandler(reader_DeviceConfigurationRead);
@@ -91,7 +90,12 @@ namespace RocketDownload
             public string Class { get; set; }
 
         }
-
+        public class Event
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public string Date { get; set; }
+        }
 
         private void reader_DeviceConfigurationRead(object sender, StationConfigurationEventArgs e)
         {
@@ -148,7 +152,7 @@ namespace RocketDownload
             comboboxPortsList.IsEnabled = false;
             buttonRefresh.IsEnabled = false;
             buttonConnect.IsEnabled = false;
-            
+
 
 
 
@@ -576,7 +580,7 @@ namespace RocketDownload
             openFileDialog.Filter = "Database File (*.db)|*.db|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                textDatabase.ToolTip = "Database: "+openFileDialog.FileName;
+                textDatabase.ToolTip = "Database: " + openFileDialog.FileName;
                 databaselocation1.Text = openFileDialog.FileName;
                 databaselocation = openFileDialog.FileName;
                 Download.IsEnabled = true;
@@ -601,7 +605,7 @@ namespace RocketDownload
             var style = "<style>footer,header{width:100%;box-shadow:rgba(0,0,0,.156863) 0 2px 5px 0,rgba(0,0,0,.117647) 0 2px 10px 0;text-align:center}*{margin:0}header{background-color:#1e88e5;top:0;padding-top:.5%;padding-bottom:.5%}body,html{margin:0;padding:0;height:100%;width:100%;font-family:Roboto,Segoe-UI,San-Francisco,sans-serif}footer{background-color:#1976d2;bottom:0}footer p{padding:10px;color:#fff}#course-info{margin-top:.5%}@media(max-width:550px){#page-title,h1{font-weight:500}main{width:90%;margin-left:5%}td,th,tr{border-bottom:1px solid #d0d0d0;padding:3%;text-align:left!important}h1{margin-top:3%}#page-title{color:#fff;margin:0;padding:0}}@media(min-width:550px){#page-title,h1{font-weight:500}main{width:90%;margin-left:5%}td,th,tr{border-bottom:1px solid #d0d0d0;padding:1%;text-align:left!important}h1{margin-top:1%}#page-title{color:#fff;margin:0;padding:0}}table{width:98%;margin-top:1%;margin-bottom:3%;border-collapse:collapse;border-spacing:0;border-radius:5px;margin-left:1%}tr{transition:background-color .5s ease}th{font-weight:700;text-align:left}tr:hover{background-color:#e8e8e8}th{border-bottom:1.25px solid #d0d0d0}</style>";
             DateTime date = DateTime.Now;
             var head = $"<!DOCTYPE HTML><html lang=\"en\"><head> <title>{eventname} - Results</title> <meta charset=\"utf - 8\"> <meta name=\"description\" content=\"Results for {eventname}\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1,minimum-scale=1\">  {style}</head><body> <header> <h1 id=\"page-title\">{eventname} - Results</h1> </header> <main>";
-            var footer = $"</table></div></main> <footer> <p>Results compiled on {date.ToString("dd/MM/yyyy")} at {date.ToString("H:mm")} using RocketDownload</p></footer></body></html>";
+            var footer = $"</table></div></main> <footer> <p>Results compiled on {date.ToString("dd/MM/yyyy")} at {date.ToString("H:mm:ss")} using Nevis</p></footer></body></html>";
             var resultswrite = "";
             using (var db = new LiteDatabase(@databaselocation))
             {
@@ -961,12 +965,12 @@ namespace RocketDownload
                     if (result.Course != course)
                     {
                         entriesLog(result.Course + ":\n");
-                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + " - "+result.Club+"\n"));
+                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + " - " + result.Club + "\n"));
                         course = result.Course;
                     }
                     else
                     {
-                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " +  result.Class + " - "+result.Club + "\n"));
+                        entriesLog(Convert.ToString("    " + result.Sicard + " - " + result.Name + " - " + result.Class + " - " + result.Club + "\n"));
 
                     }
                 }
@@ -1141,12 +1145,13 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Download";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255,35,35,162));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-           resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
         }
 
         private void entriesButton_Click(object sender, RoutedEventArgs e)
@@ -1159,12 +1164,14 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Entries";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
-            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+
         }
 
         private void resultsButton_Click(object sender, RoutedEventArgs e)
@@ -1177,12 +1184,14 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Results";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+
         }
 
         private void coursesButton_Click(object sender, RoutedEventArgs e)
@@ -1195,12 +1204,14 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Courses";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+
         }
 
         private void safetyButton_Click(object sender, RoutedEventArgs e)
@@ -1213,12 +1224,14 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Visible;
             UITitle.Text = "Safety Check";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+
         }
 
         private void settingsButton_Click(object sender, RoutedEventArgs e)
@@ -1231,21 +1244,188 @@ namespace RocketDownload
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Settings";
             UIMessage.Visibility = Visibility.Hidden;
-            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 24, 24, 120));
-            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 35, 35, 162));
+            downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
+            settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+
         }
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
+        private void AddXMLCompetitors_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.CheckFileExists = true;
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Title = "Open Entries from IOF 3.0 XML";
+            openFileDialog.Filter = "XML File (*.xml)|*.xml|All files (*.*)|*.*";
 
-    }
-    }
+            if (openFileDialog.ShowDialog() == true)
+            {
+                using (var db = new LiteDatabase(@databaselocation))
+                {
+                    var entries = db.GetCollection<Entry>("entries");
+                    var xmlfile = openFileDialog.FileName;
+                    XmlDocument doc = new XmlDocument();
+                    doc.Load(xmlfile);
+                    var courseno = 0;
+                    foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                    {
+                        if (node.Name == "PersonEntry")
+                        {
+                            var entry2 = new Entry { };
+                            var given = "";
+                            var family = "";
+                            foreach (XmlNode node1 in node.ChildNodes)
+                            {
+                                if (node1.Name == "Person")
+                                {
+                                    foreach (XmlNode node2 in node1.ChildNodes)
+                                    {
+                                        if (node2.Name == "Name")
+                                        {
+                                            foreach (XmlNode node3 in node2.ChildNodes)
+                                            {
+                                                if (node3.Name == "Given")
+                                                {
+                                                    given = node3.InnerText;
+                                                }
+                                                if (node3.Name == "Family")
+                                                {
+                                                    family = node3.InnerText;
+                                                }
+                                            }
+                                            entry2.Name = given + " " + family;
+                                        }
+                                    }
+                                }
+                                if (node1.Name == "ControlCard") { entry2.Sicard = node1.InnerText; }
+                                if (node1.Name == "Organisation") { entry2.Club = node1["Name"].InnerText; }
+                                if (node1.Name == "Class") { entry2.Course = node1["Name"].InnerText; }
+                            }
+                            if (entry2.Sicard == null)
+                            {
+                                entriesLog(entry2.Name + " needs to hire a SiCard");
+                                entry2.Sicard = "Hire";
+                            }
+                            entries.Insert(entry2);
+                            courseno = courseno + 1;
 
-        
+                        }
+
+
+                    }
+
+
+                    Alert alert = new Alert();
+                    alert.Title = "";
+                    alert.textBlock.Text = courseno.ToString() + " Entries imported";
+                    alert.Show();
+
+
+                }
+            }
+        }
+
+        private void xmlresults_Click(object sender, RoutedEventArgs e)
+        {
+
+            var eventname = System.IO.Path.GetFileNameWithoutExtension(databaselocation);
+            DateTime date = DateTime.Now;
+            var head = $"< Event xmlns: xsd = \"http://www.w3.org/2001/XMLSchema\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance\" CreatedBy = \"Nevis\" Date = \"\" > < Name >{eventname}</ Name >< Date >{date.ToString("dd-MM-yyyy H:mm:ss")}</ Date ><Results>";
+            var footer = "</Event>";
+            var resultswrite = "";
+            using (var db = new LiteDatabase(@databaselocation))
+            {
+                var course = "";
+                var entries = db.GetCollection<Entry>("entries");
+                var results = entries.Find(Query.EQ("Downloaded", true)).OrderBy(x => x.Course).ThenBy(x => x.Time);
+                var resultlist = from result in results select result;
+                var a = 1;
+                var distance = "";
+                var climb = "";
+                foreach (var result in resultlist)
+                {
+
+                    if (result.Course != course)
+                    {
+                        if (a == 1)
+                        {
+                            var courses = db.GetCollection<Course>("courses");
+
+                            var results1 = courses.Find(Query.EQ("Name", result.Course));
+                            var resultlist1 = from result1 in results1 select result1;
+
+                            foreach (var result1 in resultlist1)
+                            {
+                                distance = result1.Distance;
+                                climb = result1.Climb;
+                                break;
+                            }
+                            if (resultswrite != "")
+                            {
+                                resultswrite += $" </CourseResults> <CourseResults Name=\"{ result.Course}\" Distance=\"{distance} \" Climb=\"{ climb} \"> ";
+                                resultswrite += $" <Person>< Name >{ result.Name} </ Name > < Position > { a}</ Position > < Club > { result.Club} </ Club >< Class > { result.Time} </ Class > < SiCard > { result.Sicard} </ SiCard > < Time > { result.Time} </ Time ></Person>";
+                            }
+                            else
+                            {
+                                resultswrite += $" <CourseResults Name=\"{ result.Course}\" Distance=\"{distance} \" Climb=\"{ climb} \"> ";
+                                resultswrite += $" <Person>< Name >{ result.Name} </ Name > < Position > { a}</ Position > < Club > { result.Club} </ Club >< Class > { result.Time} </ Class > < SiCard > { result.Sicard} </ SiCard > < Time > { result.Time} </ Time ></Person>";
+                            }
+                        }
+                        else
+                        {
+                            var courses = db.GetCollection<Course>("courses");
+
+                            var results1 = courses.Find(Query.EQ("Name", result.Course));
+                            var resultlist1 = from result1 in results1 select result1;
+                            if (result.Course != "Unknown")
+                            {
+                                foreach (var result1 in resultlist1)
+                                {
+                                    distance = result1.Distance;
+                                    climb = result1.Climb;
+                                    break;
+                                }
+                                a = 1;
+                                resultswrite += $" <CourseResults Name=\"{ result.Course}\" Distance=\"{distance} \" Climb=\"{ climb} \"> ";
+                                resultswrite += $" <Person>< Name >{ result.Name} </ Name > < Position > { a}</ Position > < Club > { result.Club} </ Club >< Class > { result.Time} </ Class > < SiCard > { result.Sicard} </ SiCard > < Time > { result.Time} </ Time ></Person>";
+
+
+                            }
+                            else
+                            {
+                                resultswrite += $" <CourseResults Name=\"{ result.Course}\" Distance=\"{distance} \" Climb=\"{ climb} \"> ";
+                                resultswrite += $"<Person> < Name >{ result.Name} </ Name > < Position > { a}</ Position > < Club > { result.Club} </ Club >< Class > { result.Time} </ Class > < SiCard > { result.Sicard} </ SiCard > < Time > { result.Time} </ Time ></Person>";
+                            }
+
+                        }
+                        course = result.Course;
+                        a += 1;
+                    }
+                    else
+                    {
+                        resultswrite += $"<Person> < Name >{ result.Name} </ Name > < Position > { a}</ Position > < Club > { result.Club} </ Club >< Class > { result.Time} </ Class > < SiCard > { result.Sicard} </ SiCard > < Time > { result.Time} </ Time ></Person>";
+                        a += 1;
+                    }
+                }
+            }
+            var text = head + resultswrite + footer;
+            File.WriteAllText(@databaselocation.Split('.')[0] + ".xml", text);
+            resultsLog("\nFile Written to: " + databaselocation.Split('.')[0] + ".xml");
+        }
+    }
+}
+
+
+
+
+
+
 
