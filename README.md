@@ -1,5 +1,5 @@
-<img src="https://raw.githubusercontent.com/bonalybob/RocketDownload/master/favicon.ico" width="100">
-# RocketDownload
+<img src="https://raw.githubusercontent.com/bonalybob/nevis/" width="100">
+# Nevis
 
 #### A Simple, Fast, Easy Results Program for the SportIdent Timing System
 
