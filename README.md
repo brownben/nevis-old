@@ -1,4 +1,5 @@
-<img src="https://github.com/bonalybob/nevis/blob/master/Assets/nevis.png?raw=true" width="100">
+<img src="https://github.com/bonalybob/nevis/blob/master/Assets/nevis.png?raw=true" width="100"/>
+
 # Nevis
 
 #### A Simple, Fast, Easy Results Program for the SportIdent Timing System
