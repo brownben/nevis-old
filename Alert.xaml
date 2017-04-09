@@ -5,11 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Nevis"
         mc:Ignorable="d"
-        Title="Alert" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Icon="favicon.ico" Topmost="True" FontSize="14" Height="113.333" ShowInTaskbar="False">
+        Title="Alert" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" Icon="Assets/favicon.ico" Topmost="True" FontSize="14" ShowInTaskbar="False" ResizeMode="NoResize" WindowStyle="ThreeDBorderWindow">
+   
+
     <Grid>
-        <Button x:Name="OK" Content="OK" Height="25" Margin="0,35,10,10" Width="97" Click="OK_Click" HorizontalAlignment="Right" ClickMode="Press" IsDefault="True" FontSize="12" VerticalAlignment="Top" IsCancel="True"/>
+        <Grid x:Name="alert" Visibility="Hidden">
+        <Button x:Name="OK" Content="OK" Height="25" Margin="0,35,10,10" Width="97" Click="OK_Click" HorizontalAlignment="Right" ClickMode="Press" IsDefault="True" FontSize="12" VerticalAlignment="Bottom" IsCancel="True"/>
 
         <TextBlock x:Name="textBlock" Margin="10,10,10,0" TextWrapping="Wrap" Text="Backed database up to: c:\\Hello\file\location" VerticalAlignment="Top" FontSize="12"/>
-        
+
+    </Grid>
+    <Grid x:Name="password" Visibility="Hidden" >
+            <TextBlock Text="Please enter password for the event:"  Margin="10,7,10,0" TextWrapping="Wrap" FontSize="12" />
+            <PasswordBox x:Name="passwordbox" Height="20" VerticalAlignment="Top" Margin="10,28,10,0" FontSize="12"/>
+            <Button x:Name="Enter" Content="Enter" Height="25" Margin="0,12,10,10" Width="97" Click="Enter_Click" HorizontalAlignment="Right" ClickMode="Press" IsDefault="True" FontSize="12" VerticalAlignment="Bottom" IsCancel="True"/>
+
+
+        </Grid>
+        <Grid x:Name="progress"  >
+            <TextBlock x:Name="people" Text="0 of ~ People imported from Archive"  Margin="0,10,0,0" TextWrapping="Wrap" FontSize="12" TextAlignment="Center" Height="25" VerticalAlignment="Top" />
+            <ProgressBar x:Name="progressbar" Height="20" Margin="0,30,0,0" Width="243" Foreground="#E5081D84" BorderBrush="#FFE1F5FF" Background="#FFE1F5FF" VerticalAlignment="Top" IsIndeterminate="True"/>
+            <Button x:Name="OK1" Content="OK" Height="25" Margin="0,55,10,10" Width="97" Click="OK_Click" HorizontalAlignment="Right" ClickMode="Press" IsDefault="True" FontSize="12" VerticalAlignment="Bottom" IsCancel="True"/>
+
+
+        </Grid>
     </Grid>
 </Window>

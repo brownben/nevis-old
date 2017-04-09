@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!-- Created by RocketDownload -->
+<Event
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	CreatedBy="RocketDownload" 
+	Date="">
+	<Name></Name>
+	<Date></Date>
+	<Results>
+		<CourseResults Name="" Distance="" Climb="">
+			<Person>
+				<Name>Name</Name>
+				<Position>1st</Position>
+				<Club>Club</Club>
+				<Class>M100</Class>
+				<SiCard>1234567</SiCard>
+				<Time>18:32</Time>
+			</Person>
+		</CourseResults>
+	</Results>
+	<Courses>
+		<Course>
+			<Name>Long</Name>
+			<Distance>5000</Distance>
+			<Climb>100</Climb>
+			<Controls>
+				<Control code="102"/>
+				<Control code="103"/>
+				<Control code="104"/>
+				<Control code="105"/>
+			</Controls>
+		</Course>
+	</Courses>
+	<Entries>
+		<Person>
+			<Name>Name</Name>
+			<Position>1st</Position>
+			<Club>Club</Club>
+			<Class>M100</Class>
+			<SiCard>1234567</SiCard>
+			<StartTime>12:55:00</StartTime>
+			<Time>18:32</Time>
+		</Person>
+	</Entries>
+	
+</Event>
+ 

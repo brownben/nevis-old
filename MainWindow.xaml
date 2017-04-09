@@ -6,16 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"  
     xmlns:local="clr-namespace:Nevis" 
-    mc:Ignorable="d"     MinWidth="500" MinHeight="400" WindowStartupLocation="CenterScreen" Icon="Assets/favicon.ico" Title="Nevis" BorderBrush="#FF181878" BorderThickness="0" WindowStyle="ThreeDBorderWindow" Margin="0" Width="550" Height="450">
+    mc:Ignorable="d"     MinWidth="500" MinHeight="400" WindowStartupLocation="CenterScreen" Icon="Assets/favicon.ico" Title="Nevis" BorderBrush="#FF181878" BorderThickness="0" WindowStyle="ThreeDBorderWindow" Margin="0" Width="560" Height="450">
 
     <Grid >
 
         <TextBlock x:Name="UITitle" Text="Title" FontSize="25" Margin="60,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" />
-        <TextBlock x:Name="UIMessage" Text="Please go to Settings to select your database" FontSize="16" Margin="60,45,0,0" HorizontalAlignment="Left" Width="320" Height="35" VerticalAlignment="Top" Visibility="Hidden" />
 
 
-
-        <Grid x:Name="menu" HorizontalAlignment="Left" Margin="0" Width="50" Background="#FFE1F5FF">
+        <Grid x:Name="menu" HorizontalAlignment="Left" Margin="0" Width="50" Background="#FFE1F5FF" Panel.ZIndex="5">
             <Image RenderOptions.BitmapScalingMode="HighQuality" Source="Assets/nevis.png" VerticalAlignment="Top" Width="50"  Margin="0,5,0,0" Height="49"  />
             <Grid Margin="0,75,0,0" Height="240" VerticalAlignment="Top">
                 <Button x:Name="downloadButton" Background="#FFE1F5FF" Style="{StaticResource BlueStyle}" BorderBrush="#FFE1F5FF" Foreground="White" Margin="0" Height="40"  FontSize="14" Click="downloadButton_Click" ToolTip="Download" VerticalAlignment="Top" >
@@ -49,9 +47,13 @@
             <Button x:Name="buttonConnect" Content="Connect" Height="25" Margin="165,30,0,0" VerticalAlignment="Top" Click="buttonConnect_Click" Width="150" Panel.ZIndex="1" FontWeight="Normal" Grid.Column="1"  />
             <RichTextBox x:Name="listboxLog" VerticalScrollBarVisibility="Auto" Margin="0,60,10,10" Panel.ZIndex="1" FontWeight="Normal" FontSize="14" />
         </Grid>
-
+        <Grid x:Name="Intro" Margin="0" Background="#FFE1F5FF">
+            <Image Source="Assets/nevis.png" Width="200" VerticalAlignment="Top" Margin="0,20,0,0"></Image>
+            <TextBlock VerticalAlignment="Top" Height="58" Margin="0,287,0,0" Foreground="#E5081D84" Text="Nevis" TextAlignment="Center" FontSize="50" />
+            <Button VerticalAlignment="Top" Width="150" Height="25" Margin="0,360,0,0" Style="{StaticResource BlueStyle}" Foreground="#E5081D84" Content="Open or Create an Event" Click="browse_Click" BorderBrush="#00707070" Background="#00DDDDDD"/>
+        </Grid>
         <Grid x:Name="Entries" Margin="60,35,0,0" Visibility="Hidden">
-            <TextBox x:Name="textName" Height="20" Margin="80,5,25,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  />
+          <TextBox x:Name="textName" Height="20" Margin="80,5,25,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  />
             <TextBox x:Name="textSI" Height="20" Margin="80,30,25,0" TextWrapping="Wrap" VerticalAlignment="Top"  FontWeight="Normal"  />
             <TextBox x:Name="textCourse" Height="20" Margin="80,85,25,0" TextWrapping="Wrap" VerticalAlignment="Top"  FontWeight="Normal" />
             <TextBox x:Name="textClub" Height="20" Margin="80,110,25,0" TextWrapping="Wrap" VerticalAlignment="Top"  FontWeight="Normal"  />
@@ -66,8 +68,10 @@
             <Label x:Name="labelStart" Content="Start Time:" HorizontalAlignment="Left" Height="25" Margin="0,157,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal" />
             <Label x:Name="labelTime" Content="Time Taken:" HorizontalAlignment="Left" Height="25" Margin="0,183,0,0" VerticalAlignment="Top" Width="80" FontWeight="Normal" />
             <Button x:Name="Enter" Content="Enter" Height="25" Margin="275,212,0,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="Enter_Click"  />
-            <Button x:Name="Search" Content="Search" Height="25" Margin="150,55,0,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="Search_Click"  />
-            <Button x:Name="ArchiveSearch" Content="Archive Search" Height="25" Margin="0,55,150,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="ArchiveSearch_Click"  />
+            <Button x:Name="Search" Content="Search" Height="25" Margin="275,55,0,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="Search_Click"  />
+            <Button x:Name="ArchiveSearch" Content="Archive Search" Height="25" Margin="0,55,0,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="ArchiveSearch_Click"  />
+            <Button x:Name="Clear" Content="Clear" Height="25" Margin="0,55,275,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="Clear_Click"  />
+
             <Button x:Name="XMLEntries" Content="Add IOF XML Entries" Height="25" Margin="0,212,275,0" VerticalAlignment="Top" Width="125" FontWeight="Normal" Click="AddXMLCompetitors_Click"  />
 
             <TextBox x:Name="entries" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Margin="0,245,10,10" FontWeight="Normal"/>
@@ -81,37 +85,37 @@
             <Button x:Name="liveresults" Content="Live Results" Height="25" Margin="265,5,0,0" VerticalAlignment="Top" Width="125" Click="liveresults_Click" FontWeight="Normal" />
         </Grid>
 
-        <Grid x:Name="Database" Margin="65,35,0,0">
+        <Grid x:Name="Database" Margin="65,35,0,0" Visibility="Hidden">
             <Grid>
-                <TextBlock Text="Database" FontSize="18" VerticalAlignment="Top" />
-            <Grid VerticalAlignment="Top">
-            <TextBox x:Name="databaselocation1" Height="20" Margin="0,30,140,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  IsEnabled="False" BorderThickness="1"  />
+                <TextBlock Text="Event" FontSize="18" VerticalAlignment="Top" />
+                <Grid VerticalAlignment="Top">
+                    <TextBox x:Name="databaselocation1" Height="20" Margin="0,30,140,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  IsEnabled="False" BorderThickness="1"  />
 
-            <Button x:Name="DatabaseConnect" Content="Browse for Database" Height="23" Margin="0,30,10,0" VerticalAlignment="Top" Width="120" Click="browse_Click" FontWeight="Normal" HorizontalAlignment="Right" />
+                    <Button x:Name="DatabaseConnect" Content="Browse for Event" Height="23" Margin="0,30,10,0" VerticalAlignment="Top" Width="120" Click="browse_Click" FontWeight="Normal" HorizontalAlignment="Right" />
+                </Grid>
+
+
+                <Grid VerticalAlignment="Top">
+                    <TextBox x:Name="backupNo" Height="20" Margin="65,65,140,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  BorderThickness="1"  />
+                    <Button x:Name="backupButton" Content="Backup Event" Height="23" Margin="0,65,10,0" VerticalAlignment="Top" Width="120" Click="backupButton_Click" FontWeight="Normal"  HorizontalAlignment="Right" />
+                    <TextBlock x:Name="backupidlabel" Margin="0,65,0,0" TextWrapping="Wrap" Text="Backup ID:" VerticalAlignment="Top" FontWeight="Normal" TextAlignment="Center" HorizontalAlignment="Left" Width="56" />
+                </Grid>
+
             </Grid>
-            
-            
-            <Grid VerticalAlignment="Top">
-                <TextBox x:Name="backupNo" Height="20" Margin="65,65,140,0" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Normal"  BorderThickness="1"  />
-                <Button x:Name="backupButton" Content="Backup Database" Height="23" Margin="0,65,10,0" VerticalAlignment="Top" Width="120" Click="backupButton_Click" FontWeight="Normal"  HorizontalAlignment="Right" />
-                <TextBlock x:Name="backupidlabel" Margin="0,65,0,0" TextWrapping="Wrap" Text="Backup ID:" VerticalAlignment="Top" FontWeight="Normal" TextAlignment="Center" HorizontalAlignment="Left" Width="56" />
-            </Grid>
-                
-            </Grid>
-            <Button x:Name="archive" Click="archive_Click" VerticalAlignment="Top" Width="125" Height="25" Margin="0,95,0,0" Content="Import Archive"/>
+            <Button x:Name="archive" Click="archive_Click" VerticalAlignment="Top" Width="150" Height="25" Margin="0,95,0,0" Content="Import SI Card Archive"/>
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,125,0,0" Height="244">
-            <TextBlock Text="About" FontSize="18" VerticalAlignment="Top" Margin="0,0,0,0" />
-            <TextBlock Text="Nevis 1.4 14/02/2017" Margin="0,30,0,0" VerticalAlignment="Top"/>
-            <TextBlock  Margin="0,45,0,0" VerticalAlignment="Top">
+                <TextBlock Text="About" FontSize="18" VerticalAlignment="Top" Margin="0,0,0,0" />
+                <TextBlock Text="Nevis 1.4 14/02/2017" Margin="0,30,0,0" VerticalAlignment="Top"/>
+                <TextBlock  Margin="0,45,0,0" VerticalAlignment="Top">
                 (c) 2017 Bonalybob - 
                     <Hyperlink NavigateUri="https://bonalybob.github.io/Nevis/license.html"  RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF181878">
                         MIT License
                     </Hyperlink>
-            </TextBlock>
-            <TextBlock Text="Nevis uses:" Margin="0,65,0,0" VerticalAlignment="Top"/>
-            <TextBlock Text="- LiteDB - MIT License - Mauricio David " Margin="20,80,0,0" VerticalAlignment="Top"/>
-            <TextBlock Text="- SportIdent Libraries - CC BY-ND 3.0 License " Margin="20,95,0,0" VerticalAlignment="Top"/>
-            <TextBlock Text="- Google Icons - Apache License Version 2.0  " Margin="20,110,0,0" VerticalAlignment="Top"/>
+                </TextBlock>
+                <TextBlock Text="Nevis uses:" Margin="0,65,0,0" VerticalAlignment="Top"/>
+                <TextBlock Text="- LiteDB - MIT License - Mauricio David " Margin="20,80,0,0" VerticalAlignment="Top"/>
+                <TextBlock Text="- SportIdent Libraries - CC BY-ND 3.0 License " Margin="20,95,0,0" VerticalAlignment="Top"/>
+                <TextBlock Text="- Google Icons - Apache License Version 2.0  " Margin="20,110,0,0" VerticalAlignment="Top"/>
             </Grid>
         </Grid>
 

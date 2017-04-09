@@ -18,8 +18,10 @@ namespace Nevis
     public partial class MainWindow : Window
     {
         public Reader reader;
+        public string password = "orienteer";
         public string databaselocation = "";
         public int complete = 0;
+        public int idnumber = 0;
         public MainWindow()
         {
 
@@ -38,17 +40,16 @@ namespace Nevis
             SafetyCheck.IsEnabled = false;
             backupidlabel.IsEnabled = false;
             archive.IsEnabled = false;
+            menu.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Hidden;
             Database.Visibility = Visibility.Hidden;
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
-            UIMessage.Visibility = Visibility.Visible;
-            textDatabase.ToolTip = "Please select a Database";
-            UIMessage.Text = "Please go to Settings to select your database";
+            textDatabase.ToolTip = "Please select an Event";
             UITitle.Text = "Welcome to Nevis";
-
+            UITitle.Visibility = Visibility.Hidden;
             comboboxPortsList.Items.Add("Ports List");
             comboboxPortsList.SelectedIndex = 0;
             reader.DeviceConfigurationRead += new DeviceConfigurationReadEventHandler(reader_DeviceConfigurationRead);
@@ -200,7 +201,7 @@ namespace Nevis
             var i = 0;
             var j = 0;
 
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var done = 0;
                 var entries = db.GetCollection<Entry>("entries");
@@ -430,21 +431,27 @@ namespace Nevis
 
         private void Enter_Click(object sender, RoutedEventArgs e)
         {
+            var done = 0;
             var name = textName.Text;
             var si = textSI.Text;
             var course = textCourse.Text;
             var club = textClub.Text;
             var clas = textClass.Text;
             var start = textStart.Text;
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var entries = db.GetCollection<Entry>("entries");
-                var results = entries.Find(Query.EQ("Sicard", si));
+
+
+
+
+                var results = entries.Find(Query.EQ("Id", idnumber));
                 var resultlist = from result in results select result;
-                var done = 0;
+
 
                 foreach (var result in resultlist)
                 {
+
                     var entry = new Entry
                     {
                         Name = name,
@@ -458,7 +465,7 @@ namespace Nevis
                     entry.LastSeenAt = result.LastSeenAt;
                     entry.Time = result.Time;
                     entry.Downloaded = result.Downloaded;
-                    entry.Id = result.Id;
+                    entry.Id = idnumber;
                     entries.Update(entry);
 
                     done = 1;
@@ -479,19 +486,15 @@ namespace Nevis
                         LastSeenAt = "",
                         LastSeenTime = ""
                     };
-
-                    entries.Insert(entry1);
+                    if (idnumber != 0) { entry1.Id = idnumber; entries.Update(entry1); }
+                    else { entries.Insert(entry1); }
 
 
                 }
 
-                textName.Text = "";
-                textSI.Text = "";
-                textCourse.Text = "";
-                textClass.Text = "";
-                textStart.Text = "";
-                textClub.Text = "";
-                textTime.Text = "";
+
+                clear();
+
             }
         }
 
@@ -499,7 +502,7 @@ namespace Nevis
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new LiteDatabase(databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 if (textName.Text == "")
                 {
@@ -515,6 +518,7 @@ namespace Nevis
                         textStart.Text = result.Start;
                         textClub.Text = result.Club;
                         textTime.Text = result.Time;
+                        idnumber = result.Id;
                     }
                 }
                 else if (textSI.Text == "")
@@ -531,6 +535,7 @@ namespace Nevis
                         textStart.Text = result.Start;
                         textClub.Text = result.Club;
                         textTime.Text = result.Time;
+                        idnumber = result.Id;
                     }
                 }
 
@@ -540,7 +545,7 @@ namespace Nevis
 
         private void refresh_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var course = "";
                 resultsClear();
@@ -569,18 +574,33 @@ namespace Nevis
 
             }
         }
-
+        private void Clear_Click(object sender, RoutedEventArgs e)
+        {
+            clear();
+        }
+        private void clear()
+        {
+            textName.Text = "";
+            textSI.Text = "";
+            textCourse.Text = "";
+            textClass.Text = "";
+            textStart.Text = "";
+            textClub.Text = "";
+            textTime.Text = "";
+            idnumber = 0;
+        }
         private void browse_Click(object sender, RoutedEventArgs e)
         {
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.CheckFileExists = false;
             openFileDialog.CheckPathExists = false;
-            openFileDialog.Title = "Open or Create a Database";
-            openFileDialog.Filter = "Database File (*.db)|*.db|All files (*.*)|*.*";
+            openFileDialog.Title = "Open or Create a Event";
+            openFileDialog.Filter = "Nevis Event File (*.evnt)|*.evnt|Old Nevis Database File (*.db)|*.db|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                textDatabase.ToolTip = "Database: " + openFileDialog.FileName;
+                menu.Visibility = Visibility.Visible;
+                textDatabase.ToolTip = "Event: " + openFileDialog.FileName;
                 databaselocation1.Text = openFileDialog.FileName;
                 databaselocation = openFileDialog.FileName;
                 Download.IsEnabled = true;
@@ -607,7 +627,7 @@ namespace Nevis
             var head = $"<!DOCTYPE HTML><html lang=\"en\"><head> <title>{eventname} - Results</title> <meta charset=\"utf - 8\"> <meta name=\"description\" content=\"Results for {eventname}\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1,minimum-scale=1\">  {style}</head><body> <header> <h1 id=\"page-title\">{eventname} - Results</h1> </header> <main>";
             var footer = $"</table></div></main> <footer> <p>Results compiled on {date.ToString("dd/MM/yyyy")} at {date.ToString("H:mm:ss")} using Nevis</p></footer></body></html>";
             var resultswrite = "";
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var course = "";
                 var entries = db.GetCollection<Entry>("entries");
@@ -676,8 +696,14 @@ namespace Nevis
             }
             var text = head + resultswrite + footer;
             File.WriteAllText(@databaselocation.Split('.')[0] + ".html", text);
-            resultsLog("\nFile Written to: " + databaselocation.Split('.')[0] + ".html");
-
+            Alert alert = new Alert();
+            alert.Title = "";
+            alert.password.Visibility = Visibility.Hidden;
+            alert.progress.Visibility = Visibility.Hidden;
+            alert.Enter.IsEnabled = false;
+            alert.alert.Visibility = Visibility.Visible;
+            alert.textBlock.Text = "File Written to: " + databaselocation.Split('.')[0] + ".html";
+            alert.Show();
 
 
 
@@ -698,7 +724,7 @@ namespace Nevis
 
             }
 
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var course = new Course
                 {
@@ -750,7 +776,7 @@ namespace Nevis
             CourseDistance.Text = "";
             CourseClimb.Text = "";
             textCourseNos.Text = "";
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
 
                 var courses = db.GetCollection<Course>("courses");
@@ -791,7 +817,7 @@ namespace Nevis
             openFileDialog.Filter = "XML File (*.xml)|*.xml|All files (*.*)|*.*";
             if (openFileDialog.ShowDialog() == true)
             {
-                using (var db = new LiteDatabase(@databaselocation))
+                using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
                 {
                     var courses = db.GetCollection<Course>("courses");
                     var xmlfile = openFileDialog.FileName;
@@ -840,6 +866,10 @@ namespace Nevis
                     }
                     Alert alert = new Alert();
                     alert.Title = "";
+                    alert.password.Visibility = Visibility.Hidden;
+                    alert.progress.Visibility = Visibility.Hidden;
+                    alert.Enter.IsEnabled = false;
+                    alert.alert.Visibility = Visibility.Visible;
                     alert.textBlock.Text = courseno.ToString() + " Courses imported";
                     alert.Show();
                 }
@@ -941,18 +971,22 @@ namespace Nevis
             {
                 backupNo.Text = "1";
             }
-            var newloc = databaselocation.Split('.')[0] + "-backup-" + backupNo.Text + ".db";
+            var newloc = databaselocation.Split('.')[0] + "-backup-" + backupNo.Text + ".evnt";
             File.Copy(databaselocation, newloc);
             Alert alert = new Alert();
             alert.Title = "";
-            alert.textBlock.Text = "Database backed up to: " + newloc;
+            alert.progress.Visibility = Visibility.Hidden;
+            alert.Enter.IsEnabled = false;
+            alert.password.Visibility = Visibility.Hidden;
+            alert.alert.Visibility = Visibility.Visible;
+            alert.textBlock.Text = "Event backed up to: " + newloc;
             alert.Show();
 
         }
 
         private void EntriesRefresh_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var course = "";
                 entriesClear();
@@ -992,7 +1026,7 @@ namespace Nevis
                 System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
                 while ((line = file.ReadLine()) != null)
                 {
-                    using (var db = new LiteDatabase(@databaselocation))
+                    using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
                     {
                         if (line != "#,SIID,Control time,")
                         {
@@ -1037,6 +1071,10 @@ namespace Nevis
                 file.Close();
                 Alert alert = new Alert();
                 alert.Title = "";
+                alert.password.Visibility = Visibility.Hidden;
+                alert.progress.Visibility = Visibility.Hidden;
+                alert.Enter.IsEnabled = false;
+                alert.alert.Visibility = Visibility.Visible;
                 alert.textBlock.Text = counter + " Punches imported as safety data";
                 alert.Show();
             };
@@ -1045,7 +1083,7 @@ namespace Nevis
         private void refreshsafety_Click(object sender, RoutedEventArgs e)
         {
             safetyClear();
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var entriesdata = db.GetCollection<Entry>("entries");
                 var results = entriesdata.Find(Query.EQ("Downloaded", false)).OrderBy(x => x.LastSeenTime);
@@ -1063,9 +1101,90 @@ namespace Nevis
             LiveResults liveresults = new LiveResults();
             liveresults.Show();
         }
+        private Nevis.MainWindow.Archive archiveadd(string line)
+        {
+            
+                var archives = new Archive();
+                archives.Sicard = line.Split(',')[0];
+                archives.Name = line.Split(',')[3];
+                archives.Club = line.Split(',')[7];
+                if (line.Split(',')[4] == "m")
+                {
+                    archives.Class = "M";
+                }
+                if (line.Split(',')[4] == "f")
+                {
+                    archives.Class = "W";
+                }
+                if (line.Split(',')[5].Length == 4)
+                {
+                    DateTime date = DateTime.Now;
+                    var compdate = Convert.ToInt32(date.ToString(line.Split(',')[5]));
+                    var currentdate = Convert.ToInt32(date.ToString("yyyy"));
+                    var diff = currentdate - compdate;
+                    if (line.Split(',')[4] == "m")
+                    {
+                        if (diff <= 10)
+                        {
+                            archives.Class = "M10";
+                        }
+                        else if (diff <= 12) { archives.Class = "M12"; }
+                        else if (diff <= 14) { archives.Class = "M14"; }
+                        else if (diff <= 16) { archives.Class = "M16"; }
+                        else if (diff <= 18) { archives.Class = "M18"; }
+                        else if (diff <= 20) { archives.Class = "M20"; }
+                        else if (diff <= 21) { archives.Class = "M21"; }
+                        else if (diff <= 35) { archives.Class = "M35"; }
+                        else if (diff <= 40) { archives.Class = "M40"; }
+                        else if (diff <= 45) { archives.Class = "M45"; }
+                        else if (diff <= 50) { archives.Class = "M50"; }
+                        else if (diff <= 55) { archives.Class = "M55"; }
+                        else if (diff <= 60) { archives.Class = "M60"; }
+                        else if (diff <= 65) { archives.Class = "M65"; }
+                        else if (diff <= 70) { archives.Class = "M70"; }
+                        else if (diff <= 75) { archives.Class = "M75"; }
+                        else if (diff <= 80) { archives.Class = "M80"; }
+                        else if (diff <= 85) { archives.Class = "M85"; }
+                        else if (diff <= 90) { archives.Class = "M90"; }
+                        else if (diff <= 95) { archives.Class = "M95"; }
+                        else if (diff <= 100) { archives.Class = "M100"; }
+                    }
+                    if (line.Split(',')[4] == "f")
+                    {
+                        if (diff <= 10)
+                        {
+                            archives.Class = "W10";
+                        }
+                        else if (diff <= 12) { archives.Class = "W12"; }
+                        else if (diff <= 14) { archives.Class = "W14"; }
+                        else if (diff <= 16) { archives.Class = "W16"; }
+                        else if (diff <= 18) { archives.Class = "W18"; }
+                        else if (diff <= 20) { archives.Class = "W20"; }
+                        else if (diff <= 21) { archives.Class = "W21"; }
+                        else if (diff <= 35) { archives.Class = "W35"; }
+                        else if (diff <= 40) { archives.Class = "W40"; }
+                        else if (diff <= 45) { archives.Class = "W45"; }
+                        else if (diff <= 50) { archives.Class = "W50"; }
+                        else if (diff <= 55) { archives.Class = "W55"; }
+                        else if (diff <= 60) { archives.Class = "W60"; }
+                        else if (diff <= 65) { archives.Class = "W65"; }
+                        else if (diff <= 70) { archives.Class = "W70"; }
+                        else if (diff <= 75) { archives.Class = "W75"; }
+                        else if (diff <= 80) { archives.Class = "W80"; }
+                        else if (diff <= 85) { archives.Class = "W85"; }
+                        else if (diff <= 90) { archives.Class = "W90"; }
+                        else if (diff <= 95) { archives.Class = "W95"; }
+                        else if (diff <= 100) { archives.Class = "W100"; }
+                    }
+
+                }
+
+
+                return (archives);
+            } 
         private void archive_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 string line;
                 var counter = 0;
@@ -1076,32 +1195,52 @@ namespace Nevis
                 openFileDialog.CheckPathExists = true;
                 openFileDialog.Title = "Open SiCard Archive";
                 openFileDialog.Filter = "CSV File(*.csv)|*.csv|All files (*.*)|*.*";
+                Alert alert = new Alert();
+                alert.Title = "";
+                alert.password.Visibility = Visibility.Hidden;
+                alert.Enter.IsEnabled = false;
+                alert.OK.IsEnabled = false;
+                alert.progress.Visibility = Visibility.Visible;
+                alert.alert.Visibility = Visibility.Hidden;
+                alert.OK1.IsEnabled = false;
+                
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                   
+                    string filex = new StreamReader(openFileDialog.FileName).ReadToEnd();
+                    string[] lines = filex.Split('\n');
+                    int countOfLines = lines.GetLength(0);
+                    countOfLines = countOfLines - 2;
+
+                    alert.progressbar.Maximum = countOfLines;
+                    alert.people.Text = "0 of " + countOfLines.ToString() + " Card imported from Archive";
+
+                    StreamReader file = new StreamReader(openFileDialog.FileName);
                     while ((line = file.ReadLine()) != null)
                     {
+
                         if (line != "\"CardNumber\",\"CardLabel\",\"CardStatus\",\"Name\",\"Sex\",\"DateOfBirth\",\"MembershipNo\",\"Club\"")
                         {
-                            var archives = new Archive();
-                            archives.Sicard = line.Split(',')[0];
-                            archives.Name = line.Split(',')[3];
-                            archives.Club = line.Split(',')[7];
-                            archive.Insert(archives);
+                            archive.Insert(archiveadd(line));
                             counter = counter + 1;
+                            alert.people.Text = counter + " of " + countOfLines.ToString() + " Card imported from Archive";
+                            alert.progressbar.Value = alert.progressbar.Value + 1;
                         }
+                        }
+                        alert.progress.Visibility = Visibility.Hidden;
+                        alert.alert.Visibility = Visibility.Visible;
+                        alert.textBlock.Text = counter.ToString() + " cards imported from the Archive";
+                        alert.OK.IsEnabled = true;
+                        alert.Show();
+                        
+                    
 
-                    }
-                    Alert alert = new Alert();
-                    alert.Title = "";
-                    alert.textBlock.Text = counter + " Cards imported from Archive";
-                    alert.Show();
                 }
             }
         }
         private void ArchiveSearch_Click(object sender, RoutedEventArgs e)
         {
-            using (var db = new LiteDatabase(databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 if (textName.Text == "")
                 {
@@ -1110,9 +1249,9 @@ namespace Nevis
                     var resultlist = from result in results select result;
                     foreach (var result in resultlist)
                     {
-                        textName.Text = result.Name;
+                        textName.Text = result.Name.Split('"')[1];
                         textSI.Text = result.Sicard;
-                        textClub.Text = result.Club;
+                        textClub.Text = result.Club.Split('"')[1];
                         textClass.Text = result.Class;
 
                     }
@@ -1124,9 +1263,9 @@ namespace Nevis
                     var resultlist = from result in results select result;
                     foreach (var result in resultlist)
                     {
-                        textName.Text = result.Name;
+                        textName.Text = result.Name.Split('"')[1];
                         textSI.Text = result.Sicard;
-                        textClub.Text = result.Club;
+                        textClub.Text = result.Club.Split('"')[1];
                         textClass.Text = result.Class;
 
                     }
@@ -1137,6 +1276,7 @@ namespace Nevis
         }
         private void downloadButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Visible;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Hidden;
@@ -1144,7 +1284,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Download";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1152,10 +1293,12 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+            clear();
         }
 
         private void entriesButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Visible;
             Results.Visibility = Visibility.Hidden;
@@ -1163,7 +1306,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Entries";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1171,11 +1315,13 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+            clear();
 
         }
 
         private void resultsButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Visible;
@@ -1183,7 +1329,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Results";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1191,11 +1338,12 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
-
+            clear();
         }
 
         private void coursesButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Hidden;
@@ -1203,7 +1351,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Visible;
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Courses";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1211,11 +1360,12 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             coursesButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
-
+            clear();
         }
 
         private void safetyButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Hidden;
@@ -1223,7 +1373,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Visible;
             UITitle.Text = "Safety Check";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1231,11 +1382,13 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
+            clear();
 
         }
 
         private void settingsButton_Click(object sender, RoutedEventArgs e)
         {
+            Intro.Visibility = Visibility.Hidden;
             Download.Visibility = Visibility.Hidden;
             Entries.Visibility = Visibility.Hidden;
             Results.Visibility = Visibility.Hidden;
@@ -1243,7 +1396,8 @@ namespace Nevis
             Courses.Visibility = Visibility.Hidden;
             SafetyCheck.Visibility = Visibility.Hidden;
             UITitle.Text = "Settings";
-            UIMessage.Visibility = Visibility.Hidden;
+            UITitle.Visibility = Visibility.Visible;
+            menu.Visibility = Visibility.Visible;
             downloadButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             entriesButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             resultsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
@@ -1251,7 +1405,7 @@ namespace Nevis
             safetyButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 225, 245, 255));
             settingsButton.Background = new SolidColorBrush(Color.FromArgb(255, 193, 234, 254));
-
+            clear();
         }
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
@@ -1268,7 +1422,7 @@ namespace Nevis
 
             if (openFileDialog.ShowDialog() == true)
             {
-                using (var db = new LiteDatabase(@databaselocation))
+                using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
                 {
                     var entries = db.GetCollection<Entry>("entries");
                     var xmlfile = openFileDialog.FileName;
@@ -1325,6 +1479,10 @@ namespace Nevis
 
                     Alert alert = new Alert();
                     alert.Title = "";
+                    alert.progress.Visibility = Visibility.Hidden;
+                    alert.password.Visibility = Visibility.Hidden;
+                    alert.Enter.IsEnabled = false;
+                    alert.alert.Visibility = Visibility.Visible;
                     alert.textBlock.Text = courseno.ToString() + " Entries imported";
                     alert.Show();
 
@@ -1341,7 +1499,7 @@ namespace Nevis
             var head = $"< Event xmlns: xsd = \"http://www.w3.org/2001/XMLSchema\" xmlns: xsi = \"http://www.w3.org/2001/XMLSchema-instance\" CreatedBy = \"Nevis\" Date = \"\" > < Name >{eventname}</ Name >< Date >{date.ToString("dd-MM-yyyy H:mm:ss")}</ Date ><Results>";
             var footer = "</Event>";
             var resultswrite = "";
-            using (var db = new LiteDatabase(@databaselocation))
+            using (var db = new LiteDatabase("filename=" + databaselocation + ";password=" + password + ";"))
             {
                 var course = "";
                 var entries = db.GetCollection<Entry>("entries");
@@ -1420,6 +1578,8 @@ namespace Nevis
             File.WriteAllText(@databaselocation.Split('.')[0] + ".xml", text);
             resultsLog("\nFile Written to: " + databaselocation.Split('.')[0] + ".xml");
         }
+
+
     }
 }
 
