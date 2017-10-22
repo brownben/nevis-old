@@ -1,0 +1,118 @@
+*{
+    font-family:Roboto;
+    font-weight:300;
+}
+html,body{
+    margin:0;
+    height:100%;
+    overflow:hidden;
+}
+header{
+    width:100%;
+    height:30px;
+    background: linear-gradient(67deg, #0ED2F7, #B2FEFA); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    user-select: none;
+}
+header p{
+    float:left;
+    line-height:30px;
+    color:white;
+    margin:0;
+    margin-left:10px;
+    font-size:13.5px;
+}
+header a{
+    -webkit-app-region: no-drag;
+    width:45px;
+    color:white;
+    background-color:transparent;
+    border:none;
+    height:30px;
+    outline: none;
+    float:right;
+    text-decoration: none;
+    line-height:30px;
+    text-align:center;
+    margin:0;
+    transition:.25s;
+}
+header svg{
+    fill:white
+}
+header a:hover{
+    background: #0ED2F7; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+header #close:hover{
+    background: #f44336; /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+header img{
+    height:20px;
+    padding-top:5px;
+    padding-left:10px;
+    float:left;
+
+
+}
+main{
+    width:90%;
+    margin-left:5%;
+    margin-right:5%;
+    margin-top:12px;
+
+}
+#connection-details{
+    display: block;
+    text-align:center;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+#connect{
+    color:white;
+    background-color:#0ED2F7;
+    border:none;
+    border-radius:10%;
+    padding:6px;
+    transition:0.25s;
+    outline:none;
+    box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),0 1px 5px 0 rgba(0,0,0,0.12),0 3px 1px -2px rgba(0,0,0,0.2);
+}
+
+#connect:hover{
+  box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14),0 1px 10px 0 rgba(0,0,0,0.12),0 2px 4px -1px rgba(0,0,0,0.3);
+}
+#download-output{
+    width:100%;
+    height:300px;
+    border:1px #c7c7c7 solid;
+    padding:5px;
+    box-sizing: border-box;
+    font-size:12px;
+}
+#scroll{
+    overflow-y:auto!important;
+    overflow-x:hidden;
+    height:auto;
+    margin:0;
+    height:auto;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #EEEEEE;
+    border-radius:10px;
+}
+::-webkit-scrollbar-thumb:active {
+        background: #e0e0e0;;
+}
+

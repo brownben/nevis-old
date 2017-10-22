@@ -1,0 +1,13 @@
+{
+  "name": "nevis",
+  "description": "A app to read SI Cards to create results",
+  "license": "MIT",
+  "version": "0.2.0",
+  "main": "main.js",
+  "dependencies": {
+    "serialport": "^6.0.3"
+  },
+  "devDependencies": {
+    "electron-rebuild": "^1.6.0"
+  }
+}

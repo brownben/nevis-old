@@ -1,0 +1,51 @@
+02 B1 82 00 01 AA FE FE FE
+58 DD //Card No?
+04 //Card Number Series
+00 00 00 00 00 00 00 00 00
+65    //Security Byte 1
+58 DD //Start Number / Card Number
+21 30 //Start Time
+21 68 //Finish Time
+04    //Record Count
+56    //Security Byte 2
+BD BE //Check Time? Not Set
+28
+04 //Card Number Series
+39 00 07
+00 //Punch 31
+65 21 43 //Punch 1
+66 21 4E //Punch 2
+67 21 59 //Punch 3
+00 EE EE //Punch 4
+00 EE EE //Punch 5
+00 //Punch 32
+00 EE EE //Punch 6
+00 EE EE //Punch 7
+00 EE EE //Punch 8
+00 EE EE //Punch 9
+00 EE EE //Punch 10
+00 //Punch 33
+00 EE EE //Punch 11
+00 EE EE //Punch 12
+00 EE EE //Punch 13
+00 EE EE //Punch 14
+00 EE EE //Punch 15
+00 //Punch 34
+00 EE EE //Punch 16
+00 EE EE //Punch 17
+00 EE EE //Punch 18
+00 EE EE //Punch 19
+00 EE EE //Punch 20
+00 //Punch 35
+00 EE EE //Punch 21
+00 EE EE //Punch 22
+00 EE EE //Punch 23
+00 EE EE //Punch 24
+00 EE EE //Punch 25
+00 //Punch 36
+00 EE EE //Punch 26
+00 EE EE //Punch 27
+00 EE EE //Punch 28
+00 EE EE //Punch 29
+00 EE EE //Punch 30
+E8 D3 03
