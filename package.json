@@ -5,9 +5,14 @@
   "version": "0.2.0",
   "main": "main.js",
   "dependencies": {
-    "serialport": "^6.0.3"
+    "serialport": "^6.0.4"
   },
   "devDependencies": {
+    "electron": "^1.7.9",
     "electron-rebuild": "^1.6.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "rebuild": "electron-rebuild"
   }
 }

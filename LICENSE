@@ -1,6 +1,19 @@
 MIT License
 
-Copyright (c) 2017 bonalybob
+All parts are Licensed under the MIT Licensed
+
+- Nevis
+Copyright (c) 2017 Bonalybob
+
+- CRC
+Copyright (c) 2016 Jan Vorwerk
+Copyright (c) 2013 Simon Denier
+
+- Serialport
+Copyright (c) 2010 Christopher Williams. All rights reserved.
+
+- Electron
+Copyright (c) 2013-2017 GitHub Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
