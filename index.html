@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Nevis</title>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 
 <body>
     <header>
-        <img src="./Nevis Logo.png" />
+        <img src="./Nevis Logo.png" id="logo" />
         <p>Nevis</p>
         <a id="close" href="javascript:window.close()">
             <svg color="white" width="10" height="10">
@@ -31,38 +31,67 @@
         </a>
 
     </header>
-    <div id="scroll">
-        <main>
 
-            <div id="connection-details">
 
-                <button id="connect">Connect</button>
+    <main>
+        <div id="connection-details">
+            <p class="label">Port:</p>
+            <div id='port'>
+                <p id="port-content" class="content"></p>
+                <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                    <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                    <path d="M0-.75h24v24H0z" fill="none" />
+                </svg>
+
             </div>
-            <p id="download-output">
-                Download
-            </p>
+            <div id="port-menu" class="hidden">
 
-        </main>
-    </div>
+            </div>
+            <p class="label">Baud Rate:</p>
+            <div id="baud">
+                <p id="baud-content" class="content">4800</p>
+                <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                    <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                    <path d="M0-.75h24v24H0z" fill="none" />
+                </svg>
+
+            </div>
+            <div id="baud-menu" class="hidden">
+                <p id="baud-serial">4800 (Serial)</p>
+                <p id="baud-usb">38400 (USB)</p>
+            </div>
+
+
+            <button id="connect">Connect</button>
+
+        </div>
+        <div id="scroll" height='400px'>
+
+            <div id="download-output">
+
+            </div>
+        </div>
+    </main>
+
     <script>
         const ipc = require('electron').ipcRenderer
+
+        var SerialPort = require('serialport');
 
 
         // Window Commands & Icons
 
-        document.getElementById('icon-min').setAttribute('style', 'display:inline')
-        document.getElementById('icon-max').setAttribute('style', 'display:none')
+        document.getElementById('icon-min').setAttribute('style', 'display:inline');
+        document.getElementById('icon-max').setAttribute('style', 'display:none');
 
         document.getElementById('maximize').addEventListener('click', function () {
             ipc.send('window', 'maximize')
         })
+
         document.getElementById('minimize').addEventListener('click', function () {
             ipc.send('window', 'minimize')
         })
-        ipc.on('connected', function (event, arg) {
-            const message = `${arg}`
-            document.getElementById('data').innerHTML = message
-        })
+
         ipc.on('window', function (event, arg) {
             if (arg == 'minimized') {
                 document.getElementById('icon-min').setAttribute('style', 'display:inline')
@@ -73,17 +102,76 @@
                 document.getElementById('icon-max').setAttribute('style', 'display:inline')
             }
         })
+
         ipc.on('resize', function (event, arg) {
             var pixels = arg[1] - 30
             document.getElementById('scroll').setAttribute('style', "height:" + pixels + "px")
 
         })
-        var sp = require('serialport');
 
-        sp.list(function (err, ports) {
-            console.log(ports);
-        });
-        console.log(process.versions.node)
+        // Menu Collapse
+        document.getElementById('baud').addEventListener('click', function () {
+            if (document.getElementById('baud-menu').getAttribute('class') == 'hidden') {
+                document.getElementById('baud-menu').setAttribute('class', ' ')
+            }
+            else {
+                document.getElementById('baud-menu').setAttribute('class', 'hidden')
+            }
+        })
+        document.getElementById('port').addEventListener('click', function () {
+
+            if (document.getElementById('port-menu').getAttribute('class') == 'hidden') {
+
+                document.getElementById('port-menu').innerHTML = "";
+                portsList = ""
+                noOfPorts = 1
+                SerialPort.list(function (err, ports) {
+                    ports.forEach(function (port) {
+
+                        document.getElementById('port-menu').innerHTML = document.getElementById('port-menu').innerHTML + "<p id='" + noOfPorts + "' class='portslistitem'> " + port.comName + "</p>";
+                        document.getElementById(noOfPorts).addEventListener('click', function () {
+                            document.getElementById('port-content').innerText = document.getElementById(noOfPorts).innerText;
+                            document.getElementById('port-menu').setAttribute('class', 'hidden')
+                            portName = document.getElementById('port-content').innerText;
+                            noOfPorts++;
+                        })
+                    });
+                    if (ports.length < 1) {
+
+                        document.getElementById('port-menu').innerHTML = document.getElementById('port-menu').innerHTML + "<p id='NoDev'>No Devices Detected</p>";
+
+                        document.getElementById('NoDev').addEventListener('click', function () {
+                            document.getElementById('port-content').innerText = " ";
+                            document.getElementById('port-menu').setAttribute('class', 'hidden')
+                        })
+                    }
+
+                });
+
+                document.getElementById('port-menu').setAttribute('class', '')
+
+            }
+            else {
+
+                document.getElementById('port-menu').setAttribute('class', 'hidden')
+
+            }
+        })
+        document.getElementById('baud-usb').addEventListener('click', function () {
+            document.getElementById('baud-content').innerText = "38400";
+            port.baudrate = 38400
+            document.getElementById('baud-menu').setAttribute('class', 'hidden')
+        })
+        document.getElementById('baud-serial').addEventListener('click', function () {
+            document.getElementById('baud-content').innerText = "4800";
+            port.baudrate = 4800
+            document.getElementById('baud-menu').setAttribute('class', 'hidden')
+        })
+        //Read Port
+        require('./si-data.js')
+
+
+
     </script>
 </body>
 

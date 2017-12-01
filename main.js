@@ -2,6 +2,7 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const Menu = require('electron').Menu
+const MenuItem = require('electron').MenuItem
 const url = require('url')
 const ipc = require('electron').ipcMain
 
@@ -15,7 +16,7 @@ function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
         width: 450,
-        minWidth: 205,
+
         height: 400,
         frame: false,
         icon: __dirname + '/Nevis Logo.png',
@@ -29,12 +30,13 @@ function createWindow() {
         slashes: true
     }))
 
-
     // Emitted when the window is closed.
     win.on('closed', () => {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
+
+
         win = null
     })
     win.on('resize', () => {
@@ -42,6 +44,7 @@ function createWindow() {
     })
     win.on('ready-to-show', function () {
         win.show();
+        win.webContents.send('resize', win.getSize())
         win.focus();
     });
 
@@ -60,6 +63,7 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit()
     }
+
 })
 
 app.on('activate', () => {
@@ -85,13 +89,12 @@ var template = [{
     accelerator: 'CmdOrCtrl+V',
     role: 'paste'
 }]
-const menu = Menu.buildFromTemplate(template)
+const ContextMenu = Menu.buildFromTemplate(template)
 app.on('browser-window-created', function (event, win) {
     win.webContents.on('context-menu', function (e, params) {
-        menu.popup(win, params.x, params.y)
+        ContextMenu.popup(win, params.x, params.y)
     })
 })
-
 
 ipc.on('window', function (event, arg) {
     if (arg == 'maximize') {
@@ -112,4 +115,8 @@ ipc.on('window', function (event, arg) {
         win.minimize()
     }
 
+
+})
+ipc.on('resize', function (event, arg) {
+    event.sender.send('resize', win.getSize())
 })
