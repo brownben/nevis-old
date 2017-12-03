@@ -1,6 +1,7 @@
 {
   "name": "nevis",
   "description": "A app to read SI Cards to create results",
+  "repository": "https://github.com/bonalybob/Nevis.git",
   "license": "MIT",
   "version": "0.2.0",
   "main": "main.js",
