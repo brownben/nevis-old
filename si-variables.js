@@ -7,15 +7,26 @@
 // Make Unit beep Until Removed
 module.exports.beep = new Buffer([0xFF, 0x06])
 
+// SI Card 5
+// Positions of Start and Finish Data & Read Instructions
 module.exports.card5 = function () {
     this.startByte1 = 24;
     this.startByte2 = 25;
     this.finishByte1 = 26;
     this.finishByte2 = 27;
+
     this.read = new Buffer([0xFF, 0x02, 0xB1, 0x00, 0xB1, 0x00, 0x03]);
 }
 
+// SI Card 10, 11 & SIAC
+// Positions of Start and Finish Data & Read Instructions for all blocks
+// Block 8 reads out Blocks 0, 4, 5, 6, 7
 module.exports.card10 = function () {
+    this.startByte1 = 20;
+    this.startByte2 = 21;
+    this.finishByte1 = 24;
+    this.finishByte2 = 25;
+
     this.readBlock0 = new Buffer([0xFF, 0x02, 0xEF, 0x01, 0x00, 0xE2, 0x09, 0x03])
     this.readBlock1 = new Buffer([0xFF, 0x02, 0xEF, 0x01, 0x01, 0xE3, 0x09, 0x03])
     this.readBlock2 = new Buffer([0xFF, 0x02, 0xEF, 0x01, 0x02, 0xE0, 0x09, 0x03])

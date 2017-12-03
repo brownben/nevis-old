@@ -110,67 +110,72 @@
         })
 
         // Menu Collapse
+        const portMenu = document.getElementById('port-menu');
+        const baudMenu = document.getElementById('baud-menu');
+
+
         document.getElementById('baud').addEventListener('click', function () {
-            if (document.getElementById('baud-menu').getAttribute('class') == 'hidden') {
-                document.getElementById('baud-menu').setAttribute('class', ' ')
+            if (baudMenu.getAttribute('class') == 'hidden') {
+                baudMenu.setAttribute('class', ' ')
             }
             else {
-                document.getElementById('baud-menu').setAttribute('class', 'hidden')
+                baudMenu.setAttribute('class', 'hidden')
             }
         })
+        document.getElementById('baud-usb').addEventListener('click', function () {
+            document.getElementById('baud-content').innerText = "38400";
+            port.baudrate = 38400
+            baudMenu.setAttribute('class', 'hidden')
+        })
+        document.getElementById('baud-serial').addEventListener('click', function () {
+            document.getElementById('baud-content').innerText = "4800";
+            port.baudrate = 4800
+            baudMenu.setAttribute('class', 'hidden')
+        })
+
+
         document.getElementById('port').addEventListener('click', function () {
 
-            if (document.getElementById('port-menu').getAttribute('class') == 'hidden') {
+            if (portMenu.getAttribute('class') == 'hidden') {
 
-                document.getElementById('port-menu').innerHTML = "";
+                portMenu.innerHTML = "";
                 portsList = ""
                 noOfPorts = 1
                 SerialPort.list(function (err, ports) {
                     ports.forEach(function (port) {
 
-                        document.getElementById('port-menu').innerHTML = document.getElementById('port-menu').innerHTML + "<p id='" + noOfPorts + "' class='portslistitem'> " + port.comName + "</p>";
+                        portMenu.innerHTML = portMenu.innerHTML + "<p id='" + noOfPorts + "' class='portslistitem'> " + port.comName + "</p>";
                         document.getElementById(noOfPorts).addEventListener('click', function () {
                             document.getElementById('port-content').innerText = document.getElementById(noOfPorts).innerText;
-                            document.getElementById('port-menu').setAttribute('class', 'hidden')
+                            portMenu.setAttribute('class', 'hidden')
                             portName = document.getElementById('port-content').innerText;
                             noOfPorts++;
                         })
                     });
                     if (ports.length < 1) {
 
-                        document.getElementById('port-menu').innerHTML = document.getElementById('port-menu').innerHTML + "<p id='NoDev'>No Devices Detected</p>";
+                        portMenu.innerHTML = portMenu.innerHTML + "<p id='NoDev'>No Devices Detected</p>";
 
                         document.getElementById('NoDev').addEventListener('click', function () {
                             document.getElementById('port-content').innerText = " ";
-                            document.getElementById('port-menu').setAttribute('class', 'hidden')
+                            portMenu.setAttribute('class', 'hidden')
                         })
                     }
 
                 });
 
-                document.getElementById('port-menu').setAttribute('class', '')
+                portMenu.setAttribute('class', '')
 
             }
             else {
 
-                document.getElementById('port-menu').setAttribute('class', 'hidden')
+                portMenu.setAttribute('class', 'hidden')
 
             }
         })
-        document.getElementById('baud-usb').addEventListener('click', function () {
-            document.getElementById('baud-content').innerText = "38400";
-            port.baudrate = 38400
-            document.getElementById('baud-menu').setAttribute('class', 'hidden')
-        })
-        document.getElementById('baud-serial').addEventListener('click', function () {
-            document.getElementById('baud-content').innerText = "4800";
-            port.baudrate = 4800
-            document.getElementById('baud-menu').setAttribute('class', 'hidden')
-        })
+
         //Read Port
         require('./si-data.js')
-
-
 
     </script>
 </body>
