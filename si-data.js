@@ -7,7 +7,7 @@
 /* ------ Import and Set Up Variables ----- */
 
 const si = require('./si-variables.js');
-const crc = require('./crc.js')
+const crc = require('./crc.js');
 const card5 = new si.card5();
 const card10 = new si.card10();
 
@@ -34,7 +34,7 @@ function output(data, type) {
     }
     else {
         downloadOutput.innerHTML = downloadOutput.innerHTML + "<p>" + data + "</p>";
-        ipc.send('resize', 0)
+        ipc.send('resize', 0);
     }
     document.getElementById('scroll').scrollTop = downloadOutput.scrollHeight;
 }
@@ -116,19 +116,19 @@ function getName(personalData) {
     // Data is separated by colons, first name then surname; so two colons
 
     var name = "";
-    colonCounter = 0
+    colonCounter = 0;
 
     for (character of personalData) {
         if (character != 0x3B && colonCounter <= 1) {
-            name = name + String.fromCharCode(character)
+            name = name + String.fromCharCode(character);
         }
         else if (character == 0x3B && colonCounter <= 1) {
-            name = name + " "
+            name = name + " ";
             colonCounter++;
         }
         else {
-            return name
-            break
+            return name;
+            break;
         }
     }
 }
@@ -143,38 +143,43 @@ function processCard10Punches(data, blockNumber) {
         var position = 6;
         while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
             time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
-            controlCode = parseInt(data[position + 1])
+            controlCode = parseInt(data[position + 1]);
 
-            displayControlPunch(controlCode, time)
+            displayControlPunch(controlCode, time);
 
             position = position + 4;
         }
         if (blockNumber == 7) {
             currentDownload.complete = true;
-            diplayControlPunch("F", finishTime)
-            port.write(si.beep)
+            diplayControlPunch("F", finishTime);
+            port.write(si.beep);
+            return true;
         }
         else {
             if (position != 134) {
                 downloadComplete = true;
-                displayControlPunch("F", finishTime)
-                port.write(si.beep)
+                displayControlPunch("F", finishTime);
+                port.write(si.beep);
+                return true;
             }
             else {
                 if (blockNumber == 4) {
-                    port.write(card10.readBlock5)
+                    port.write(card10.readBlock5);
+                    return false;
                 }
                 else if (blockNumber == 5) {
-                    port.write(card10.readBlock6)
+                    port.write(card10.readBlock6);
+                    return false;
                 }
                 else if (blockNumber == 6) {
-                    port.write(card10.readBlock7)
+                    port.write(card10.readBlock7);
+                    return false;
                 }
             }
         }
     }
     else {
-        output("Error: Problem with data transmission - Please Re-insert Card", 'error')
+        output("Error: Problem with data transmission - Please Re-insert Card", 'error');
     }
 }
 
@@ -183,29 +188,55 @@ function dataTranslation(serialData) {
     // Turn raw data into times
     // Each type for packet is a seperate If and all have a CRC check
 
+    // Type of Card Being Read
+    var typeOfCard = null;
+
     // If Card5 just been inserted
     if ((serialData[0] == 0x02) && (serialData[1] == 0xE5)) { //If SI 5 inserted send signal to read SI5 data
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
-
-            siid = calculateSIID(serialData.slice(5, 9))
-            port.write(card5.read)
-
+            siid = calculateSIID(serialData.slice(5, 9));
+            port.write(card5.read);
+            typeOfCard = 5;
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error')
+            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
         }
     }
 
-    // If Card10+ just been inserted
-    else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8)) {//If SI 10+ inserted send signal to read SI10 data
+    // If Card 8,9,10,11 or SIAC have been inserted
+    else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8) && (serialData[1] == 0x06)) {
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
 
-            siid = calculateSIID(serialData.slice(5, 9))
-            port.write(card10.readBlock0)
+            siid = calculateSIID(serialData.slice(5, 9));
 
+            if (siid >= 7000000) {
+                port.write(card10.readBlock0);
+                typeOfCard = 10;
+            }
+            else if (2000000 <= siid && 2999999 >= siid) {
+                output('Error: Card 8 Not Currently Avaliable to Read', 'error');
+                typeOfCard = 8;
+            }
+            else if (1000000 <= siid && 1999999 >= siid) {
+                output('Error: Card 9 Not Currently Avaliable to Read', 'error');
+                typeOfCard = 9;
+            }
+            else if (4000000 <= siid && 4999999 >= siid) {
+                output('Error: pCard Not Currently Avaliable to Read', 'error');
+                typeOfCard = 'p';
+            }
+            // No Intention to Implement as Not used in Orienteering
+            else if (6000000 <= siid && 6999999 >= siid) {
+                output('Error: tCard Not Currently Avaliable to Read', 'error');
+                typeOfCard = 't';
+            }
+            else if (14000000 <= siid && 14999999 >= siid) {
+                output('Error: fCard Not Currently Avaliable to Read', 'error');
+                typeOfCard = 'f';
+            }
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error')
+            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
         }
     }
 
@@ -214,79 +245,105 @@ function dataTranslation(serialData) {
 
         if (parseInt(serialData[133].toString(16) + serialData[134].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 133)).toString(16), 16)) {
 
-            port.write(si.beep)
-            startTime = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
-            finishTime = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
-            time = calculateTime(startTime, finishTime)
+            if (typeOfCard == 5) {
 
-            output("(" + siid + ")" + " - " + time[0] + ":" + time[1], 'big')
-            displayControlPunch("S", startTime)
+                port.write(si.beep);
+                startTime = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
+                finishTime = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
+                time = calculateTime(startTime, finishTime);
 
-            var position = 38;
-            var blockPosition = 0;
-            while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
+                output("(" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
+                displayControlPunch("S", startTime);
 
-                time = parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16);
-                controlCode = parseInt(serialData[position])
-                displayControlPunch(controlCode, time)
+                var position = 38;
+                var blockPosition = 0;
+                while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
 
-                if (blockPosition < 4) {
-                    position = position + 3;
-                    blockPosition++;
+                    time = parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16);
+                    controlCode = parseInt(serialData[position]);
+                    displayControlPunch(controlCode, time);
+
+                    if (blockPosition < 4) {
+                        position = position + 3;
+                        blockPosition++;
+                    }
+                    else {
+                        position = position + 4;
+                        blockPosition = 0;
+                    }
+
                 }
-                else {
-                    position = position + 4;
-                    blockPosition = 0
-                }
-
+                displayControlPunch("F", finishTime);
+                typeOfCard = null;
             }
-            displayControlPunch("F", finishTime)
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error')
+            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
         }
+
     }
 
-    // Read Block 0 of Card 10+ data
+    // Read Block 0 of Card 8,9,10,11 or SIAC data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x00) && (serialData.length == 137)) {
+
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
 
-            startTime = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
-            finishTime = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
-            time = calculateTime(startTime, finishTime)
+            if (typeOfCard == 10) {
 
-            var name = getName(serialData.slice(38, 133))
+                startTime = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
+                finishTime = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
+                time = calculateTime(startTime, finishTime);
 
-            output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big')
-            displayControlPunch("S", startTime)
+                var name = getName(serialData.slice(38, 133));
 
-            port.write(card10.readBlock4)
-            downloadComplete = false;
+                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
+                displayControlPunch("S", startTime);
 
+                port.write(card10.readBlock4);
+                downloadComplete = false;
+
+            }
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error')
+            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
         }
+
     }
 
     // Read Block 4 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
-        processCard10Punches(serialData, 4)
+        if (typeOfCard == 10) {
+            if (processCard10Punches(serialData, 4) == true) {
+                typeOfCard = null;
+            }
+        }
     }
 
     // Read Block 5 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
-        processCard10Punches(serialData, 5)
+        if (typeOfCard == 10) {
+            if (processCard10Punches(serialData, 5) == true) {
+                typeOfCard = null;
+            }
+        }
     }
 
     // Read Block 6 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
-        processCard10Punches(serialData, 6)
+        if (typeOfCard == 10) {
+            if (processCard10Punches(serialData, 6) == true) {
+                typeOfCard = null;
+            }
+        }
     }
 
     // Read Block 57of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
-        processCard10Punches(serialData, 7)
+        if (typeOfCard == 10) {
+            if (processCard10Punches(serialData, 7) == true) {
+                typeOfCard = null;
+            }
+        }
     }
 
 }
@@ -354,7 +411,7 @@ connect.addEventListener('click', function () {
             }
         });
 
-        port.open()
+        port.open();
         connect.textContent = "Disconnect";
     }
 })
