@@ -34,40 +34,62 @@
 
 
     <main>
-        <div id="connection-details">
-            <p class="label">Port:</p>
-            <div id='port'>
-                <p id="port-content" class="content"></p>
-                <svg fill="#000000" viewBox="0 0 24 24" width="20">
-                    <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
-                    <path d="M0-.75h24v24H0z" fill="none" />
-                </svg>
+        <div id="menu-panel">
+            <div id="download-menu" style="display:none">
+                <p class="label">Port:</p>
+                <div id='port'>
+                    <p id="port-content" class="content"></p>
+                    <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                        <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                        <path d="M0-.75h24v24H0z" fill="none" />
+                    </svg>
 
+                </div>
+                <div id="port-menu" class="hidden">
+
+                </div>
+                <p class="label">Baud Rate:</p>
+                <div id="baud">
+                    <p id="baud-content" class="content">4800</p>
+                    <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                        <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                        <path d="M0-.75h24v24H0z" fill="none" />
+                    </svg>
+
+                </div>
+                <div id="baud-menu" class="hidden">
+                    <p id="baud-serial">4800 (Serial)</p>
+                    <p id="baud-usb">38400 (USB)</p>
+                </div>
+
+                <button id="connect">Connect</button>
             </div>
-            <div id="port-menu" class="hidden">
-
+            <div id="main-menu" style="display:none">
+                <p id="download">Download</p>
+                <p id="entries">Entries</p>
             </div>
-            <p class="label">Baud Rate:</p>
-            <div id="baud">
-                <p id="baud-content" class="content">4800</p>
-                <svg fill="#000000" viewBox="0 0 24 24" width="20">
-                    <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
-                    <path d="M0-.75h24v24H0z" fill="none" />
-                </svg>
-
-            </div>
-            <div id="baud-menu" class="hidden">
-                <p id="baud-serial">4800 (Serial)</p>
-                <p id="baud-usb">38400 (USB)</p>
-            </div>
-
-
-            <button id="connect">Connect</button>
-
+            <button id="back">Back</button>
         </div>
         <div id="scroll" height='400px'>
 
-            <div id="download-output">
+            <div id="download-output" style="display:none">
+
+            </div>
+            <div id="entries" style="display:none">
+                <form>
+                    <div class="text-input">
+                        <input id="name" type="text" required/>
+                        <label for="name">Name</label>
+                    </div>
+                    <div class="text-input">
+                        <input id="age-class" type="text" required/>
+                        <label for="age-class">Age Class</label>
+                    </div>
+                    <div class="text-input">
+                        <input id="course" type="text" required/>
+                        <label for="course">Course</label>
+                    </div>
+                </form>
 
             </div>
         </div>
@@ -79,7 +101,7 @@
         var SerialPort = require('serialport');
 
 
-        // Window Commands & Icons
+        /* ----- Window Commands & Icons ----- */
 
         document.getElementById('icon-min').setAttribute('style', 'display:inline');
         document.getElementById('icon-max').setAttribute('style', 'display:none');
@@ -108,6 +130,7 @@
             document.getElementById('scroll').setAttribute('style', "height:" + pixels + "px")
 
         })
+
 
         // Menu Collapse
         const portMenu = document.getElementById('port-menu');
