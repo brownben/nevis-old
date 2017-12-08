@@ -102,9 +102,14 @@ main {
   background-color: #29B6F6;
 }
 #menu-panel #back {
-  margin-top: 50px !important;
+  margin-top: 40px !important;
+  position:relative;
+
 }
 
+#download-menu , #main-menu  {
+  margin-top:30px;
+}
 #download-menu p, #main-menu p {
   font-family: Roboto;
   font-weight: 300;
@@ -144,7 +149,9 @@ main {
   padding-bottom: 5px;
   transition: .5s;
 }
-
+#main-menu p{
+  margin-top:5px;
+}
 #baud-menu p:hover, #port-menu p:hover, #main-menu p:hover {
   color: white;
   background-color: #29B6F6;
@@ -197,7 +204,7 @@ main {
   outline: 0;
   border: 0;
   padding: 2px;
-  border-bottom: 1.8px solid #BDBDBD;
+  border-bottom: 1px solid #BDBDBD;
   font-family: Roboto;
   font-weight: 300;
   transition: border 1s linear;
@@ -208,7 +215,7 @@ main {
   position: relative;
 }
 #entries input:focus {
-  border-bottom: 1.8px solid #03A9F4;
+  border-bottom: 1px solid #03A9F4;
 }
 #entries input:required:valid + label {
   color: #BDBDBD;

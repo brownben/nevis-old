@@ -104,11 +104,12 @@ main{
         }
     }
     #back{
-        margin-top:50px!important;
+        margin-top: 40px !important;
+        position:relative;
     }
 }
 #download-menu, #main-menu{
-
+    margin-top:30px;
     p {
         font-family:Roboto;
         font-weight:300;
@@ -139,6 +140,9 @@ main{
 
 
 
+}
+#main-menu p{
+    margin-top:10px;
 }
 #baud, #port{
     transition:.3s;
@@ -210,7 +214,7 @@ main{
         outline:0;
         border:0;
         padding:2px;
-        border-bottom: 1.8px solid #BDBDBD;
+        border-bottom: 1px solid #BDBDBD;
         font-family: Roboto;
         font-weight: 300;
         transition:border 1s linear;
@@ -220,7 +224,7 @@ main{
         background:transparent;
         position:relative;
         &:focus{
-            border-bottom: 1.8px solid #03A9F4;
+            border-bottom: 1px solid #03A9F4;
 
         }
         &:required:valid + label{

@@ -65,8 +65,8 @@
                 <button id="connect">Connect</button>
             </div>
             <div id="main-menu" style="display:none">
-                <p id="download">Download</p>
-                <p id="entries">Entries</p>
+                <p id="menu-download">Download</p>
+                <p id="menu-entries">Entries</p>
             </div>
             <button id="back">Back</button>
         </div>
@@ -100,6 +100,42 @@
 
         var SerialPort = require('serialport');
 
+        document.getElementById('download-output').setAttribute('style', 'display:none;')
+        document.getElementById('entries').setAttribute('style', 'display:none;')
+        document.getElementById('download-menu').setAttribute('style', 'display:none;')
+        document.getElementById('main-menu').setAttribute('style', 'display:block;')
+        document.getElementById('back').setAttribute('style', 'display:none;')
+
+        document.getElementById('menu-download').addEventListener('click', function () {
+            document.getElementById('download-output').setAttribute('style', 'display:block;')
+            document.getElementById('entries').setAttribute('style', 'display:none;')
+            document.getElementById('download-menu').setAttribute('style', 'display:block;')
+            document.getElementById('main-menu').setAttribute('style', 'display:none;')
+            document.getElementById('back').setAttribute('style', 'display:block;')
+        })
+
+        document.getElementById('menu-entries').addEventListener('click', function () {
+            document.getElementById('download-output').setAttribute('style', 'display:none;')
+            document.getElementById('entries').setAttribute('style', 'display:block;')
+            document.getElementById('download-menu').setAttribute('style', 'display:none;')
+            document.getElementById('main-menu').setAttribute('style', 'display:none;')
+            document.getElementById('back').setAttribute('style', 'display:block;')
+        })
+
+        document.getElementById('back').addEventListener('click', function () {
+            if (document.getElementById('download-output').getAttribute('style') == 'display:block;') {
+                if (document.getElementById('connect').innerText == 'Disconnect') {
+                    port.close();
+                }
+            }
+
+            document.getElementById('download-output').setAttribute('style', 'display:none;')
+            document.getElementById('entries').setAttribute('style', 'display:none;')
+            document.getElementById('download-menu').setAttribute('style', 'display:none;')
+            document.getElementById('main-menu').setAttribute('style', 'display:block;')
+            document.getElementById('back').setAttribute('style', 'display:none;')
+
+        })
 
         /* ----- Window Commands & Icons ----- */
 
