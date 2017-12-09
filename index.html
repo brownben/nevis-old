@@ -98,46 +98,8 @@
     <script>
         const ipc = require('electron').ipcRenderer
 
-        var SerialPort = require('serialport');
-
-        document.getElementById('download-output').setAttribute('style', 'display:none;')
-        document.getElementById('entries').setAttribute('style', 'display:none;')
-        document.getElementById('download-menu').setAttribute('style', 'display:none;')
-        document.getElementById('main-menu').setAttribute('style', 'display:block;')
-        document.getElementById('back').setAttribute('style', 'display:none;')
-
-        document.getElementById('menu-download').addEventListener('click', function () {
-            document.getElementById('download-output').setAttribute('style', 'display:block;')
-            document.getElementById('entries').setAttribute('style', 'display:none;')
-            document.getElementById('download-menu').setAttribute('style', 'display:block;')
-            document.getElementById('main-menu').setAttribute('style', 'display:none;')
-            document.getElementById('back').setAttribute('style', 'display:block;')
-        })
-
-        document.getElementById('menu-entries').addEventListener('click', function () {
-            document.getElementById('download-output').setAttribute('style', 'display:none;')
-            document.getElementById('entries').setAttribute('style', 'display:block;')
-            document.getElementById('download-menu').setAttribute('style', 'display:none;')
-            document.getElementById('main-menu').setAttribute('style', 'display:none;')
-            document.getElementById('back').setAttribute('style', 'display:block;')
-        })
-
-        document.getElementById('back').addEventListener('click', function () {
-            if (document.getElementById('download-output').getAttribute('style') == 'display:block;') {
-                if (document.getElementById('connect').innerText == 'Disconnect') {
-                    port.close();
-                }
-            }
-
-            document.getElementById('download-output').setAttribute('style', 'display:none;')
-            document.getElementById('entries').setAttribute('style', 'display:none;')
-            document.getElementById('download-menu').setAttribute('style', 'display:none;')
-            document.getElementById('main-menu').setAttribute('style', 'display:block;')
-            document.getElementById('back').setAttribute('style', 'display:none;')
-
-        })
-
         /* ----- Window Commands & Icons ----- */
+        // Title Bar (Max and Min) + Scrollbar
 
         document.getElementById('icon-min').setAttribute('style', 'display:inline');
         document.getElementById('icon-max').setAttribute('style', 'display:none');
@@ -167,75 +129,14 @@
 
         })
 
+        //Main Menu
+        require('./main-menu.js')
 
-        // Menu Collapse
-        const portMenu = document.getElementById('port-menu');
-        const baudMenu = document.getElementById('baud-menu');
+        //Download Page
+        require('./downloads.js')
 
-
-        document.getElementById('baud').addEventListener('click', function () {
-            if (baudMenu.getAttribute('class') == 'hidden') {
-                baudMenu.setAttribute('class', ' ')
-            }
-            else {
-                baudMenu.setAttribute('class', 'hidden')
-            }
-        })
-        document.getElementById('baud-usb').addEventListener('click', function () {
-            document.getElementById('baud-content').innerText = "38400";
-            port.baudrate = 38400
-            baudMenu.setAttribute('class', 'hidden')
-        })
-        document.getElementById('baud-serial').addEventListener('click', function () {
-            document.getElementById('baud-content').innerText = "4800";
-            port.baudrate = 4800
-            baudMenu.setAttribute('class', 'hidden')
-        })
-
-
-        document.getElementById('port').addEventListener('click', function () {
-
-            if (portMenu.getAttribute('class') == 'hidden') {
-
-                portMenu.innerHTML = "";
-                portsList = ""
-                noOfPorts = 1
-                SerialPort.list(function (err, ports) {
-                    ports.forEach(function (port) {
-
-                        portMenu.innerHTML = portMenu.innerHTML + "<p id='" + noOfPorts + "' class='portslistitem'> " + port.comName + "</p>";
-                        document.getElementById(noOfPorts).addEventListener('click', function () {
-                            document.getElementById('port-content').innerText = document.getElementById(noOfPorts).innerText;
-                            portMenu.setAttribute('class', 'hidden')
-                            portName = document.getElementById('port-content').innerText;
-                            noOfPorts++;
-                        })
-                    });
-                    if (ports.length < 1) {
-
-                        portMenu.innerHTML = portMenu.innerHTML + "<p id='NoDev'>No Devices Detected</p>";
-
-                        document.getElementById('NoDev').addEventListener('click', function () {
-                            document.getElementById('port-content').innerText = " ";
-                            portMenu.setAttribute('class', 'hidden')
-                        })
-                    }
-
-                });
-
-                portMenu.setAttribute('class', '')
-
-            }
-            else {
-
-                portMenu.setAttribute('class', 'hidden')
-
-            }
-        })
-
-        //Read Port
-        require('./si-data.js')
-
+        //Entries Page
+        require('./entries.js')
     </script>
 </body>
 
