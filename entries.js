@@ -7,8 +7,17 @@
 // Database
 const loki = require('lokijs');
 
-var db = new loki('./nevis.db');
-var competitors = db.addCollection('competitors');
+var db = new loki('./nevis.db', {
+    autoload: true,
+    autoloadCallback: databaseInitialize
+});
+
+function databaseInitialize() {
+    if (!db.getCollection("competitors")) {
+        db.addCollection("competitors");
+    }
+};
+var competitors = db.getCollection('competitors');
 
 document.getElementById('entries-submit').addEventListener('click', function () {
     competitors.insert({
@@ -20,5 +29,4 @@ document.getElementById('entries-submit').addEventListener('click', function () 
     document.getElementById('entries-age-class').value = "";
     course: document.getElementById('entries-course').value = "";
     db.saveDatabase();
-    console.log(competitors.data)
 });
