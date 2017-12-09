@@ -7,7 +7,7 @@
 // Database
 const loki = require('lokijs');
 
-var db = new loki('./nevis.json');
+var db = new loki('./nevis.db');
 var competitors = db.addCollection('competitors');
 
 document.getElementById('entries-submit').addEventListener('click', function () {
