@@ -34,6 +34,12 @@
 
     <main>
         <div id="menu-panel">
+            <div id="main-menu">
+                <p id="menu-download">Download</p>
+                <p id="menu-entries">Entries</p>
+                <p id="menu-results">Results</p>
+                <p id="menu-courses">Courses</p>
+            </div>
             <div id="download-menu">
                 <p class="label">Port:</p>
                 <div id='port'>
@@ -63,10 +69,7 @@
 
                 <button id="connect">Connect</button>
             </div>
-            <div id="main-menu">
-                <p id="menu-download">Download</p>
-                <p id="menu-entries">Entries</p>
-            </div>
+
             <button id="back">Back</button>
         </div>
         <div id="scroll" height='400px'>
@@ -77,17 +80,31 @@
                 <form>
                     <div class="text-input">
                         <input id="entries-name" type="text" required/>
-                        <label for="name">Name</label>
+                        <label for="entries-name">Name</label>
                     </div>
                     <div class="text-input">
-                        <input id="entries-age-class" type="text" required/>
-                        <label for="age-class">Age Class</label>
+                        <input id="entries-siid" max="9999999" type="text" required/>
+                        <label for="entries-siid">SI Number</label>
+                    </div>
+                    <div class="text-input">
+                        <input id="entries-age-class" pattern="[MW]{1}[0-9]{2}" type="text" required/>
+                        <label for="entries-age-class">Age Class</label>
+                    </div>
+                    <div class="text-input">
+                        <input id="entries-club" type="text" required/>
+                        <label for="entries-club">Club</label>
                     </div>
                     <div class="text-input">
                         <input id="entries-course" type="text" required/>
-                        <label for="course">Course</label>
+                        <label for="entries-course">Course</label>
                     </div>
+                    <div class="checkbox-input">
+                        <label for="entries-nc">Non-Competitive?
+                            <input id="entries-nc" type="checkbox" required/>
+                            <span for="entries-nc" />
+                        </label>
 
+                    </div>
                 </form>
                 <button id="entries-submit">Add Entry</button>
             </div>

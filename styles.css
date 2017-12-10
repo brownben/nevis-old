@@ -155,23 +155,27 @@ main {
   margin-top: 15px;
 }
 
-#main-menu p {
-  margin-top: 10px;
-}
-
 #baud, #port {
-  transition: .3s;
+  transition: .5s;
 }
 
 #baud:hover, #port:hover {
   background-color: #E1F5FE;
 }
 
-#baud-menu p, #port-menu p, #main-menu p {
+#baud-menu p, #port-menu p {
   margin: 0;
   padding-top: 5px;
   padding-bottom: 5px;
   transition: .5s;
+}
+
+#main-menu p {
+  margin: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  transition: background-color .5s;
+  margin-top: 10px;
 }
 
 #baud-menu p:hover, #port-menu p:hover, #main-menu p:hover {
@@ -241,10 +245,12 @@ main {
   width: 225px;
   background: transparent;
   position: relative;
+  color: #616161;
 }
 
 #entries input:focus {
   border-bottom: 1px solid #03A9F4;
+  color: black;
 }
 
 #entries input:required:valid + label {
@@ -259,6 +265,60 @@ main {
   top: -20px;
 }
 
+#entries label {
+  position: relative;
+  font-size: 15px;
+  color: #BDBDBD;
+  font-family: Roboto;
+  font-weight: 300;
+  width: 50px;
+  transition: .25s ease-out;
+  margin-left: -232px;
+}
+
+#entries .checkbox-input {
+  margin-top: 17px;
+  margin-left: 5px;
+}
+
+#entries .checkbox-input input {
+  display: none;
+}
+
+#entries .checkbox-input label {
+  position: relative;
+  font-size: 15px;
+  color: #BDBDBD;
+  font-family: Roboto;
+  font-weight: 300;
+  width: 50px;
+  transition: .45s ease-out;
+  margin: 0px;
+}
+
+#entries .checkbox-input span {
+  height: 10px;
+  width: 10px;
+  margin-left: 10px;
+  border: 1px solid #BDBDBD;
+  display: inline-block;
+  position: relative;
+  transition: .5s;
+}
+
+#entries .checkbox-input [type=checkbox]:checked + span {
+  height: 12px;
+  width: 6px;
+  margin-left: 13px;
+  border: 1.5px solid #03A9F4;
+  display: inline-block;
+  position: relative;
+  border-top: 0;
+  border-left: 0;
+  transition: .5s;
+  transform: rotate(405deg);
+}
+
 #entries button {
   background-color: #03A9F4;
   color: white;
@@ -270,21 +330,11 @@ main {
   border: none;
   transition: .5s;
   padding: 5px 7px;
+  margin-bottom: 5px;
 }
 
 #entries button:hover {
   box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-}
-
-#entries label {
-  position: relative;
-  font-size: 15px;
-  color: #BDBDBD;
-  font-family: Roboto;
-  font-weight: 300;
-  width: 50px;
-  transition: 1s ease-out;
-  margin-left: -230px;
 }
 
 #entries .text-input {

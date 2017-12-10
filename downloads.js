@@ -6,7 +6,7 @@
 // Setup the whole Download screen                              //
 
 /* ------ Import and Set Up Variables ----- */
-
+const SerialPort = require('serialport');
 const si = require('./si-variables.js');
 const crc = require('./crc.js');
 const card5 = new si.card5();
