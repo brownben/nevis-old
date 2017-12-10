@@ -6,8 +6,9 @@
   "version": "0.2.0",
   "main": "main.js",
   "dependencies": {
-    "serialport": "^6.0.4",
-    "lokijs": "^1.5.1"
+    "crypto-js": "^3.1.9-1",
+    "lokijs": "^1.5.1",
+    "serialport": "^6.0.4"
   },
   "devDependencies": {
     "electron": "^1.7.9",
