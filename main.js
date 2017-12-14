@@ -7,8 +7,7 @@ const url = require('url')
 const ipc = require('electron').ipcMain
 const dialog = require('electron').dialog
 const globalShortcut = require('electron').globalShortcut
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+
 let win
 var maximized = false;
 
@@ -21,6 +20,8 @@ function createWindow() {
         frame: false,
         icon: __dirname + '/Nevis Logo.png',
         show: false,
+        minHeight: 95,
+        minWidth: 160
     })
 
     // and load the index.html of the app.

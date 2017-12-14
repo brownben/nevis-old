@@ -118,12 +118,22 @@ main {
 }
 
 #menu-panel #back {
-  margin-top: 40px !important;
-  position: relative;
+  width: 160px;
+  left: 0;
+  bottom: 0px;
+  position: absolute;
+  background-color: white;
+  margin-top: 0px;
+  padding-bottom: 10px;
+}
+
+#menu-panel #back button {
+  margin-top: 0px;
 }
 
 #download-menu, #main-menu {
-  margin-top: 30px;
+  display: flex;
+  margin-top: 20px;
 }
 
 #download-menu p, #main-menu p {
@@ -149,10 +159,15 @@ main {
   display: inline-flex;
 }
 
-#download-menu .label, #main-menu .label {
+#download-menu .label:not(:first-child), #main-menu .label:not(:first-child) {
   margin: 0;
   font-size: 14px;
   margin-top: 15px;
+}
+
+#download-menu .label, #main-menu .label {
+  margin: 0;
+  font-size: 14px;
 }
 
 #baud, #port {
@@ -170,11 +185,17 @@ main {
   transition: .5s;
 }
 
+#baud-menu, #port-menu {
+  transition: transform .3s;
+  transform: scaleY(100%);
+  transform-origin: top;
+}
+
 #main-menu p {
   margin: 0;
   padding-top: 5px;
   padding-bottom: 5px;
-  transition: background-color .5s;
+  transition: .5s;
   margin-top: 10px;
 }
 
@@ -184,14 +205,11 @@ main {
 }
 
 .hidden {
+  transform: scaleY(0);
+  transition: transform .3s;
+  transform-origin: bottom;
   height: 0px;
   font-size: 0px;
-}
-
-.hidden p {
-  font-size: 0px !important;
-  height: 0px !important;
-  padding: 0px !important;
 }
 
 #download-output {
@@ -228,6 +246,13 @@ main {
   margin-bottom: 3px;
 }
 
+#about {
+  margin-left: 10px;
+  font-family: Roboto;
+  font-weight: 100;
+  margin-bottom: 10px;
+}
+
 #entries {
   margin-left: 10px;
 }
@@ -242,7 +267,8 @@ main {
   transition: border 1s linear;
   font-size: 15px;
   margin-left: 5px;
-  width: 225px;
+  min-width: 195px;
+  width: 60%;
   background: transparent;
   position: relative;
   color: #616161;
@@ -273,7 +299,13 @@ main {
   font-weight: 300;
   width: 50px;
   transition: .25s ease-out;
-  margin-left: -232px;
+  margin-left: -60%;
+}
+
+@media (max-width: 480px) {
+  #entries label {
+    margin-left: -200px;
+  }
 }
 
 #entries .checkbox-input {
@@ -319,24 +351,6 @@ main {
   transform: rotate(405deg);
 }
 
-#entries button {
-  background-color: #03A9F4;
-  color: white;
-  border-radius: 10%;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-  margin-left: 180px;
-  margin-top: 15px;
-  outline: none;
-  border: none;
-  transition: .5s;
-  padding: 5px 7px;
-  margin-bottom: 5px;
-}
-
-#entries button:hover {
-  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-}
-
 #entries .text-input {
   display: block;
   margin-top: 25px;
@@ -348,23 +362,19 @@ main {
   height: 100%;
   margin: 0;
   height: auto;
+  padding-right: 10px;
 }
 
 ::-webkit-scrollbar {
   width: 12px;
 }
 
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-thumb {
   background: #F5F5F5;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #EEEEEE;
-  border-radius: 10px;
-}
-
 ::-webkit-scrollbar-thumb:active {
-  background: #e0e0e0;
+  background: #eee;
 }
 
 @media (max-width: 205px) {

@@ -39,40 +39,48 @@
                 <p id="menu-entries">Entries</p>
                 <p id="menu-results">Results</p>
                 <p id="menu-courses">Courses</p>
+                <p id="menu-about">About</p>
             </div>
-            <div id="download-menu">
-                <p class="label">Port:</p>
-                <div id='port'>
-                    <p id="port-content" class="content"></p>
-                    <svg fill="#000000" viewBox="0 0 24 24" width="20">
-                        <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
-                        <path d="M0-.75h24v24H0z" fill="none" />
-                    </svg>
+            <div id="scroll-menu">
+                <div id="download-menu">
+                    <p class="label">Port:</p>
+                    <div id='port'>
+                        <p id="port-content" class="content"></p>
+                        <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                            <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                            <path d="M0-.75h24v24H0z" fill="none" />
+                        </svg>
+
+                    </div>
+                    <div id="port-menu" class="hidden">
+
+                    </div>
+                    <p class="label">Baud Rate:</p>
+                    <div id="baud">
+                        <p id="baud-content" class="content">4800</p>
+                        <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                            <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                            <path d="M0-.75h24v24H0z" fill="none" />
+                        </svg>
+
+                    </div>
+                    <div id="baud-menu" class="hidden">
+                        <p id="baud-serial">4800 (Serial)</p>
+                        <p id="baud-usb">38400 (USB)</p>
+                    </div>
+
+                    <button id="connect">Connect</button>
 
                 </div>
-                <div id="port-menu" class="hidden">
-
+                <div id="entries-menu">
+                    <button id="entries-submit">Add Entry</button>
                 </div>
-                <p class="label">Baud Rate:</p>
-                <div id="baud">
-                    <p id="baud-content" class="content">4800</p>
-                    <svg fill="#000000" viewBox="0 0 24 24" width="20">
-                        <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
-                        <path d="M0-.75h24v24H0z" fill="none" />
-                    </svg>
-
+                <div id='back'>
+                    <button id='back-button'>Back</button>
                 </div>
-                <div id="baud-menu" class="hidden">
-                    <p id="baud-serial">4800 (Serial)</p>
-                    <p id="baud-usb">38400 (USB)</p>
-                </div>
-
-                <button id="connect">Connect</button>
             </div>
-
-            <button id="back">Back</button>
         </div>
-        <div id="scroll" height='400px'>
+        <div id="scroll">
 
             <div id="download-output">
             </div>
@@ -103,12 +111,75 @@
                             <input id="entries-nc" type="checkbox" required/>
                             <span for="entries-nc" />
                         </label>
-
                     </div>
                 </form>
-                <button id="entries-submit">Add Entry</button>
-            </div>
 
+            </div>
+            <div id="about">
+                <h2>About</h2>
+                <p>
+                    Nevis a fast, easy, stress free way to manage timing of events using the SportIdent timing system. Nevis is software to allow
+                    you to download the download from SportIdent cards into results. It can manage entries, courses and results
+                    and is designed to be used for small orienteering events. It is opensource and al code is avaiable on
+                    Github.
+                </p>
+                <p>Nevis is in no way related or endorsed by SportIdent. To find out about SportIdent go to thier website: sportident.com</p>
+
+                <h2>Help</h2>
+                <p>Basic help at some point may be avaliable at: https://github.com/bonalybob/Nevis</p>
+
+                <h2>Credits</h2>
+                <h4>CRC Algorithm from opensportident</h4>
+                <p>MIT License - https://github.com/angexis/opensportident.js/blob/master/LICENSE</p>
+                <p>
+                    Copyright
+                    <br/> (c) 2016 Jan Vorwerk Copyright
+                    <br/>(c) 2013 Simon Denier
+                </p>
+
+                <h4> Serialport </h4>
+                <p> MIT License - https://github.com/node-serialport/node-serialport/blob/master/LICENSE</p>
+                <p> Copyright (c) 2010 Christopher Williams. All rights reserved. </p>
+
+                <h4> Electron </h4>
+                <p> MIT License - https://github.com/electron/electron/blob/master/LICENSE</p>
+                <p>Copyright (c) 2013-2017 GitHub Inc. </p>
+
+                <h4> Material Design Icons </h4>
+                <p> Apache 2.0 License - https://github.com/google/material-design-icons/blob/master/LICENSE</p>
+
+
+                <h4> LokiJS </h4>
+                <p> MIT License - https://github.com/techfort/LokiJS/blob/master/LICENSE.txt</p>
+                <p>Copyright (c) 2015 TechFort</p>
+
+
+                <h4> Crypto-JS</h4>
+                <p> MIT License - https://github.com/brix/crypto-js/blob/develop/LICENSE</p>
+                <p>Copyright
+                    <br/>(c) 2009-2013 Jeff Mott Copyright
+                    <br/>(c) 2013-2016 Evan Vosberg</p>
+                <h2>License</h2>
+                <h3> MIT License</h3>
+                <p>
+                    Copyright (c) 2017 Bonalybob
+                </p>
+                <p>
+                    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+                    files (the " Software "), to deal in the Software without restriction, including without limitation the
+                    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+                    and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+                    The above copyright notice and this permission notice shall be included in all copies or substantial
+                    portions of the Software.
+                </p>
+                <p>
+                    THE SOFTWARE IS PROVIDED "AS IS ", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS
+                    OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+                    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+                    IN THE SOFTWARE.
+                </p>
+            </div>
         </div>
     </main>
 
@@ -142,8 +213,9 @@
 
         ipc.on('resize', function (event, arg) {
             var pixels = arg[1] - 30
-            document.getElementById('scroll').setAttribute('style', "height:" + pixels + "px")
-
+            var minusBackButtonPixels = pixels - 45
+            document.getElementById('scroll').setAttribute('style', "height: " + pixels + "px ")
+            document.getElementById('scroll-menu').setAttribute('style', "height: " + minusBackButtonPixels + "px ")
         })
 
         //Main Menu
