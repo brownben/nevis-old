@@ -226,15 +226,6 @@ function dataTranslation(serialData) {
                 output('Error: pCard Not Currently Avaliable to Read', 'error');
                 typeOfCard = 'p';
             }
-            // No Intention to Implement as Not used in Orienteering
-            else if (6000000 <= siid && 6999999 >= siid) {
-                output('Error: tCard Not Currently Avaliable to Read', 'error');
-                typeOfCard = 't';
-            }
-            else if (14000000 <= siid && 14999999 >= siid) {
-                output('Error: fCard Not Currently Avaliable to Read', 'error');
-                typeOfCard = 'f';
-            }
         }
         else {
             output("Error: Problem with data transmission - Please Re-insert Card", 'error');
