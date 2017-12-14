@@ -299,7 +299,7 @@ main {
   font-weight: 300;
   width: 50px;
   transition: .25s ease-out;
-  margin-left: -60%;
+  margin-left: -61%;
 }
 
 @media (max-width: 480px) {
