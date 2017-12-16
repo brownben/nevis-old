@@ -16,6 +16,13 @@ var db = new loki('./databases/nevis.db', {
     autoloadCallback: databaseInitialize
 });
 
+function databaseInitialize() {
+    competitors = db.getCollection("competitors");
+    if (competitors === null) {
+        competitors = db.addCollection("competitors");
+    }
+}
+
 function blankEntry() {
     document.getElementById('entries-name').value = "";
     document.getElementById('entries-siid').value = "";
@@ -23,13 +30,6 @@ function blankEntry() {
     document.getElementById('entries-age-class').value = "";
     document.getElementById('entries-course').value = "";
     document.getElementById('entries-nc').value = false;
-}
-
-function databaseInitialize() {
-    competitors = db.getCollection("competitors");
-    if (competitors === null) {
-        competitors = db.addCollection("competitors");
-    }
 }
 
 // Add Entry

@@ -21,6 +21,21 @@ const card10 = new si.card10();//Card 10, 11 & SIAC
 const CryptoJS = require('crypto-js').AES;
 var encryptionKey = 'orienteer';
 
+// Set up Database
+const loki = require('lokijs');
+
+var db = new loki('./databases/nevis.db', {
+    autoload: true,
+    autoloadCallback: databaseInitialize
+});
+
+function databaseInitialize() {
+    downloads = db.getCollection("downloads");
+    if (downloads === null) {
+        downloads = db.addCollection("downloads");
+    }
+}
+
 /* ------ HTML Elements ----- */
 
 const connect = document.getElementById('connect');
@@ -33,6 +48,8 @@ var download = function () {
     this.controlCodes = [];
     this.controlTimes = [];
 }
+
+var currentDownload = new download();
 
 /* ----- Functions -----*/
 
@@ -162,13 +179,14 @@ function processCard10Punches(data, blockNumber) {
         while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
             time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
             controlCode = parseInt(data[position + 1]);
-
+            currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
+            currentDownload.controlTimes = currentDownload.controlTimes + time;
             displayControlPunch(controlCode, time);
 
             position = position + 4;
         }
         if (blockNumber == 7) {
-            currentDownload.complete = true;
+
             diplayControlPunch("F", finishTime);
             port.write(si.beep);
             return true;
@@ -206,11 +224,13 @@ function processCard8Punches(data, blockNumber) {
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
         time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
         controlCode = parseInt(data[position + 1]);
+        currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
+        currentDownload.controlTimes = currentDownload.controlTimes + time;
         displayControlPunch(controlCode, time);
         position = position + 4;
     }
     if (blockNumber == 1) {
-        currentDownload.complete = true;
+
         diplayControlPunch("F", finishTime);
         port.write(si.beep);
         return true;
@@ -233,7 +253,9 @@ function dataTranslation(serialData) {
     // If Card5 just been inserted
     if ((serialData[0] == 0x02) && (serialData[1] == 0xE5)) { //If SI 5 inserted send signal to read SI5 data
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
+            currentDownload = new download();
             siid = calculateSIID(serialData.slice(5, 9));
+            currentDownload.siid = siid;
             port.write(card5.read);
             typeOfCard = 5;
         }
@@ -245,9 +267,9 @@ function dataTranslation(serialData) {
     // If Card 8,9,10,11 or SIAC have been inserted
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8) && (serialData[1] == 0x06)) {
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
-
+            currentDownload = new download();
             siid = calculateSIID(serialData.slice(5, 9));
-
+            currentDownload.siid = siid;
             if (siid >= 7000000) {
                 port.write(card10.readBlock0);
                 typeOfCard = 10;
@@ -257,11 +279,11 @@ function dataTranslation(serialData) {
                 typeOfCard = 8;
             }
             else if (1000000 <= siid && 1999999 >= siid) {
-                port.write(card9.readBlock0);
+                port.write(card8.readBlock0);
                 typeOfCard = 9;
             }
             else if (4000000 <= siid && 4999999 >= siid) {
-                output('Error: pCard Not Currently Avaliable to Read', 'error');
+                port.write(card8.readBlock0)
                 typeOfCard = 'p';
             }
         }
@@ -281,7 +303,8 @@ function dataTranslation(serialData) {
                 startTime = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
                 finishTime = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
                 time = calculateTime(startTime, finishTime);
-
+                currentDownload.start = startTime;
+                currentDownload.finish = finishTime;
                 output("(" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
                 displayControlPunch("S", startTime);
 
@@ -291,6 +314,8 @@ function dataTranslation(serialData) {
 
                     time = parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16);
                     controlCode = parseInt(serialData[position]);
+                    currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
+                    currentDownload.controlTimes = currentDownload.controlTimes + time;
                     displayControlPunch(controlCode, time);
 
                     if (blockPosition < 4) {
@@ -323,7 +348,8 @@ function dataTranslation(serialData) {
                 startTime = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
                 finishTime = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
                 time = calculateTime(startTime, finishTime);
-
+                currentDownload.start = startTime;
+                currentDownload.finish = finishTime;
                 var name = getName(serialData.slice(38, 133));
 
                 output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
@@ -338,7 +364,8 @@ function dataTranslation(serialData) {
                 startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
                 finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
                 time = calculateTime(startTime, finishTime);
-
+                currentDownload.start = startTime;
+                currentDownload.finish = finishTime;
                 var name = getName(serialData.slice(38, 58));
 
                 output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
@@ -353,7 +380,8 @@ function dataTranslation(serialData) {
                 startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
                 finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
                 time = calculateTime(startTime, finishTime);
-
+                currentDownload.start = startTime;
+                currentDownload.finish = finishTime;
                 var name = getName(serialData.slice(38, 133));
 
                 output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
@@ -368,7 +396,8 @@ function dataTranslation(serialData) {
                 startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
                 finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
                 time = calculateTime(startTime, finishTime);
-
+                currentDownload.start = startTime;
+                currentDownload.finish = finishTime;
                 var name = getName(serialData.slice(38, 133));
 
                 output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
@@ -390,16 +419,22 @@ function dataTranslation(serialData) {
 
             if (typeOfCard == 8) {
                 processCard8Punches(serialData.slice(6, 134), 1)
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
 
             }
             if (typeOfCard == 9) {
                 processCard8Punches(serialData.slice(18, 134), 1)
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
 
             }
             if (typeOfCard == 'p') {
                 processCard8Punches(serialData.slice(54, 134), 1)
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
 
             }
@@ -409,6 +444,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 4) == true) {
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
             }
         }
@@ -418,6 +455,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 5) == true) {
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
             }
         }
@@ -427,6 +466,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 6) == true) {
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
             }
         }
@@ -436,6 +477,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 7) == true) {
+                downloads.insert(currentDownload)
+                currentDownload = new download();
                 typeOfCard = null;
             }
         }
