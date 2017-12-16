@@ -14,7 +14,8 @@ const crc = require('./crc.js');
 // Variables for Reading Cards
 const si = require('./si-variables.js');
 const card5 = new si.card5();
-const card10 = new si.card10();
+const card8 = new si.card8();  // Card 8,9 & P
+const card10 = new si.card10();//Card 10, 11 & SIAC
 
 // Require  CryptJS for Encryption
 const CryptoJS = require('crypto-js').AES;
@@ -199,6 +200,27 @@ function processCard10Punches(data, blockNumber) {
         output("Error: Problem with data transmission - Please Re-insert Card", 'error');
     }
 }
+function processCard8Punches(data, blockNumber) {
+    var endOfPunches = data.length - 1;
+    var position = 0;
+    while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
+        time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
+        controlCode = parseInt(data[position + 1]);
+        displayControlPunch(controlCode, time);
+        position = position + 4;
+    }
+    if (blockNumber == 1) {
+        currentDownload.complete = true;
+        diplayControlPunch("F", finishTime);
+        port.write(si.beep);
+        return true;
+    }
+    else {
+        port.write(card8.readBlock1);
+        return false;
+    }
+}
+
 
 
 function dataTranslation(serialData) {
@@ -231,11 +253,11 @@ function dataTranslation(serialData) {
                 typeOfCard = 10;
             }
             else if (2000000 <= siid && 2999999 >= siid) {
-                output('Error: Card 8 Not Currently Avaliable to Read', 'error');
+                port.write(card8.readBlock0);
                 typeOfCard = 8;
             }
             else if (1000000 <= siid && 1999999 >= siid) {
-                output('Error: Card 9 Not Currently Avaliable to Read', 'error');
+                port.write(card9.readBlock0);
                 typeOfCard = 9;
             }
             else if (4000000 <= siid && 4999999 >= siid) {
@@ -311,13 +333,78 @@ function dataTranslation(serialData) {
                 downloadComplete = false;
 
             }
+            else if (typeOfCard == 9) {
+
+                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                time = calculateTime(startTime, finishTime);
+
+                var name = getName(serialData.slice(38, 58));
+
+                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
+                displayControlPunch("S", startTime);
+                processCard8Punches(serialdata.slice(59, 133), 0)
+                port.write(card8.readBlock1);
+                downloadComplete = false;
+
+            }
+            else if (typeOfCard == 8) {
+
+                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                time = calculateTime(startTime, finishTime);
+
+                var name = getName(serialData.slice(38, 133));
+
+                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
+                displayControlPunch("S", startTime);
+
+                port.write(card8.readBlock1);
+                downloadComplete = false;
+
+            }
+            else if (typeOfCard == 'p') {
+
+                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                time = calculateTime(startTime, finishTime);
+
+                var name = getName(serialData.slice(38, 133));
+
+                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
+                displayControlPunch("S", startTime);
+
+                port.write(card8.readBlock1);
+                downloadComplete = false;
+
+            }
         }
         else {
             output("Error: Problem with data transmission - Please Re-insert Card", 'error');
         }
 
     }
+    // Read Block 1 of Card 8 + 9
+    else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x01) && (serialData.length == 137)) {
+        if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
 
+            if (typeOfCard == 8) {
+                processCard8Punches(serialData.slice(6, 134), 1)
+                typeOfCard = null;
+
+            }
+            if (typeOfCard == 9) {
+                processCard8Punches(serialData.slice(18, 134), 1)
+                typeOfCard = null;
+
+            }
+            if (typeOfCard == 'p') {
+                processCard8Punches(serialData.slice(54, 134), 1)
+                typeOfCard = null;
+
+            }
+        }
+    }
     // Read Block 4 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
@@ -345,7 +432,7 @@ function dataTranslation(serialData) {
         }
     }
 
-    // Read Block 57of Card 10+ data
+    // Read Block 7 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 7) == true) {
