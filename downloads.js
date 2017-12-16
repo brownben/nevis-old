@@ -420,6 +420,7 @@ function dataTranslation(serialData) {
             if (typeOfCard == 8) {
                 processCard8Punches(serialData.slice(6, 134), 1)
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
 
@@ -427,6 +428,7 @@ function dataTranslation(serialData) {
             if (typeOfCard == 9) {
                 processCard8Punches(serialData.slice(18, 134), 1)
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
 
@@ -434,6 +436,7 @@ function dataTranslation(serialData) {
             if (typeOfCard == 'p') {
                 processCard8Punches(serialData.slice(54, 134), 1)
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
 
@@ -445,6 +448,7 @@ function dataTranslation(serialData) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 4) == true) {
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
             }
@@ -456,6 +460,7 @@ function dataTranslation(serialData) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 5) == true) {
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
             }
@@ -467,6 +472,7 @@ function dataTranslation(serialData) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 6) == true) {
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
             }
@@ -478,6 +484,7 @@ function dataTranslation(serialData) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 7) == true) {
                 downloads.insert(currentDownload)
+                db.saveDatabase();
                 currentDownload = new download();
                 typeOfCard = null;
             }
