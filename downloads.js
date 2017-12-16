@@ -5,17 +5,33 @@
 // Read and display the data coming from punches to a station   //
 // Setup the whole Download screen                              //
 
+
 /* ------ Import and Set Up Variables ----- */
+// Libraries for reading Serialport
 const SerialPort = require('serialport');
-const si = require('./si-variables.js');
 const crc = require('./crc.js');
+
+// Variables for Reading Cards
+const si = require('./si-variables.js');
 const card5 = new si.card5();
 const card10 = new si.card10();
+
+// Require  CryptJS for Encryption
+const CryptoJS = require('crypto-js').AES;
+var encryptionKey = 'orienteer';
 
 /* ------ HTML Elements ----- */
 
 const connect = document.getElementById('connect');
 
+/* ------ Download Class for Database ----- */
+var download = function () {
+    this.siid = '';
+    this.start = 0;
+    this.finish = 0;
+    this.controlCodes = [];
+    this.controlTimes = [];
+}
 
 /* ----- Functions -----*/
 
