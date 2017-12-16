@@ -20,7 +20,3 @@ Copyright (c) 2013-2017 GitHub Inc.
 > MIT License - https://github.com/techfort/LokiJS/blob/master/LICENSE.txt
 Copyright (c) 2015 TechFort <joe.minichino@gmail.com>
 
-## Crypt-Js
-> MIT License - https://github.com/brix/crypto-js/blob/develop/LICENSE
-Copyright (c) 2009-2013 Jeff Mott
-Copyright (c) 2013-2016 Evan Vosberg

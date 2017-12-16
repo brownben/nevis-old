@@ -14,17 +14,18 @@ const crc = require('./crc.js');
 // Variables for Reading Cards
 const si = require('./si-variables.js');
 const card5 = new si.card5();
-const card8 = new si.card8();  // Card 8,9 & P
-const card10 = new si.card10();//Card 10, 11 & SIAC
+const card8 = new si.card8();   // Card 8,9 & P
+const card10 = new si.card10(); //Card 10, 11 & SIAC
 
-// Require  CryptJS for Encryption
-const CryptoJS = require('crypto-js').AES;
-var encryptionKey = 'orienteer';
+// Encryption for Database
+var cryptedFileAdapter = require('./encryption-adapter.js');
+cryptedFileAdapter.setKey('orienteer');
 
 // Set up Database
 const loki = require('lokijs');
 
 var db = new loki('./nevis.db', {
+    adapter: cryptedFileAdapter,
     autoload: true,
     autoloadCallback: databaseInitialize
 });

@@ -6,7 +6,6 @@
   "version": "0.2.0",
   "main": "main.js",
   "dependencies": {
-    "crypto-js": "^3.1.9-1",
     "lokijs": "^1.5.1",
     "serialport": "^6.0.4"
   },

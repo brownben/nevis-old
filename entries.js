@@ -4,14 +4,15 @@
 
 // Add and View Entries                                         //
 
-// Require  CryptJS for Encryption
-const CryptoJS = require('crypto-js').AES;
-var encryptionKey = 'orienteer';
+// Encryption for Database
+var cryptedFileAdapter = require('./encryption-adapter.js');
+cryptedFileAdapter.setKey('orienteer');
 
-// Database
+// Set up Database
 const loki = require('lokijs');
 
-var db = new loki('./databases/nevis.db', {
+var db = new loki('./nevis.db', {
+    adapter: cryptedFileAdapter,
     autoload: true,
     autoloadCallback: databaseInitialize
 });
@@ -37,12 +38,12 @@ document.getElementById('entries-submit').addEventListener('click', function () 
     if (document.getElementById('entries-name').value != "" || document.getElementById('entries-siid').value != "") {
 
         competitors.insert({
-            name: CryptoJS.encrypt(document.getElementById('entries-name').value, encryptionKey).toString(),
-            siid: CryptoJS.encrypt(document.getElementById('entries-siid').value, encryptionKey).toString(),
-            club: CryptoJS.encrypt(document.getElementById('entries-club').value, encryptionKey).toString(),
-            ageClass: CryptoJS.encrypt(document.getElementById('entries-age-class').value, encryptionKey).toString(),
-            course: CryptoJS.encrypt(document.getElementById('entries-course').value, encryptionKey).toString(),
-            nonCompetitive: CryptoJS.encrypt(document.getElementById('entries-nc').value, encryptionKey).toString()
+            name: document.getElementById('entries-name').value,
+            siid: document.getElementById('entries-siid').value,
+            club: document.getElementById('entries-club').value,
+            ageClass: document.getElementById('entries-age-class').value,
+            course: document.getElementById('entries-course').value,
+            nonCompetitive: document.getElementById('entries-nc').value
         });
 
         db.saveDatabase();
