@@ -24,7 +24,7 @@ var encryptionKey = 'orienteer';
 // Set up Database
 const loki = require('lokijs');
 
-var db = new loki('./databases/nevis.db', {
+var db = new loki('./nevis.db', {
     autoload: true,
     autoloadCallback: databaseInitialize
 });
@@ -47,6 +47,7 @@ var download = function () {
     this.finish = 0;
     this.controlCodes = [];
     this.controlTimes = [];
+    this.name = '';
 }
 
 var currentDownload = new download();
@@ -78,7 +79,7 @@ function output(data, type) {
 function calculateSIID(data) {
     // Turn the bytes transmitted from the station into a human readable and idenifiable SIID (SI Number)
 
-    siid = parseInt(data[0] + data[1] + data[2] + data[3], 16);
+    var siid = parseInt(data[0] + data[1] + data[2] + data[3], 16);
     // SI Card 5
     if ((data[0] == 0x00) && (data[1] == 0x01)) {
         siid = siid - 65536;
@@ -125,11 +126,18 @@ function calculateSIID(data) {
 
 
 function calculateTime(startRaw, finishRaw) {
-    // Calculate time taken from start tofinish from the raw start and finish times
+    // Calculate time taken from start to finish from the raw start and finish times
+    // Make sure numbers have 2 digits
 
-    timeRaw = finishraw - startRaw;
-    timeMinutes = (timeRaw - (timeRaw % 60)) / 60;
-    timeSeconds = timeRaw % 60;
+    var timeRaw = finishRaw - startRaw;
+    var timeMinutes = (timeRaw - (timeRaw % 60)) / 60;
+    var timeSeconds = timeRaw % 60;
+    if (timeSeconds <= 9) {
+        timeSeconds = '0' + timeSeconds;
+    }
+    if (timeMinutes <= 9) {
+        timeMinutes = '0' + timeMinutes;
+    }
     return [timeMinutes, timeSeconds, timeRaw];
 
 }
@@ -137,11 +145,21 @@ function calculateTime(startRaw, finishRaw) {
 
 function displayControlPunch(controlCode, time) {
     // Display Control Code and Time of punch in a human readable format
+    // Make sure numbers have 2 digits
 
-    timeHour = (time - (time % 3600)) / 3600;
-    timeMinutes = ((time % 3600) - (time % 60)) / 60;
-    timeSeconds = time % 60;
-    output(controlCode + " - " + timeHour + ":" + timeMinutes + ":" + timeSeconds);
+    var timeHours = (time - (time % 3600)) / 3600;
+    var timeMinutes = ((time % 3600) - (time % 60)) / 60;
+    var timeSeconds = time % 60;
+    if (timeSeconds <= 9) {
+        timeSeconds = '0' + timeSeconds;
+    }
+    if (timeMinutes <= 9) {
+        timeMinutes = '0' + timeMinutes;
+    }
+    if (timeHours <= 9) {
+        timeHours = '0' + timeHours;
+    }
+    output(controlCode + " - " + timeHours + ":" + timeMinutes + ":" + timeSeconds);
 
 }
 
@@ -177,24 +195,20 @@ function processCard10Punches(data, blockNumber) {
 
         var position = 6;
         while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-            time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
-            controlCode = parseInt(data[position + 1]);
-            currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
-            currentDownload.controlTimes = currentDownload.controlTimes + time;
-            displayControlPunch(controlCode, time);
-
+            currentDownload.controlCodes.push(parseInt(data[position + 1]));
+            currentDownload.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
             position = position + 4;
         }
         if (blockNumber == 7) {
 
-            diplayControlPunch("F", finishTime);
+
             port.write(si.beep);
             return true;
         }
         else {
             if (position != 134) {
                 downloadComplete = true;
-                displayControlPunch("F", finishTime);
+
                 port.write(si.beep);
                 return true;
             }
@@ -215,23 +229,20 @@ function processCard10Punches(data, blockNumber) {
         }
     }
     else {
-        output("Error: Problem with data transmission - Please Re-insert Card", 'error');
+        return "Error: Problem with data transmission - Please Re-insert Card"
     }
 }
 function processCard8Punches(data, blockNumber) {
     var endOfPunches = data.length - 1;
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-        time = parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16);
-        controlCode = parseInt(data[position + 1]);
-        currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
-        currentDownload.controlTimes = currentDownload.controlTimes + time;
-        displayControlPunch(controlCode, time);
+
+        currentDownload.controlCodes.push(parseInt(data[position + 1]));
+        currentDownload.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
+
         position = position + 4;
     }
     if (blockNumber == 1) {
-
-        diplayControlPunch("F", finishTime);
         port.write(si.beep);
         return true;
     }
@@ -242,25 +253,24 @@ function processCard8Punches(data, blockNumber) {
 }
 
 
-
+// Type of Card Being Read
+var typeOfCard = null;
 function dataTranslation(serialData) {
     // Turn raw data into times
     // Each type for packet is a seperate If and all have a CRC check
 
-    // Type of Card Being Read
-    var typeOfCard = null;
-
     // If Card5 just been inserted
     if ((serialData[0] == 0x02) && (serialData[1] == 0xE5)) { //If SI 5 inserted send signal to read SI5 data
+
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
             currentDownload = new download();
-            siid = calculateSIID(serialData.slice(5, 9));
-            currentDownload.siid = siid;
+            currentDownload.siid = calculateSIID(serialData.slice(5, 9));
             port.write(card5.read);
+
             typeOfCard = 5;
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
+            return "Error: Problem with data transmission - Please Re-insert Card"
         }
     }
 
@@ -288,36 +298,25 @@ function dataTranslation(serialData) {
             }
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
+            return "Error: Problem with data transmission - Please Re-insert Card";
         }
     }
 
     // Read block of Card 5 data
+
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xB1) && (serialData[2] == 0x82) && (serialData.length == 136)) {
 
         if (parseInt(serialData[133].toString(16) + serialData[134].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 133)).toString(16), 16)) {
 
             if (typeOfCard == 5) {
 
-                port.write(si.beep);
-                startTime = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
-                finishTime = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
-                time = calculateTime(startTime, finishTime);
-                currentDownload.start = startTime;
-                currentDownload.finish = finishTime;
-                output("(" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
-                displayControlPunch("S", startTime);
-
+                currentDownload.start = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
+                currentDownload.finish = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
                 var position = 38;
                 var blockPosition = 0;
                 while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
-
-                    time = parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16);
-                    controlCode = parseInt(serialData[position]);
-                    currentDownload.controlCodes = currentDownload.controlCodes + controlCode;
-                    currentDownload.controlTimes = currentDownload.controlTimes + time;
-                    displayControlPunch(controlCode, time);
-
+                    currentDownload.controlCodes.push(parseInt(serialData[position]));
+                    currentDownload.controlTimes.push(parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16));
                     if (blockPosition < 4) {
                         position = position + 3;
                         blockPosition++;
@@ -326,14 +325,14 @@ function dataTranslation(serialData) {
                         position = position + 4;
                         blockPosition = 0;
                     }
-
                 }
-                displayControlPunch("F", finishTime);
                 typeOfCard = null;
+                port.write(si.beep);
+                return currentDownload
             }
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
+            return "Error: Problem with data transmission - Please Re-insert Card"
         }
 
     }
@@ -345,31 +344,18 @@ function dataTranslation(serialData) {
 
             if (typeOfCard == 10) {
 
-                startTime = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
-                finishTime = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
-                time = calculateTime(startTime, finishTime);
-                currentDownload.start = startTime;
-                currentDownload.finish = finishTime;
-                var name = getName(serialData.slice(38, 133));
-
-                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
-                displayControlPunch("S", startTime);
-
+                currentDownload.start = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
+                currentDownload.finish = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
+                currentDownload.name = getName(serialData.slice(38, 133));
                 port.write(card10.readBlock4);
                 downloadComplete = false;
 
             }
             else if (typeOfCard == 9) {
 
-                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                time = calculateTime(startTime, finishTime);
-                currentDownload.start = startTime;
-                currentDownload.finish = finishTime;
-                var name = getName(serialData.slice(38, 58));
-
-                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
-                displayControlPunch("S", startTime);
+                currentDownload.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                currentDownload.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                currentDownload.name = getName(serialData.slice(38, 58));
                 processCard8Punches(serialdata.slice(59, 133), 0)
                 port.write(card8.readBlock1);
                 downloadComplete = false;
@@ -377,39 +363,25 @@ function dataTranslation(serialData) {
             }
             else if (typeOfCard == 8) {
 
-                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                time = calculateTime(startTime, finishTime);
-                currentDownload.start = startTime;
-                currentDownload.finish = finishTime;
-                var name = getName(serialData.slice(38, 133));
-
-                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
-                displayControlPunch("S", startTime);
-
+                currentDownload.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                currentDownload.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                currentDownload.name = getName(serialData.slice(38, 133));
                 port.write(card8.readBlock1);
                 downloadComplete = false;
 
             }
             else if (typeOfCard == 'p') {
 
-                startTime = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                finishTime = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                time = calculateTime(startTime, finishTime);
-                currentDownload.start = startTime;
-                currentDownload.finish = finishTime;
-                var name = getName(serialData.slice(38, 133));
-
-                output(name + " (" + siid + ")" + " - " + time[0] + ":" + time[1], 'big');
-                displayControlPunch("S", startTime);
-
+                currentDownload.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                currentDownload.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                currentDownload.name = getName(serialData.slice(38, 133));
                 port.write(card8.readBlock1);
                 downloadComplete = false;
 
             }
         }
         else {
-            output("Error: Problem with data transmission - Please Re-insert Card", 'error');
+            return "Error: Problem with data transmission - Please Re-insert Card"
         }
 
     }
@@ -419,26 +391,29 @@ function dataTranslation(serialData) {
 
             if (typeOfCard == 8) {
                 processCard8Punches(serialData.slice(6, 134), 1)
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
+
+
                 typeOfCard = null;
+                return currentDownload
+
 
             }
             if (typeOfCard == 9) {
                 processCard8Punches(serialData.slice(18, 134), 1)
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
+
                 typeOfCard = null;
+                return currentDownload
+
 
             }
             if (typeOfCard == 'p') {
                 processCard8Punches(serialData.slice(54, 134), 1)
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
                 typeOfCard = null;
+                return currentDownload
+
 
             }
         }
@@ -447,10 +422,10 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 4) == true) {
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
                 typeOfCard = null;
+                return currentDownload
+
             }
         }
     }
@@ -459,10 +434,10 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 5) == true) {
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
                 typeOfCard = null;
+                return currentDownload
+
             }
         }
     }
@@ -471,10 +446,10 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 6) == true) {
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
                 typeOfCard = null;
+                return currentDownload
+
             }
         }
     }
@@ -483,10 +458,10 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 7) == true) {
-                downloads.insert(currentDownload)
-                db.saveDatabase();
-                currentDownload = new download();
+
                 typeOfCard = null;
+                return currentDownload
+
             }
         }
     }
@@ -498,14 +473,8 @@ function dataTranslation(serialData) {
 
 connect.addEventListener('click', function () {
 
-    // Close Port if Open
-    if (connect.textContent = "Disconnect") {
-        port.close();
-        connect.textContent = "Connect";
-    }
-
     // Open the port
-    else {
+    if (connect.textContent == "Connect") {
 
         /* ----- Set up Port ----- */
 
@@ -546,8 +515,35 @@ connect.addEventListener('click', function () {
                 }
                 else {
                     if (dataInList.length == 135 || dataInList.length == 136 || dataInList.length == 11) {
-                        dataTranslation(dataInList);
+                        dataInList.push(0x03)
+                        var returnedData = dataTranslation(dataInList);
                         dataInList = []
+
+
+                        if (returnedData != null) {
+
+                            if (typeof returnedData == 'string') {
+                                output(returnedData, 'error')
+                            }
+                            else {
+                                downloads.insert({
+                                    'siid': returnedData.siid,
+                                    'start': returnedData.start,
+                                    'finish': returnedData.finish,
+                                    'controlCodes': returnedData.controlCodes,
+                                    'controlTimes': returnedData.controlTimes
+                                });
+                                db.saveDatabase();
+                                currentDownload = new download();
+                                var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+                                output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
+                                displayControlPunch('S', returnedData.start);
+                                for (punch in returnedData.controlCodes) {
+                                    displayControlPunch(returnedData.controlCodes[punch], returnedData.controlTimes[punch])
+                                }
+                                displayControlPunch('F', returnedData.finish)
+                            }
+                        }
                     }
                     else {
                         dataInList.push(byte);
@@ -558,6 +554,11 @@ connect.addEventListener('click', function () {
 
         port.open();
         connect.textContent = "Disconnect";
+    }
+    // Close Port if Open
+    else {
+        port.close();
+        connect.textContent = "Connect";
     }
 })
 
@@ -590,15 +591,12 @@ document.getElementById('baud-serial').addEventListener('click', function () {
 
 // Port Menu & Autogenerated Menu Items
 document.getElementById('port').addEventListener('click', function () {
-
     if (portMenu.getAttribute('class') == 'hidden') {
-
         portMenu.innerHTML = "";
         portsList = ""
         noOfPorts = 1
         SerialPort.list(function (err, ports) {
             ports.forEach(function (port) {
-
                 portMenu.innerHTML = portMenu.innerHTML + "<p id='" + noOfPorts + "' class='portslistitem'> " + port.comName + "</p>";
                 document.getElementById(noOfPorts).addEventListener('click', function () {
                     document.getElementById('port-content').innerText = document.getElementById(noOfPorts).innerText;
@@ -608,23 +606,16 @@ document.getElementById('port').addEventListener('click', function () {
                 })
             });
             if (ports.length < 1) {
-
                 portMenu.innerHTML = portMenu.innerHTML + "<p id='NoDev'>No Devices Detected</p>";
-
                 document.getElementById('NoDev').addEventListener('click', function () {
                     document.getElementById('port-content').innerText = " ";
                     portMenu.setAttribute('class', 'hidden')
                 })
             }
-
         });
-
         portMenu.setAttribute('class', '')
-
     }
     else {
-
         portMenu.setAttribute('class', 'hidden')
-
     }
 })
