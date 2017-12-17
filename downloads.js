@@ -7,14 +7,15 @@
 
 
 /* ------ Import and Set Up Variables ----- */
-// Libraries for reading Serialport
+
+// Libraries for reading Serialport and Data Verification
 const SerialPort = require('serialport');
 const crc = require('./crc.js');
 
 // Variables for Reading Cards
 const si = require('./si-variables.js');
 const card5 = new si.card5();
-const card8 = new si.card8();   // Card 8,9 & P
+const card8 = new si.card8(); // Card 8,9 & P
 const card10 = new si.card10(); //Card 10, 11 & SIAC
 
 // Encryption for Database
@@ -201,8 +202,6 @@ function processCard10Punches(data, blockNumber) {
             position = position + 4;
         }
         if (blockNumber == 7) {
-
-
             port.write(si.beep);
             return true;
         }
@@ -237,10 +236,8 @@ function processCard8Punches(data, blockNumber) {
     var endOfPunches = data.length - 1;
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-
         currentDownload.controlCodes.push(parseInt(data[position + 1]));
         currentDownload.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
-
         position = position + 4;
     }
     if (blockNumber == 1) {
@@ -306,11 +303,9 @@ function dataTranslation(serialData) {
     // Read block of Card 5 data
 
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xB1) && (serialData[2] == 0x82) && (serialData.length == 136)) {
-
         if (parseInt(serialData[133].toString(16) + serialData[134].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 133)).toString(16), 16)) {
 
             if (typeOfCard == 5) {
-
                 currentDownload.start = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
                 currentDownload.finish = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
                 var position = 38;
@@ -344,13 +339,11 @@ function dataTranslation(serialData) {
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
 
             if (typeOfCard == 10) {
-
                 currentDownload.start = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
                 currentDownload.finish = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
                 currentDownload.name = getName(serialData.slice(38, 133));
                 port.write(card10.readBlock4);
                 downloadComplete = false;
-
             }
             else if (typeOfCard == 9) {
 
@@ -360,25 +353,14 @@ function dataTranslation(serialData) {
                 processCard8Punches(serialdata.slice(59, 133), 0)
                 port.write(card8.readBlock1);
                 downloadComplete = false;
-
             }
-            else if (typeOfCard == 8) {
+            else if (typeOfCard == 8 || typeOfCard == 'p') {
 
                 currentDownload.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
                 currentDownload.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
                 currentDownload.name = getName(serialData.slice(38, 133));
                 port.write(card8.readBlock1);
                 downloadComplete = false;
-
-            }
-            else if (typeOfCard == 'p') {
-
-                currentDownload.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                currentDownload.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                currentDownload.name = getName(serialData.slice(38, 133));
-                port.write(card8.readBlock1);
-                downloadComplete = false;
-
             }
         }
         else {
@@ -392,41 +374,23 @@ function dataTranslation(serialData) {
 
             if (typeOfCard == 8) {
                 processCard8Punches(serialData.slice(6, 134), 1)
-
-
-
-                typeOfCard = null;
-                return currentDownload
-
-
             }
             if (typeOfCard == 9) {
                 processCard8Punches(serialData.slice(18, 134), 1)
-
-
-                typeOfCard = null;
-                return currentDownload
-
-
             }
             if (typeOfCard == 'p') {
                 processCard8Punches(serialData.slice(54, 134), 1)
-
-                typeOfCard = null;
-                return currentDownload
-
-
             }
+            typeOfCard = null;
+            return currentDownload
         }
     }
     // Read Block 4 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 4) == true) {
-
                 typeOfCard = null;
                 return currentDownload
-
             }
         }
     }
@@ -435,10 +399,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 5) == true) {
-
                 typeOfCard = null;
                 return currentDownload
-
             }
         }
     }
@@ -447,10 +409,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 6) == true) {
-
                 typeOfCard = null;
                 return currentDownload
-
             }
         }
     }
@@ -459,10 +419,8 @@ function dataTranslation(serialData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (typeOfCard == 10) {
             if (processCard10Punches(serialData, 7) == true) {
-
                 typeOfCard = null;
                 return currentDownload
-
             }
         }
     }
@@ -519,21 +477,15 @@ connect.addEventListener('click', function () {
                         dataInList.push(0x03)
                         var returnedData = dataTranslation(dataInList);
                         dataInList = []
-
-
                         if (returnedData != null) {
 
                             if (typeof returnedData == 'string') {
                                 output(returnedData, 'error')
                             }
                             else {
-                                downloads.insert({
-                                    'siid': returnedData.siid,
-                                    'start': returnedData.start,
-                                    'finish': returnedData.finish,
-                                    'controlCodes': returnedData.controlCodes,
-                                    'controlTimes': returnedData.controlTimes
-                                });
+                                // Save and Display Download
+
+                                downloads.insert(returnedData);
                                 db.saveDatabase();
                                 currentDownload = new download();
                                 var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
@@ -552,7 +504,6 @@ connect.addEventListener('click', function () {
                 }
             }
         });
-
         port.open();
         connect.textContent = "Disconnect";
     }

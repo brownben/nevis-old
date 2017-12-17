@@ -37,6 +37,9 @@ module.exports.card10 = function () {
     this.readBlock7 = new Buffer([0xFF, 0x02, 0xEF, 0x01, 0x07, 0xE5, 0x09, 0x03])
     this.readBlock8 = new Buffer([0xFF, 0x02, 0xEF, 0x01, 0x08, 0xEA, 0x09, 0x03])
 }
+
+// SI Card 8, 9 & P
+// Positions of Start and Finish Data & Read Instructions for all blocks
 module.exports.card8 = function () {
     this.startByte1 = 14;
     this.startByte2 = 15;
