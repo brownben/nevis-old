@@ -238,7 +238,14 @@ main{
     font-family:Roboto;
     font-weight:100;
     margin-bottom:10px;
-
+    h2, h3, h5,h4{
+        font-weight:300;
+        margin-bottom:15px;
+        margin-top:5px;
+    }
+    overflow-wrap: normal;
+    word-wrap: normal;
+    overflow-x: initial
 }
 #entries{
 
@@ -253,8 +260,8 @@ main{
         transition:border 1s linear;
         font-size:15px;
         margin-left:5px;
-        min-width:195px;
-        width:60%;
+        margin-right:10px;
+        width:calc(100% - 35px);
         background:transparent;
         position:relative;
         color:#616161;
@@ -286,13 +293,9 @@ main{
         font-weight: 300;
         width:50px;
         transition:.25s ease-out;
-        margin-left:-61%;
+        margin-left:calc(-100% + 20px);
   }
-  @media (max-width:480px){
-      label{
-          margin-left:-200px;
-      }
-  }
+
     .checkbox-input{
         margin-top:17px;
         margin-left:5px;
@@ -345,9 +348,58 @@ main{
   }
 }
 
+#results{
+    h2{
+        margin:10px;
+        margin-left:15px
+
+    }
+    font-family:Roboto;
+    font-weight:100;
+    margin-left:10px;
+    table{
+        margin-left:15px;
+        margin-right:15px;
+        text-align:center;
+
+        width:calc(100% - 30px);
+        border-collapse: collapse;
+        tr{
+
+            transition:.5s;
+            &:nth-child(even){
+                background-color:#E3F2FD;
+                border:0;
+
+            }
+            &:hover{
+                background-color:#BBDEFB;
+            }
+            td{
+                padding:7px;
+
+            }
+            th{
+                padding:7px;
+                font-weight:300
+            }
+        }
+
+    }
 
 
+}
 
+@media(max-width:440px){
+    .class{
+        display:none;
+    }
+}
+@media(max-width:490px){
+    .club{
+        display:none;
+    }
+}
 #scroll{
     overflow-y:auto!important;
     overflow-x:hidden;

@@ -251,6 +251,15 @@ main {
   font-family: Roboto;
   font-weight: 100;
   margin-bottom: 10px;
+  overflow-wrap: normal;
+  word-wrap: normal;
+  overflow-x: initial;
+}
+
+#about h2, #about h3, #about h5, #about h4 {
+  font-weight: 300;
+  margin-bottom: 15px;
+  margin-top: 5px;
 }
 
 #entries {
@@ -267,8 +276,8 @@ main {
   transition: border 1s linear;
   font-size: 15px;
   margin-left: 5px;
-  min-width: 195px;
-  width: 60%;
+  margin-right: 10px;
+  width: calc(100% - 35px);
   background: transparent;
   position: relative;
   color: #616161;
@@ -299,13 +308,7 @@ main {
   font-weight: 300;
   width: 50px;
   transition: .25s ease-out;
-  margin-left: -61%;
-}
-
-@media (max-width: 480px) {
-  #entries label {
-    margin-left: -200px;
-  }
+  margin-left: calc(-100% + 20px);
 }
 
 #entries .checkbox-input {
@@ -356,6 +359,59 @@ main {
   margin-top: 25px;
 }
 
+#results {
+  font-family: Roboto;
+  font-weight: 100;
+  margin-left: 10px;
+}
+
+#results h2 {
+  margin: 10px;
+  margin-left: 15px;
+}
+
+#results table {
+  margin-left: 15px;
+  margin-right: 15px;
+  text-align: center;
+  width: calc(100% - 30px);
+  border-collapse: collapse;
+}
+
+#results table tr {
+  transition: .5s;
+}
+
+#results table tr:nth-child(even) {
+  background-color: #E3F2FD;
+  border: 0;
+}
+
+#results table tr:hover {
+  background-color: #BBDEFB;
+}
+
+#results table tr td {
+  padding: 7px;
+}
+
+#results table tr th {
+  padding: 7px;
+  font-weight: 300;
+}
+
+@media (max-width: 440px) {
+  .class {
+    display: none;
+  }
+}
+
+@media (max-width: 490px) {
+  .club {
+    display: none;
+  }
+}
+
 #scroll {
   overflow-y: auto !important;
   overflow-x: hidden;
@@ -382,6 +438,4 @@ main {
     display: none;
   }
 }
- 
-
- /*# sourceMappingURL= styles.css.map */
+/*# sourceMappingURL=styles.css.map */

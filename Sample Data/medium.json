@@ -1,0 +1,10 @@
+{
+    "name": "Medium",
+    "distance": 3.0,
+    "climb": 50,
+    "controls": [
+        101,
+        102,
+        103
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "name": "Long",
+    "distance": 5.0,
+    "climb": 100,
+    "controls": [
+        101,
+        102,
+        103
+    ]
+}

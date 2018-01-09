@@ -18,7 +18,7 @@ function encrypt(input, key) {
         encryptedValue += cipher.final('base64');
 
         var result = {
-            version: "Nevis 2.0.0",
+            version: "Nevis 2.0.0 : Pre-Release",
             date: new Date(),
             value: encryptedValue
         };

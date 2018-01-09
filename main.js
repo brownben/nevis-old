@@ -128,3 +128,18 @@ ipc.on('window', function (event, arg) {
 ipc.on('resize', function (event, arg) {
     event.sender.send('resize', win.getSize())
 })
+
+ipc.on('open-course-file-dialog', function (event) {
+
+    dialog.showOpenDialog({
+        title: 'Nevis - Import Courses',
+
+        filters: [
+            { name: 'Nevis JSON', extensions: ['json'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['openFile']
+    }, function (files) {
+        if (files) event.sender.send('course-file', files)
+    })
+})

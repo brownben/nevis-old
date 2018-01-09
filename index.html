@@ -73,7 +73,16 @@
 
                 </div>
                 <div id="entries-menu" style="display:none;">
-                    <button id="entries-submit">Add Entry</button>
+                    <button id="add-entry">Add Entry</button>
+                </div>
+                <div id="entries-add-menu" style="display:none;">
+                    <button id="entries-submit">Save Entry</button>
+                </div>
+                <div id="courses-menu" style="display:none;">
+                    <button id="courses-json-import">Import Course</button>
+                </div>
+                <div id="results-menu" style="display:none;">
+                    <button id="results-refresh">Refresh Results</button>
                 </div>
                 <div id='back' style="display:none;">
                     <button id='back-button'>Back</button>
@@ -114,9 +123,11 @@
                 </form>
 
             </div>
+            <div id="courses-page" style="display:none;">
+            </div>
+            <div id="results" style="display:none;">
+            </div>
             <div id="about" style="display:none;">
-                <h2>Help</h2>
-                <p>Basic help at some point may be avaliable at: https://github.com/bonalybob/Nevis</p>
 
                 <h2>System</h2>
                 <p>Nevis Version: 2.0.0</p>
@@ -186,6 +197,41 @@
     </main>
 
     <script>
+
+        // Encryption for Database
+        var cryptedFileAdapter = require('./JS/encryption-adapter.js');
+        cryptedFileAdapter.setKey('orienteer');
+
+        // Set up Database
+        const loki = require('lokijs');
+
+        var db = new loki('./nevis.db', {
+            adapter: cryptedFileAdapter,
+            autoload: true,
+            autoloadCallback: databaseInitialize
+        });
+
+        function databaseInitialize() {
+            downloads = db.getCollection("downloads");
+            if (downloads === null) {
+                downloads = db.addCollection("downloads");
+            }
+
+            competitors = db.getCollection("competitors");
+            if (competitors === null) {
+                competitors = db.addCollection("competitors", {
+                    unique: ['siid']
+                });
+            }
+
+            courses = db.getCollection("courses");
+            if (courses === null) {
+                courses = db.addCollection("courses", {
+                    unique: ['name']
+                });
+            }
+        }
+
         const ipc = require('electron').ipcRenderer
 
         /* ----- Window Commands & Icons ----- */
@@ -220,14 +266,22 @@
             document.getElementById('scroll-menu').setAttribute('style', "height: " + minusBackButtonPixels + "px ")
         })
 
-        //Main Menu
-        require('./main-menu.js')
+
 
         //Download Page
-        require('./downloads.js')
+        require('./JS/downloads.js')
 
         //Entries Page
-        require('./entries.js')
+        require('./JS/entries.js')
+
+        //Courses Page
+        require('./JS/courses.js')
+
+        //Results Page
+        require('./JS/results.js')
+
+        //Main Menu
+        require('./JS/main-menu.js')
     </script>
 </body>
 
