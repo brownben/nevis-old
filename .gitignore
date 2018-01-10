@@ -62,6 +62,3 @@ styles.css.map
 
 # Ignore Databases
 *.db
-
-# Ignore test JS files
---*.js
