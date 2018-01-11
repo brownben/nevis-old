@@ -27,6 +27,7 @@ module.exports = {
     refreshResults: function () {
         document.getElementById('results').innerHTML = ""
         var listOfCourses = courses.find();
+        var courseCounter = 0;
         for (course of listOfCourses) {
 
             var competitorsOnCourse = competitors.find({
@@ -45,13 +46,17 @@ module.exports = {
             results = competitorsOnCourse.sort(function (a, b) {
                 return a.time - b.time;
             });
+            var card = document.createElement('div')
+            card.className = 'card';
+            card.id = "C" + courseCounter;
+            document.getElementById('results').appendChild(card)
             var h1 = document.createElement('h2')
             h1.innerText = course.name
-            document.getElementById('results').appendChild(h1)
+            document.getElementById("C" + courseCounter).appendChild(h1)
             var table = document.createElement('table');
             table.id = course.name
             table.innerHTML = "<tr><th>Pos.</th><th>Name</th><th class='class'>Class</th><th class='club'>Club</th><th>Time</th></tr>"
-            document.getElementById('results').appendChild(table);
+            document.getElementById("C" + courseCounter).appendChild(table);
             counter = 1
             for (result of results) {
                 var tr = document.createElement('tr')
@@ -62,17 +67,17 @@ module.exports = {
                     result.club = ""
                 }
                 if (result.nonCompetitive == true) {
-                    tr.innerHTML = "<td> n/c </td><td>" + result.name + "</td><td class='class'>" + result.class + "</td><td class='club'>" + result.club + "</td><td>" +calculateTime(result.time) + "</td>"
+                    tr.innerHTML = "<td> n/c </td><td>" + result.name + "</td><td class='class'>" + result.class + "</td><td class='club'>" + result.club + "</td><td>" + calculateTime(result.time) + "</td>"
                     document.getElementById(course.name).appendChild(tr)
                 }
                 else {
-                    tr.innerHTML = "<td>" + counter + "</td><td>" + result.name + "</td><td class='class'>" + result.class + "</td><td class='club'>" + result.club + "</td><td>" +calculateTime(result.time) + "</td>"
+                    tr.innerHTML = "<td>" + counter + "</td><td>" + result.name + "</td><td class='class'>" + result.class + "</td><td class='club'>" + result.club + "</td><td>" + calculateTime(result.time) + "</td>"
                     document.getElementById(course.name).appendChild(tr)
                     counter++
                 }
 
             }
-
+            courseCounter++
         }
     }
 }

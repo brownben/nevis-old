@@ -22,6 +22,7 @@ document.getElementById('add-entry').addEventListener('click', function () {
 
 // Add Entry
 document.getElementById('entries-submit').addEventListener('click', function () {
+    document.getElementById('entry-error').setAttribute('style', 'display:none')
     if (document.getElementById('entries-name').value != "" || document.getElementById('entries-siid').value != "") {
         try {
             competitors.insert({
@@ -39,8 +40,15 @@ document.getElementById('entries-submit').addEventListener('click', function () 
         }
 
         catch (exception) {
-            console.log("Error - Entry already exists for this SI Card")
+
+            document.getElementById('entry-error').setAttribute('style', 'display:block')
         }
         db.saveDatabase();
     }
 });
+
+//Blank Entry
+
+document.getElementById('entry-clear').addEventListener('click', function () {
+    blankEntry()
+})

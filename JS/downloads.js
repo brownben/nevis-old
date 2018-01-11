@@ -465,7 +465,7 @@ var currentDownload = new download();
 connect.addEventListener('click', function () {
 
     // Open the port
-    if (connect.textContent == "Connect") {
+    if (connect.textContent == "Connect" && document.getElementById('port-content').innerText != '') {
 
         /* ----- Set up Port ----- */
 
@@ -588,7 +588,7 @@ connect.addEventListener('click', function () {
         connect.textContent = "Disconnect";
     }
     // Close Port if Open
-    else {
+    else if (document.getElementById('port-content').innerText != '') {
         port.close();
         connect.textContent = "Connect";
     }

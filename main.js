@@ -15,7 +15,7 @@ var maximized = false;
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 450,
+        width: 480,
         height: 400,
         frame: false,
         icon: __dirname + '/Nevis Logo.png',
@@ -141,5 +141,20 @@ ipc.on('open-course-file-dialog', function (event) {
         properties: ['openFile']
     }, function (files) {
         if (files) event.sender.send('course-file', files)
+    })
+})
+ipc.on('select-database', function (event) {
+
+    dialog.showOpenDialog({
+        title: 'Nevis - Select Database',
+        icon: './nevis.ico',
+        filters: [
+            { name: 'Database', extensions: ['db'] },
+            { name: 'JSON', extensions: ['json'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+        properties: ['openFile']
+    }, function (files) {
+        if (files) event.sender.send('database-file', files)
     })
 })
