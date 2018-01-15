@@ -153,7 +153,7 @@ ipc.on('select-database', function (event) {
             { name: 'JSON', extensions: ['json'] },
             { name: 'All Files', extensions: ['*'] }
         ],
-        properties: ['openFile']
+        properties: ['openFile', 'promptToCreate']
     }, function (files) {
         if (files) event.sender.send('database-file', files)
     })

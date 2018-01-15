@@ -41,6 +41,10 @@
                 <p id="menu-courses">Courses</p>
                 <p id="menu-about">About</p>
             </div>
+            <div id="database-menu">
+                <button id="database-select">Select Database</button>
+                <button id="database-open">Open Database</button>
+            </div>
             <div id="scroll-menu">
                 <div id="download-menu" style="display:none;">
                     <p class="label">Port:</p>
@@ -73,6 +77,7 @@
 
                 </div>
                 <div id="entries-menu" style="display:none;">
+                    <button id="search-entries">Search Entries</button>
                     <button id="add-entry">Add Entry</button>
                 </div>
                 <div id="entries-add-menu" style="display:none;">
@@ -96,16 +101,14 @@
                 <div class="card">
                     <img src="Nevis Logo.png" />
                     <h1>Nevis</h1>
-                    <p> The Fast, Easy, Simple Software to Process Results from the SportIdent Timing System</p>
+                    <p> The Fast, Easy, Simple Software to process results from the SportIdent Timing System</p>
                 </div>
                 <div class="card" id="database">
-                    <div id="buttons">
-                        <button id="database-select">Select Database</button>
-                        <button id="database-open">Open Database</button>
-                    </div>
                     <div id='text'>
+                        <p id="current-database">Current Database:</p>
                         <p id="database-path">Select a Database</p>
                         <div class="text-input">
+
                             <input id="database-password" type="password" required/>
                             <label for="database-password">Password</label>
                         </div>
@@ -117,6 +120,28 @@
             </div>
 
             <div id="download-output" style="display:none;" class="card">
+            </div>
+            <div id="entry-search">
+                <div class="card">
+                    <div class="text-input">
+                        <input id="name-search" required/>
+                        <label for="name-search">Name</label>
+                    </div>
+                    <div class="text-input">
+                        <input id="siid-search" required/>
+                        <label for="siid-search">SI Number</label>
+                    </div>
+
+                    <div id="dropdown-input">
+                        <p id="search-course-button">Course</p>
+                        <ul id="search-course-dropdown" class="hidden">
+
+                        </ul>
+                    </div>
+                </div>
+                <div id="search-output">
+
+                </div>
             </div>
 
             <div id="entries" style="display:none;">
@@ -132,6 +157,10 @@
                             <label for="entries-siid">SI Number</label>
                         </div>
                         <div class="text-input">
+                            <input id="entries-mem-no" required/>
+                            <label for="entries-mem-no">Membership Number</label>
+                        </div>
+                        <div class="text-input">
                             <input id="entries-age-class" required/>
                             <label for="entries-age-class">Age Class</label>
                         </div>
@@ -139,9 +168,11 @@
                             <input id="entries-club" required/>
                             <label for="entries-club">Club</label>
                         </div>
-                        <div class="text-input">
-                            <input id="entries-course" required/>
-                            <label for="entries-course">Course</label>
+                        <div id="dropdown-input">
+                            <p id="entries-course">Course</p>
+                            <ul id="entries-course-dropdown" class="hidden">
+
+                            </ul>
                         </div>
                         <div class="checkbox-input">
                             <label for="entries-nc">Non-Competitive?
@@ -177,7 +208,7 @@
                     <p>MIT License - https://github.com/angexis/opensportident.js/ blob/master/LICENSE</p>
                     <p>
                         Copyright
-                        <br/> (c) 2016 Jan Vorwerk Copyright
+                        <br/> (c) 2016 Jan Vorwerk
                         <br/>(c) 2013 Simon Denier
                     </p>
 
@@ -252,10 +283,20 @@
                 autoload: true,
                 autoloadCallback: databaseInitialize
             });
-            document.getElementById('menu-panel').setAttribute('style', 'display:block;')
-            document.getElementById('database').setAttribute('style', 'display:none;')
+            document.getElementById('main-menu').setAttribute('style', 'display:block;')
+            document.getElementById('database').setAttribute('class', 'card database-hidden')
+            document.getElementById('database-menu').setAttribute('style', 'display:none;')
         })
+        /*  cryptedFileAdapter.setKey('orienteer');
+          db = new loki('./nevis.db', {
+              adapter: cryptedFileAdapter,
+              autoload: true,
+              autoloadCallback: databaseInitialize
+          });
+            document.getElementById('main-menu').setAttribute('style', 'display:block;')
 
+            document.getElementById('database-menu').setAttribute('style', 'display:none;')
+  */
         function databaseInitialize() {
             downloads = db.getCollection("downloads");
             if (downloads === null) {
@@ -327,6 +368,16 @@
 
         //Main Menu
         require('./JS/main-menu.js')
+
+        //document.getElementById('menu-panel').setAttribute('style', 'display:block;')
+       // document.getElementById('database').setAttribute('style', 'display:none;')
+
+
+
+
+
+
+
     </script>
 </body>
 

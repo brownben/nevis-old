@@ -8,12 +8,13 @@ const results = require('./Results-Functions.js')
 
 // Set Up Welcome Screen
 document.getElementById('main-screen').setAttribute('style', 'display:block;')
-document.getElementById('main-menu').setAttribute('style', 'display:block;')
-document.getElementById('menu-panel').setAttribute('style', 'display:none;')
+document.getElementById('main-menu').setAttribute('style', 'display:none;')
+document.getElementById('menu-panel').setAttribute('style', 'display:block;')
 document.getElementById('back').setAttribute('style', 'display:none;')
 document.getElementById('download-output').setAttribute('style', 'display:none;')
 document.getElementById('download-menu').setAttribute('style', 'display:none;')
 document.getElementById('entries').setAttribute('style', 'display:none;')
+document.getElementById('entry-search').setAttribute('style', 'display:none;')
 document.getElementById('entries-menu').setAttribute('style', 'display:none;')
 document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
 document.getElementById('about').setAttribute('style', 'display:none;')
@@ -30,6 +31,7 @@ document.getElementById('menu-download').addEventListener('click', function () {
     document.getElementById('back').setAttribute('style', 'display:block;')
     document.getElementById('download-output').setAttribute('style', 'display:block;')
     document.getElementById('download-menu').setAttribute('style', 'display:block;')
+    document.getElementById('entry-search').setAttribute('style', 'display:none;')
     document.getElementById('entries').setAttribute('style', 'display:none;')
     document.getElementById('entries-menu').setAttribute('style', 'display:none;')
     document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
@@ -45,6 +47,7 @@ document.getElementById('menu-entries').addEventListener('click', function () {
     ipc.send('resize', 0);
     document.getElementById('main-screen').setAttribute('style', 'display:none;')
     document.getElementById('main-menu').setAttribute('style', 'display:none;')
+    document.getElementById('entry-search').setAttribute('style', 'display:block;')
     document.getElementById('back').setAttribute('style', 'display:block;')
     document.getElementById('download-output').setAttribute('style', 'display:none;')
     document.getElementById('download-menu').setAttribute('style', 'display:none;')
@@ -62,6 +65,7 @@ document.getElementById('menu-about').addEventListener('click', function () {
     ipc.send('resize', 0);
     document.getElementById('main-screen').setAttribute('style', 'display:none;')
     document.getElementById('main-menu').setAttribute('style', 'display:none;')
+    document.getElementById('entry-search').setAttribute('style', 'display:none;')
     document.getElementById('back').setAttribute('style', 'display:block;')
     document.getElementById('download-output').setAttribute('style', 'display:none;')
     document.getElementById('download-menu').setAttribute('style', 'display:none;')
@@ -79,6 +83,7 @@ document.getElementById('menu-courses').addEventListener('click', function () {
     ipc.send('resize', 0);
     document.getElementById('main-screen').setAttribute('style', 'display:none;')
     document.getElementById('main-menu').setAttribute('style', 'display:none;')
+    document.getElementById('entry-search').setAttribute('style', 'display:none;')
     document.getElementById('back').setAttribute('style', 'display:block;')
     document.getElementById('download-output').setAttribute('style', 'display:none;')
     document.getElementById('download-menu').setAttribute('style', 'display:none;')
@@ -99,6 +104,7 @@ document.getElementById('menu-results').addEventListener('click', function () {
     document.getElementById('main-screen').setAttribute('style', 'display:none;')
     document.getElementById('main-menu').setAttribute('style', 'display:none;')
     document.getElementById('back').setAttribute('style', 'display:block;')
+    document.getElementById('entry-search').setAttribute('style', 'display:none;')
     document.getElementById('download-output').setAttribute('style', 'display:none;')
     document.getElementById('download-menu').setAttribute('style', 'display:none;')
     document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
@@ -118,9 +124,11 @@ document.getElementById('back-button').addEventListener('click', function () {
         document.getElementById('entries-menu').setAttribute('style', 'display:block;')
         document.getElementById('entries').setAttribute('style', 'display:none;')
         document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
+        document.getElementById('entry-search').setAttribute('style', 'display:block;')
     }
     else {
         document.getElementById('main-screen').setAttribute('style', 'display:block;')
+        document.getElementById('entry-search').setAttribute('style', 'display:none;')
         document.getElementById('main-menu').setAttribute('style', 'display:block;')
         document.getElementById('back').setAttribute('style', 'display:none;')
         document.getElementById('download-output').setAttribute('style', 'display:none;')

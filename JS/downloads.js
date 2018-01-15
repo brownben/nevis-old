@@ -636,10 +636,10 @@ document.getElementById('port').addEventListener('click', function () {
             ports.forEach(function (port) {
                 var p = document.createElement('p');
                 p.className = 'ports-list-item';
-                p.id = noOfPorts
                 p.innerHTML = port.comName;
-                document.getElementById('port-menu').appendChild(p);
                 p.onclick = assignPortMenuHandler;
+                document.getElementById('port-menu').appendChild(p);
+
                 noOfPorts++;
             });
             if (ports.length < 1) {
