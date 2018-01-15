@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////
+//                           styles.scss                        //
+//////////////////////////////////////////////////////////////////
+// Color Variables
+$nevis-blue:#29B6F6;
+$nevis-blue-light:#64B5F6;
+$nevis-blue-very-light:#E1F5FE;
+$label-grey:#bdbdbd;
+// Fonts
 @font-face {
     font-family: 'Roboto';
     font-style: normal;
@@ -21,21 +30,65 @@ body {
     overflow: hidden;
 }
 
+* {
+    font-family: Roboto;
+    font-weight: 100;
+}
+
 button,
 label {
     -webkit-user-select: none;
     user-select: none;
 }
 
+input {
+    outline: 0;
+    border: 0;
+    font-size: 16px;
+    padding: 2px;
+    border-bottom: 1px solid $label-grey;
+    transition: border 1s linear;
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 5px;
+    margin-right: 10px;
+    width: calc(100% - 35px);
+    background: transparent;
+    position: relative;
+    color: #616161;
+    &:focus {
+        border-bottom: 1px solid $nevis-blue;
+        color: black;
+    }
+    &:required:valid+label {
+        color: $label-grey;
+        font-size: 12px;
+        top: -20px;
+    }
+    &:focus:required+label {
+        color: $nevis-blue;
+        font-size: 12px;
+        top: -20px;
+    }
+}
+
+label {
+    position: relative;
+    font-size: 15px;
+    color: $label-grey;
+    width: 50px;
+    transition: .25s ease-out;
+    margin-left: calc(-100% + 20px);
+}
+
 header {
     width: 100%;
     height: 30px;
-    background: linear-gradient(37deg, #03A9F4, #80DEEA);
+    background: linear-gradient(37deg, $nevis-blue, #80DEEA);
     -webkit-app-region: drag;
     -webkit-user-select: none;
     user-select: none;
     p {
-        font-family: Roboto;
         font-weight: 300;
         float: left;
         line-height: 30px;
@@ -59,7 +112,7 @@ header {
         margin: 0;
         transition: .25s;
         &:hover {
-            background: #29B6F6;
+            background: $nevis-blue;
         }
     }
     #close:hover {
@@ -84,18 +137,17 @@ main {
 #menu-panel {
     float: left;
     width: 160px;
-    color: #29B6F6;
+    color: $nevis-blue;
     user-select: none;
     text-align: center;
     height: 100%;
     box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
     button {
         position: relative;
-        color: #29B6F6;
+        color: $nevis-blue;
         background-color: white;
         border: none;
         height: 35px;
-        font-family: Roboto;
         font-weight: 300;
         z-index: 1;
         line-height: 35px;
@@ -106,7 +158,7 @@ main {
         margin-top: 20px;
         &:hover {
             color: white;
-            background-color: #29B6F6;
+            background-color: $nevis-blue;
         }
     }
     #back {
@@ -131,14 +183,13 @@ main {
     display: flex;
     margin-top: 20px;
     p {
-        font-family: Roboto;
         font-weight: 300;
         height: 24px;
         line-height: 24px;
         font-size: 16px;
     }
     svg {
-        fill: #29B6F6;
+        fill: $nevis-blue;
         display: inline-flex;
         float: right;
         margin-right: 10px;
@@ -165,16 +216,28 @@ main {
 #port {
     transition: .5s;
     &:hover {
-        background-color: #E1F5FE;
+        background-color: $nevis-blue-very-light;
     }
 }
 
 #baud-menu p,
-#port-menu p {
+#port-menu p,
+#main-menu p {
     margin: 0;
     padding-top: 5px;
     padding-bottom: 5px;
     transition: .5s;
+}
+
+#main-menu p {
+    margin-bottom: 5px;
+}
+
+#baud-menu p:hover,
+#port-menu p:hover,
+#main-menu p:hover {
+    color: white;
+    background-color: $nevis-blue;
 }
 
 #baud-menu,
@@ -182,21 +245,6 @@ main {
     transition: transform .3s;
     transform: scaleY(100%);
     transform-origin: top;
-}
-
-#main-menu p {
-    margin: 0;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    transition: .5s;
-    margin-top: 10px;
-}
-
-#baud-menu p:hover,
-#port-menu p:hover,
-#main-menu p:hover {
-    color: white;
-    background-color: #29B6F6;
 }
 
 .hidden {
@@ -216,8 +264,6 @@ main {
     font-size: 12px;
     margin-top: 5px;
     p {
-        font-family: Roboto;
-        font-weight: 100;
         margin-top: 0px;
         margin-bottom: 0px;
     }
@@ -228,7 +274,7 @@ main {
         margin-bottom: 4px;
     }
     .connection {
-        color: #29B6F6;
+        color: $nevis-blue;
         font-size: 14px;
         margin-top: 4px!important;
         margin-bottom: 4px!important;
@@ -242,14 +288,12 @@ main {
 
 #about {
     margin-left: 10px;
-    font-family: Roboto;
-    font-weight: 100;
     margin-bottom: 10px;
     h2,
     h3,
     h5,
     h4 {
-        font-weight: 300;
+        font-weight: 300!important;
         margin-bottom: 15px;
         margin-top: 5px;
     }
@@ -264,39 +308,7 @@ main {
         margin-left: 0px;
         margin-top: 5px;
         margin-bottom: 5px;
-        font-family: Roboto;
-        font-weight: 300;
-    }
-    input {
-        outline: 0;
-        border: 0;
-        font-size: 16px;
-        padding: 2px;
-        border-bottom: 1px solid #BDBDBD;
-        font-family: Roboto;
-        font-weight: 100;
-        transition: border 1s linear;
-        font-size: 15px;
-        margin-left: 5px;
-        margin-right: 10px;
-        width: calc(100% - 35px);
-        background: transparent;
-        position: relative;
-        color: black;
-        &:focus {
-            border-bottom: 1px solid #03A9F4;
-            color: black;
-        }
-        &:required:valid+label {
-            color: #BDBDBD;
-            font-size: 12px;
-            top: -20px;
-        }
-        &:focus:required+label {
-            color: #03A9F4;
-            font-size: 12px;
-            top: -20px;
-        }
+        font-weight: 300!important;
     }
     .text-input {
         margin-top: 20px;
@@ -304,34 +316,22 @@ main {
             margin-top: 15px;
         }
     }
-    label {
-        position: relative;
-        font-size: 15px;
-        color: #BDBDBD;
-        font-family: Roboto;
-        font-weight: 100;
-        width: 50px;
-        transition: .25s ease-out;
-        margin-left: calc(-100% + 20px);
-    }
     #dropdown-input {
         user-select: none;
         margin-left: 5px;
         margin-right: 25px;
         margin-bottom: 10px;
-        font-family: Roboto;
-        font-weight: 100;
         font-size: 16px;
         p {
             width: 100%;
             padding: 2px;
-            color: #bdbdbd;
-            border-bottom: 1px solid #bdbdbd;
+            color: $label-grey;
+            border-bottom: 1px solid $label-grey;
             margin-bottom: 0px;
             &:after {
                 float: right;
                 content: '';
-                border: #bdbdbd solid 1px;
+                border: $label-grey solid 1px;
                 border-top: 0;
                 border-right: 0;
                 transform: rotate(-45deg);
@@ -343,10 +343,10 @@ main {
             }
         }
         .open {
-            color: #64B5F6;
-            border-bottom: 1px solid #64B5F6;
+            color: $nevis-blue-light;
+            border-bottom: 1px solid $nevis-blue-light;
             &:after {
-                border: #64B5F6 solid 1px;
+                border: $nevis-blue-light solid 1px;
                 transform: rotate(135deg);
                 border-top: 0;
                 border-right: 0;
@@ -366,7 +366,7 @@ main {
             padding: 3px;
             transition: .5s;
             &:hover {
-                background-color: #42A5F5;
+                background-color: $nevis-blue-light;
                 color: white;
             }
         }
@@ -381,46 +381,6 @@ main {
         margin-top: 15px;
     }
     margin-left:10px;
-    input {
-        outline: 0;
-        border: 0;
-        padding: 2px;
-        border-bottom: 1px solid #BDBDBD;
-        font-family: Roboto;
-        font-weight: 100;
-        transition: border 1s linear;
-        font-size: 15px;
-        margin-left: 5px;
-        margin-right: 10px;
-        width: calc(100% - 35px);
-        background: transparent;
-        position: relative;
-        color: #616161;
-        &:focus {
-            border-bottom: 1px solid #03A9F4;
-            color: black;
-        }
-        &:required:valid+label {
-            color: #BDBDBD;
-            font-size: 12px;
-            top: -20px;
-        }
-        &:focus:required+label {
-            color: #03A9F4;
-            font-size: 12px;
-            top: -20px;
-        }
-    }
-    label {
-        position: relative;
-        font-size: 15px;
-        color: #BDBDBD;
-        font-family: Roboto;
-        font-weight: 100;
-        width: 50px;
-        transition: .25s ease-out;
-        margin-left: calc(-100% + 20px);
-    }
     .checkbox-input {
         margin-bottom: 7px;
         margin-top: 17px;
@@ -431,9 +391,7 @@ main {
         label {
             position: relative;
             font-size: 15px;
-            color: #BDBDBD;
-            font-family: Roboto;
-            font-weight: 100;
+            color: $label-grey;
             width: 50px;
             transition: .45s ease-out;
             margin: 0px;
@@ -442,7 +400,7 @@ main {
             height: 10px;
             width: 10px;
             margin-left: 10px;
-            border: 1px solid #BDBDBD;
+            border: 1px solid $label-grey;
             display: inline-block;
             position: relative;
             transition: .5s;
@@ -451,7 +409,7 @@ main {
             height: 12px;
             width: 6px;
             margin-left: 13px;
-            border: 1.5px solid #03A9F4;
+            border: 1.5px solid $nevis-blue;
             display: inline-block;
             position: relative;
             border-top: 0;
@@ -469,19 +427,17 @@ main {
         margin-left: 5px;
         margin-right: 25px;
         margin-bottom: 10px;
-        font-family: Roboto;
-        font-weight: 100;
         font-size: 16px;
         p {
             width: 100%;
             padding: 2px;
-            color: #bdbdbd;
-            border-bottom: 1px solid #bdbdbd;
+            color: $label-grey;
+            border-bottom: 1px solid $label-grey;
             margin-bottom: 0px;
             &:after {
                 float: right;
                 content: '';
-                border: #bdbdbd solid 1px;
+                border: $label-grey solid 1px;
                 border-top: 0;
                 border-right: 0;
                 transform: rotate(-45deg);
@@ -493,10 +449,10 @@ main {
             }
         }
         .open {
-            color: #64B5F6;
-            border-bottom: 1px solid #64B5F6;
+            color: $nevis-blue-light;
+            border-bottom: 1px solid $nevis-blue-light;
             &:after {
-                border: #64B5F6 solid 1px;
+                border: $nevis-blue-light solid 1px;
                 transform: rotate(135deg);
                 border-top: 0;
                 border-right: 0;
@@ -517,7 +473,7 @@ main {
             padding: 3px;
             transition: .5s;
             &:hover {
-                background-color: #42A5F5;
+                background-color: $nevis-blue;
                 color: white;
             }
         }
@@ -532,8 +488,6 @@ main {
         margin: 10px;
         margin-left: 15px
     }
-    font-family:Roboto;
-    font-weight:100;
     margin-left:10px;
     table {
         margin-left: 15px;
@@ -555,7 +509,7 @@ main {
             }
             th {
                 padding: 7px;
-                font-weight: 300
+                font-weight: 300!important;
             }
         }
     }
@@ -574,8 +528,6 @@ main {
     padding: 10px;
     margin: 5px;
     margin-top: 10px;
-    font-family: Roboto;
-    font-weight: 100;
     font-size: 16px;
     p {
         margin: 0;
@@ -586,7 +538,7 @@ main {
     background: linear-gradient(37deg, #DC281E, #F00000);
     color: white;
     font-family: Roboto;
-    font-weight: 300;
+    font-weight: 300!important;
 }
 
 #main-screen {
@@ -599,7 +551,7 @@ main {
     }
     h1 {
         font-family: Roboto;
-        font-weight: 300;
+        font-weight: 300!important;
         font-size: 35px;
         margin: 10px;
         margin-bottom: 5px;
@@ -609,11 +561,9 @@ main {
         margin-bottom: 7px;
         font-size: 16px;
         margin-top: 7px;
-        font-family: Roboto;
-        font-weight: 100;
     }
     .card:first-child {
-        background: linear-gradient(37deg, #03A9F4, #80DEEA);
+        background: linear-gradient(37deg, $nevis-blue, #80DEEA);
         color: white;
     }
     #database {
@@ -635,9 +585,7 @@ main {
             outline: 0;
             border: 0;
             padding: 2px;
-            border-bottom: 1px solid #BDBDBD;
-            font-family: Roboto;
-            font-weight: 100;
+            border-bottom: 1px solid $label-grey;
             transition: border 1s linear;
             font-size: 15px;
             margin-left: 0px;
@@ -648,25 +596,23 @@ main {
             color: #616161;
             overflow: hidden;
             &:focus {
-                border-bottom: 1px solid #03A9F4;
+                border-bottom: 1px solid $nevis-blue;
                 color: black;
             }
             &:required:valid+label {
-                color: #BDBDBD;
+                color: $label-grey;
                 font-size: 12px;
                 top: -40px;
             }
             &:focus:required+label {
-                color: #03a9f4;
+                color: $nevis-blue;
                 font-size: 12px;
                 top: -40px;
             }
         }
         label {
             font-size: 15px;
-            color: #BDBDBD;
-            font-family: Roboto;
-            font-weight: 100;
+            color: $label-grey;
             width: 50px;
             transition: .25s ease-out;
             margin-left: 0px;
