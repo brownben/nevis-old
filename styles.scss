@@ -136,6 +136,7 @@ main {
 
 #menu-panel {
     float: left;
+    padding-top: 10px;
     width: 160px;
     color: $nevis-blue;
     user-select: none;
@@ -155,7 +156,7 @@ main {
         transition: 0.5s;
         outline: none;
         font-size: 16px;
-        margin-top: 20px;
+        margin-top: 5px;
         &:hover {
             color: white;
             background-color: $nevis-blue;
@@ -181,7 +182,6 @@ main {
 #download-menu,
 #main-menu {
     display: flex;
-    margin-top: 20px;
     p {
         font-weight: 300;
         height: 24px;
@@ -369,9 +369,39 @@ main {
                 background-color: $nevis-blue-light;
                 color: white;
             }
+            &:first-child {
+                height: 15px;
+            }
         }
-        #one {
-            height: 15px;
+    }
+    #search-output {
+        box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        margin: 5px;
+        margin-top: 10px;
+        font-size: 16px;
+        p {
+            margin: 0;
+            padding: 5px;
+        }
+    }
+    table {
+        text-align: center;
+        border-collapse: collapse;
+        margin-left: 10px;
+        width: calc(100% - 20px);
+        tr {
+            border-bottom: .5px #bdbdbd solid;
+            transition: .5s;
+            &:last-child {
+                border: 0;
+            }
+            &:hover {
+                background-color: #E3F2FD;
+            }
+            td {
+                padding: 7px;
+            }
         }
     }
 }
@@ -523,17 +553,6 @@ main {
     transition: .5s;
 }
 
-.entry-card {
-    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
-    padding: 10px;
-    margin: 5px;
-    margin-top: 10px;
-    font-size: 16px;
-    p {
-        margin: 0;
-    }
-}
-
 #entry-error {
     background: linear-gradient(37deg, #DC281E, #F00000);
     color: white;
@@ -568,10 +587,6 @@ main {
     }
     #database {
         height: 70px;
-        #database-path {
-            margin: 0;
-            margin-left: 5px;
-        }
         p {
             text-align: left;
             margin-left: 10px;
@@ -617,13 +632,20 @@ main {
             transition: .25s ease-out;
             margin-left: 0px;
             position: relative;
-            top: -20px;
-            margin-bottom: -20px;
+            top: -22px;
+            margin-bottom: -22px;
+        }
+        #database-path {
+            text-overflow: ellipsis;
+            margin: 0;
+            margin-left: 5px;
+            margin-top: 5px;
+            margin-bottom: -5px;
         }
         .text-input {
             margin-left: 5px;
             text-align: left;
-            margin-top: 20px;
+            margin-top: 25px;
         }
     }
     .database-hidden {
@@ -637,6 +659,7 @@ main {
             margin-top: 15px!important;
             margin-bottom: 15px!important;
         }
+        height:60px!important;
     }
 }
 
@@ -662,7 +685,7 @@ main {
 }
 
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 10px;
 }
 
 ::-webkit-scrollbar-thumb {

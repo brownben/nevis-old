@@ -15,7 +15,7 @@ var maximized = false;
 function createWindow() {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 480,
+        width: 550,
         height: 400,
         frame: false,
         icon: __dirname + '/Nevis Logo.png',

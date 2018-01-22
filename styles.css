@@ -136,6 +136,7 @@ main {
 
 #menu-panel {
   float: left;
+  padding-top: 10px;
   width: 160px;
   color: #29B6F6;
   user-select: none;
@@ -157,7 +158,7 @@ main {
   transition: 0.5s;
   outline: none;
   font-size: 16px;
-  margin-top: 20px;
+  margin-top: 5px;
 }
 
 #menu-panel button:hover {
@@ -186,7 +187,6 @@ main {
 #download-menu,
 #main-menu {
   display: flex;
-  margin-top: 20px;
 }
 
 #download-menu p,
@@ -406,8 +406,45 @@ main {
   color: white;
 }
 
-#entry-search #dropdown-input #one {
+#entry-search #dropdown-input li:first-child {
   height: 15px;
+}
+
+#entry-search #search-output {
+  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  margin: 5px;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+#entry-search #search-output p {
+  margin: 0;
+  padding: 5px;
+}
+
+#entry-search table {
+  text-align: center;
+  border-collapse: collapse;
+  margin-left: 10px;
+  width: calc(100% - 20px);
+}
+
+#entry-search table tr {
+  border-bottom: .5px #bdbdbd solid;
+  transition: .5s;
+}
+
+#entry-search table tr:last-child {
+  border: 0;
+}
+
+#entry-search table tr:hover {
+  background-color: #E3F2FD;
+}
+
+#entry-search table tr td {
+  padding: 7px;
 }
 
 #entries {
@@ -580,18 +617,6 @@ main {
   transition: .5s;
 }
 
-.entry-card {
-  box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
-  padding: 10px;
-  margin: 5px;
-  margin-top: 10px;
-  font-size: 16px;
-}
-
-.entry-card p {
-  margin: 0;
-}
-
 #entry-error {
   background: linear-gradient(37deg, #DC281E, #F00000);
   color: white;
@@ -632,11 +657,6 @@ main {
 
 #main-screen #database {
   height: 70px;
-}
-
-#main-screen #database #database-path {
-  margin: 0;
-  margin-left: 5px;
 }
 
 #main-screen #database p {
@@ -690,14 +710,26 @@ main {
   transition: .25s ease-out;
   margin-left: 0px;
   position: relative;
-  top: -20px;
-  margin-bottom: -20px;
+  top: -22px;
+  margin-bottom: -22px;
+}
+
+#main-screen #database #database-path {
+  text-overflow: ellipsis;
+  margin: 0;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: -5px;
 }
 
 #main-screen #database .text-input {
   margin-left: 5px;
   text-align: left;
-  margin-top: 20px;
+  margin-top: 25px;
+}
+
+#main-screen .database-hidden {
+  height: 60px !important;
 }
 
 #main-screen .database-hidden .text-input {
@@ -735,7 +767,7 @@ main {
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-thumb {

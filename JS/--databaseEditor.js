@@ -61,12 +61,6 @@ function databaseInitialize() {
         'siid': '422750',
         'downloadID': 4
     })
-    courses = db.getCollection("courses");
-    if (courses === null) {
-        courses = db.addCollection("courses", {
-            unique: ['name']
-        });
-    }
-    courses.insert({ 'name': 'Medium' })
+
     db.saveDatabase()
 }

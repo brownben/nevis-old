@@ -84,11 +84,16 @@
                     <button id="entries-submit">Save Entry</button>
                     <button id="entry-clear">Blank Entry</button>
                 </div>
+                <div id="entries-update-menu" style="display:none;">
+                    <button id="entries-update">Update Entry</button>
+                    <button id="entries-delete">Delete Entry</button>
+                </div>
                 <div id="courses-menu" style="display:none;">
                     <button id="courses-json-import">Import Course</button>
                 </div>
                 <div id="results-menu" style="display:none;">
                     <button id="results-refresh">Refresh Results</button>
+
                 </div>
                 <div id='back' style="display:none;">
                     <button id='back-button'>Back</button>
@@ -139,8 +144,10 @@
                         </ul>
                     </div>
                 </div>
-                <div id="search-output">
+                <div id="search-output" class="hidden">
+                    <table id="search-output-table">
 
+                    </table>
                 </div>
             </div>
 
@@ -287,16 +294,13 @@
             document.getElementById('database').setAttribute('class', 'card database-hidden')
             document.getElementById('database-menu').setAttribute('style', 'display:none;')
         })
-        /*  cryptedFileAdapter.setKey('orienteer');
-          db = new loki('./nevis.db', {
-              adapter: cryptedFileAdapter,
-              autoload: true,
-              autoloadCallback: databaseInitialize
-          });
-            document.getElementById('main-menu').setAttribute('style', 'display:block;')
+        cryptedFileAdapter.setKey('orienteer');
+        db = new loki('./nevis.db', {
+            adapter: cryptedFileAdapter,
+            autoload: true,
+            autoloadCallback: databaseInitialize
+        });
 
-            document.getElementById('database-menu').setAttribute('style', 'display:none;')
-  */
         function databaseInitialize() {
             downloads = db.getCollection("downloads");
             if (downloads === null) {
@@ -369,12 +373,9 @@
         //Main Menu
         require('./JS/main-menu.js')
 
-        //document.getElementById('menu-panel').setAttribute('style', 'display:block;')
-       // document.getElementById('database').setAttribute('style', 'display:none;')
-
-
-
-
+        document.getElementById('main-menu').setAttribute('style', 'display:block;')
+        document.getElementById('database').setAttribute('class', 'card database-hidden')
+        document.getElementById('database-menu').setAttribute('style', 'display:none;')
 
 
 
