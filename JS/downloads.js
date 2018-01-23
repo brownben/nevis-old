@@ -154,6 +154,49 @@ function displayControlPunch(controlCode, time) {
     output(controlCode + " - " + timeHours + ":" + timeMinutes + ":" + timeSeconds);
 
 }
+function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTime, elapsedTime) {
+
+
+    if (splitTime == "---") {
+        output(controlCounter + " " + controlCode + " - --- - ---");
+
+    }
+    else {
+        var splitTimeMinutes = (splitTime - (splitTime % 60)) / 60;
+        var splitTimeSeconds = splitTime % 60;
+        if (splitTimeSeconds <= 9) {
+            splitTimeSeconds = '0' + splitTimeSeconds;
+        }
+        if (splitTimeMinutes <= 9) {
+            splitTimeMinutes = '0' + splitTimeMinutes;
+        }
+
+        elapsedTime = elapsedTime + splitTime
+
+        var elapsedTimeMinutes = (elapsedTime - (elapsedTime % 60)) / 60;
+        var elapsedTimeSeconds = elapsedTime % 60;
+        if (elapsedTimeSeconds <= 9) {
+            elapsedTimeSeconds = '0' + elapsedTimeSeconds;
+        }
+        if (elapsedTimeMinutes <= 9) {
+            elapsedTimeMinutes = '0' + elapsedTimeMinutes;
+        }
+        if (controlCounter == "F") {
+
+
+            output("F - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
+
+        }
+
+        else {
+
+            output(controlCounter + " " + controlCode + " - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
+
+        }
+
+    }
+    return elapsedTime
+}
 
 
 function getName(personalData) {
@@ -479,6 +522,7 @@ connect.addEventListener('click', function () {
 
         port.on('open', function () {
             output(portName + " Opened", 'connection');
+            port.write(new Buffer(0xff, 0x02, 0xf9, 0x01, 0x02, 0x14, 0x0a, 0x03))
         });
 
         port.on('close', function () {
@@ -524,49 +568,77 @@ connect.addEventListener('click', function () {
 
                                     var linkedEntry = competitors.findOne({ 'siid': returnedData.siid.toString() });
 
-
                                     if (linkedEntry == null) {
+
                                         competitors.insert({
                                             name: returnedData.name,
                                             siid: returnedData.siid,
                                             downloadID: downloads.findOne({ 'siid': returnedData.siid }).$loki
                                         })
+
                                         var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
                                         output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                         displayControlPunch('S', returnedData.start);
+                                        var elapsedTime = 0;
+                                        var lastPunch = returnedData.start;
                                         for (punch in returnedData.controlCodes) {
-                                            displayControlPunch(returnedData.controlCodes[punch], returnedData.controlTimes[punch])
+                                            elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
+                                            lastPunch = returnedData.controlTimes[punch]
                                         }
                                         displayControlPunch('F', returnedData.finish)
                                         currentDownload = new download();
                                     }
                                     else {
+                                        var errors = "";
                                         if (returnedData.course != "") {
                                             var courseFile = courses.findOne({ 'name': linkedEntry.course })
                                             if (courseFile != null) {
-                                                errors = course.check(returnedData.controlCodes, courseFile.controls, returnedData.finish)
+                                                if (courseFile.type == "linear") {
+                                                    courseCheckData = course.check(returnedData.controlCodes, returnedData.controlTimes, courseFile.controls, returnedData.finish)
+                                                    errors = courseCheckData[0]
+                                                    splitList = courseCheckData[1]
+                                                    linkedEntry.downloadID = downloads.findOne({ 'siid': returnedData.siid }).$loki;
+
+                                                    var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+                                                    if (errors == "") {
+                                                        output(linkedEntry.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
+                                                        downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime[2]
+                                                    }
+                                                    else {
+                                                        output(linkedEntry.name + " (" + returnedData.siid + ") - " + errors, 'big');
+                                                        downloads.findOne({ 'siid': returnedData.siid }).time = errors
+                                                    }
+                                                    displayControlPunch('S', returnedData.start);
+                                                    var elapsedTime = 0;
+                                                    var lastPunch = returnedData.start;
+                                                    for (punch in splitList) {
+                                                        elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], splitList[punch] - lastPunch, elapsedTime)
+                                                        lastPunch = splitList[punch]
+                                                    }
+                                                    displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
+
+
+                                                    currentDownload = new download();
+                                                }
+
+                                            }
+                                            else {
+                                                var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+                                                output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
+                                                displayControlPunch('S', returnedData.start);
+                                                downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime
+                                                var elapsedTime = 0;
+                                                var lastPunch = returnedData.start;
+                                                for (punch in returnedData.controlCodes) {
+                                                    elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
+                                                    lastPunch = returnedData.controlTimes[punch]
+                                                }
+                                                displayControlPunch('F', returnedData.finish)
+                                                currentDownload = new download();
                                             }
                                         };
 
-                                        linkedEntry.downloadID = downloads.findOne({ 'siid': returnedData.siid }).$loki;
 
-                                        var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
-                                        if (errors == "") {
-                                            output(linkedEntry.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
-                                            downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime[2]
-                                        }
-                                        else {
-                                            output(linkedEntry.name + " (" + returnedData.siid + ") - " + errors, 'big');
-                                            downloads.findOne({ 'siid': returnedData.siid }).time = errors
-                                        }
-                                        displayControlPunch('S', returnedData.start);
-                                        for (punch in returnedData.controlCodes) {
-                                            displayControlPunch(returnedData.controlCodes[punch], returnedData.controlTimes[punch])
-                                        }
-                                        displayControlPunch('F', returnedData.finish)
-
-
-                                        currentDownload = new download();
                                     }
 
                                     db.saveDatabase();

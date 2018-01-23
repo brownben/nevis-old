@@ -1,5 +1,6 @@
 {
     "name": "Medium",
+    "type": "linear",
     "distance": 3.0,
     "climb": 50,
     "controls": [
