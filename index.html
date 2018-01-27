@@ -93,7 +93,8 @@
                 </div>
                 <div id="results-menu" style="display:none;">
                     <button id="results-refresh">Refresh Results</button>
-
+                    <button id="results-pdf">PDF Results</button>
+                    <button id="results-html-single">Single Page HTML</button>
                 </div>
                 <div id='back' style="display:none;">
                     <button id='back-button'>Back</button>
@@ -190,7 +191,10 @@
                     </form>
                 </div>
             </div>
-
+            <div id="entry-download" class="card">
+                <h2 id="entry-download-time">Time :</h2>
+                <h4 id="entry-download-controls">Controls:</h4>
+            </div>
             <div id="courses-page" style="display:none;">
             </div>
 
@@ -274,7 +278,10 @@
 
         // Require
         const ipc = require('electron').ipcRenderer
+        var fs = require('fs');
         const loki = require('lokijs');
+        const BrowserWindow = require('electron').remote.BrowserWindow
+        const path = require('path')
         var cryptedFileAdapter = require('./JS/encryption-adapter.js');
 
         document.getElementById('database-select').addEventListener('click', function () {

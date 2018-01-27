@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nevis - PDF Results</title>
+    <link rel="stylesheet" type="text/css" href="./pdfStyles.css" />
+</head>
+
+
+
+
+<body id="body">
+    <p>html</p>
+</body>
+<script>
+
+    const ipc = require('electron').ipcRenderer
+    ipc.send('pdf-window-ready')
+    ipc.on('pdf-contents', function (event, data) {
+        document.getElementById('body').innerHTML = data;
+        ipc.send('pdf-window-loaded')
+    })
+</script>
+
+</html>

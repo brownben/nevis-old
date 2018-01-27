@@ -7,6 +7,8 @@ const url = require('url')
 const ipc = require('electron').ipcMain
 const dialog = require('electron').dialog
 const globalShortcut = require('electron').globalShortcut
+const fs = require('fs');
+const shell = require('electron').shell
 
 let win
 var maximized = false;
@@ -143,6 +145,7 @@ ipc.on('open-course-file-dialog', function (event) {
         if (files) event.sender.send('course-file', files)
     })
 })
+
 ipc.on('select-database', function (event) {
 
     dialog.showOpenDialog({
@@ -157,4 +160,69 @@ ipc.on('select-database', function (event) {
     }, function (files) {
         if (files) event.sender.send('database-file', files)
     })
+})
+ipc.on('html-single-file-save', function (event) {
+
+    dialog.showSaveDialog({
+        title: 'Nevis - Save HTML results',
+        icon: './nevis.ico',
+        filters: [
+            { name: 'HTML', extensions: ['html'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+    },
+        function (file) {
+            if (file) event.sender.send('html-file', file)
+        })
+})
+
+var pdfData = ""
+var pdfPath = ""
+
+ipc.on('pdf-results-start', function (event, data) {
+
+    pdfData = data
+    dialog.showSaveDialog({
+        title: 'Nevis - Save PDF results',
+        icon: './nevis.ico',
+        filters: [
+            { name: 'PDF', extensions: ['pdf'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+    },
+        function (file) {
+            pdfPath = file
+            let winPDF = new BrowserWindow({ width: 400, height: 320, frame: false, icon: __dirname + './Nevis Logo.png', show: false })
+            winPDF.loadURL(path.join('file://', __dirname, '/pdf.html'))
+            winPDF.on('close', function () { winPDF = null })
+
+        })
+})
+
+
+
+
+ipc.on('pdf-window-ready', function (event, arg) {
+    event.sender.send('pdf-contents', pdfData)
+
+
+})
+
+ipc.on('pdf-window-loaded', function (event, arg) {
+    const winPDF = BrowserWindow.fromWebContents(event.sender)
+
+    winPDF.webContents.printToPDF({
+        'printBackground': true,
+        'pageSize': 'A4'
+    }, function (error, data) {
+        if (error) throw error
+        fs.writeFile(pdfPath, data, function (error) {
+            if (error) {
+                throw error
+            }
+            shell.openExternal('file://' + pdfPath)
+            winPDF.close()
+        })
+    })
+
 })
