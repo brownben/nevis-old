@@ -124,10 +124,10 @@ function calculateTime(startRaw, finishRaw) {
     var timeRaw = finishRaw - startRaw;
     var timeMinutes = (timeRaw - (timeRaw % 60)) / 60;
     var timeSeconds = timeRaw % 60;
-    if (timeSeconds <= 9) {
+    if (timeSeconds <= 9 && timeSeconds >= 0) {
         timeSeconds = '0' + timeSeconds;
     }
-    if (timeMinutes <= 9) {
+    if (timeMinutes <= 9 && timeMinutes >= 0) {
         timeMinutes = '0' + timeMinutes;
     }
     return [timeMinutes, timeSeconds, timeRaw];
@@ -142,13 +142,13 @@ function displayControlPunch(controlCode, time) {
     var timeHours = (time - (time % 3600)) / 3600;
     var timeMinutes = ((time % 3600) - (time % 60)) / 60;
     var timeSeconds = time % 60;
-    if (timeSeconds <= 9) {
+    if (timeSeconds <= 9 && timeSeconds >= 0) {
         timeSeconds = '0' + timeSeconds;
     }
-    if (timeMinutes <= 9) {
+    if (timeMinutes <= 9 && timeMinutes >= 0) {
         timeMinutes = '0' + timeMinutes;
     }
-    if (timeHours <= 9) {
+    if (timeHours <= 9 && timeHours >= 0) {
         timeHours = '0' + timeHours;
     }
     output(controlCode + " - " + timeHours + ":" + timeMinutes + ":" + timeSeconds);
@@ -164,10 +164,10 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
     else {
         var splitTimeMinutes = (splitTime - (splitTime % 60)) / 60;
         var splitTimeSeconds = splitTime % 60;
-        if (splitTimeSeconds <= 9) {
+        if (splitTimeSeconds <= 9 && splitTimeSeconds >= 0) {
             splitTimeSeconds = '0' + splitTimeSeconds;
         }
-        if (splitTimeMinutes <= 9) {
+        if (splitTimeMinutes <= 9 && splitTimeMinutes >= 0) {
             splitTimeMinutes = '0' + splitTimeMinutes;
         }
 
@@ -175,10 +175,10 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
 
         var elapsedTimeMinutes = (elapsedTime - (elapsedTime % 60)) / 60;
         var elapsedTimeSeconds = elapsedTime % 60;
-        if (elapsedTimeSeconds <= 9) {
+        if (elapsedTimeSeconds <= 9 && elapsedTimeSeconds >= 0) {
             elapsedTimeSeconds = '0' + elapsedTimeSeconds;
         }
-        if (elapsedTimeMinutes <= 9) {
+        if (elapsedTimeMinutes <= 9 && elapsedTimeMinutes >= 0) {
             elapsedTimeMinutes = '0' + elapsedTimeMinutes;
         }
         if (controlCounter == "F") {
@@ -189,8 +189,9 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
         }
 
         else {
+            var controlCounterOutput = parseInt(controlCounter) + 1
 
-            output(controlCounter + " " + controlCode + " - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
+            output(controlCounterOutput.toString() + " - " + controlCode + " - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
 
         }
 
@@ -230,8 +231,14 @@ function processCard10Punches(data, blockNumber, currentCard) {
 
         var position = 6;
         while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
+
             currentCard.controlCodes.push(parseInt(data[position + 1]));
-            currentCard.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
+            if (data[position + 3].toString(16).length < 2) {
+                currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
+            }
+            else {
+                currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
+            }
             position = position + 4;
         }
         if (blockNumber == 7) {
@@ -268,8 +275,15 @@ function processCard8Punches(data, blockNumber, currentCard) {
     var endOfPunches = data.length - 1;
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-        currenCard.controlCodes.push(parseInt(data[position + 1]));
-        currentCard.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
+        currentCard.controlCodes.push(parseInt(data[position + 1]));
+        if (data[position + 3].toString(16).length < 2) {
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
+
+        }
+        else {
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
+
+        }
         position = position + 4;
     }
     if (blockNumber == 1) {
@@ -286,8 +300,17 @@ function processCardPunches(data, blockNumber, currentCard) {
     var endOfPunches = data.length - 1;
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-        currenCard.controlCodes.push(parseInt(data[position + 1]));
-        currentCard.controlTimes.push(parseInt(data[position + 1].toString(16) + data[position + 2].toString(16), 16));
+        currentCard.controlCodes.push(parseInt(data[position + 1]));
+
+        if (data[position + 3].toString(16).length < 2) {
+
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
+
+        }
+        else {
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
+
+        }
         position = position + 4;
     }
     if (position != 134) {
@@ -339,8 +362,9 @@ function dataTranslation(serialData, currentData) {
         }
     }
 
+
     // If Card 8,9,10,11 or SIAC have been inserted
-    else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8) && (serialData[1] == 0x06)) {
+    else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8) && (serialData[2] == 0x06)) {
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
             currentData = new download();
             siid = calculateSIID(serialData.slice(5, 9));
@@ -376,15 +400,31 @@ function dataTranslation(serialData, currentData) {
         if (parseInt(serialData[133].toString(16) + serialData[134].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 133)).toString(16), 16)) {
 
             if (currentData.cardType == 5) {
+                if (serialData[card5.startByte2].toString(16).length < 2) {
+                    currentData.start = parseInt(serialData[card5.startByte1].toString(16) + "0" + serialData[card5.startByte2].toString(16), 16);
+                }
+                else {
+                    currentData.start = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
+                }
+                if (serialData[card5.finishByte2].toString(16).length < 2) {
+                    currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + "0" + serialData[card5.finishByte2].toString(16), 16);
+                }
+                else {
+                    currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
+                }
 
-
-                currentData.start = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
-                currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
                 var position = 38;
                 var blockPosition = 0;
                 while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
                     currentData.controlCodes.push(parseInt(serialData[position]));
-                    currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16));
+                    if (serialData[position + 3].toString(16).length < 2) {
+                        currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + "0" + serialData[position + 2].toString(16), 16));
+
+                    }
+                    else {
+                        currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16));
+
+                    }
                     if (blockPosition < 4) {
                         position = position + 3;
                         blockPosition++;
@@ -411,23 +451,53 @@ function dataTranslation(serialData, currentData) {
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
 
             if (currentData.cardType == 10) {
-                currentData.start = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
-                currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
+                if (serialData[card10.startByte2].toString(16).length < 2) {
+                    currentData.start = parseInt(serialData[card10.startByte1].toString(16) + "0" + serialData[card10.startByte2].toString(16), 16);
+                }
+                else {
+                    currentData.start = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
+                }
+                if (serialData[card10.finishByte2].toString(16).length < 2) {
+                    currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + "0" + serialData[card10.finishByte2].toString(16), 16);
+                }
+                else {
+                    currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
+                }
+
                 currentData.name = getName(serialData.slice(38, 133));
                 port.write(card10.readBlock4);
             }
             else if (currentData.cardType == 9) {
+                if (serialData[card8.startByte2].toString(16).length < 2) {
+                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + "0" + serialData[card8.startByte2].toString(16), 16);
+                }
+                else {
+                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                }
+                if (serialData[card8.finishByte2].toString(16).length < 2) {
+                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + "0" + serialData[card8.finishByte2].toString(16), 16);
+                }
+                else {
+                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                }
 
-                currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
                 currentData.name = getName(serialData.slice(38, 58));
                 processCard8Punches(serialdata.slice(59, 133), 0, currentData)
                 port.write(card8.readBlock1);
             }
             else if (currentData.cardType == 8 || currentData.cardType == 'p') {
-
-                currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                if (serialData[card8.startByte2].toString(16).length < 2) {
+                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + "0" + serialData[card8.startByte2].toString(16), 16);
+                }
+                else {
+                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
+                }
+                if (serialData[card8.finishByte2].toString(16).length < 2) {
+                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + "0" + serialData[card8.finishByte2].toString(16), 16);
+                }
+                else {
+                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
+                }
                 currentData.name = getName(serialData.slice(38, 133));
                 port.write(card8.readBlock1);
             }
@@ -562,7 +632,8 @@ connect.addEventListener('click', function () {
                             else {
                                 // Save and Display Download
                                 if (returnedData.complete == true) {
-
+                                    var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+                                    returnedData.siid = returnedData.siid.toString();
                                     downloads.insert(returnedData);
 
 
@@ -572,21 +643,39 @@ connect.addEventListener('click', function () {
 
                                         competitors.insert({
                                             name: returnedData.name,
-                                            siid: returnedData.siid,
+                                            siid: returnedData.siid.toString(),
                                             downloadID: downloads.findOne({ 'siid': returnedData.siid }).$loki
                                         })
 
-                                        var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+                                        var calculatedTime = calculateTime(returnedData.start, returnedData.finish)[2];
                                         output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                         displayControlPunch('S', returnedData.start);
+
                                         var elapsedTime = 0;
                                         var lastPunch = returnedData.start;
                                         for (punch in returnedData.controlCodes) {
-                                            elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
-                                            lastPunch = returnedData.controlTimes[punch]
+
+                                            if (returnedData.controlTimes[punch] > lastPunch) {
+
+                                                elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
+                                                lastPunch = returnedData.controlTimes[punch]
+
+
+                                            }
+                                            else {
+
+                                                elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
+
+                                                lastPunch = returnedData.controlTimes[punch] + 43200
+                                            }
+
                                         }
-                                        displayControlPunch('F', returnedData.finish)
-                                        currentDownload = new download();
+                                        if (returnedData.finish < lastPunch) {
+                                            displayControlPunchwithElapsedTime('F', '', (returnedData.finish + 43200) - lastPunch, elapsedTime)
+                                        }
+                                        else {
+                                            displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
+                                        } currentDownload = new download();
                                     }
                                     else {
                                         var errors = "";
@@ -612,11 +701,23 @@ connect.addEventListener('click', function () {
                                                     var elapsedTime = 0;
                                                     var lastPunch = returnedData.start;
                                                     for (punch in splitList) {
-                                                        elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], splitList[punch] - lastPunch, elapsedTime)
-                                                        lastPunch = splitList[punch]
-                                                    }
-                                                    displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
 
+                                                        if (returnedData.controlTimes[punch] > lastPunch) {
+                                                            elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
+                                                            lastPunch = returnedData.controlTimes[punch]
+                                                        }
+                                                        else {
+                                                            elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
+
+                                                            lastPunch = returnedData.controlTimes[punch] + 43200
+                                                        }
+                                                    }
+                                                    if (returnedData.finish < lastPunch) {
+                                                        displayControlPunchwithElapsedTime('F', '', (returnedData.finish + 43200) - lastPunch, elapsedTime)
+                                                    }
+                                                    else {
+                                                        displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
+                                                    }
 
                                                     currentDownload = new download();
                                                 }
@@ -630,10 +731,26 @@ connect.addEventListener('click', function () {
                                                 var elapsedTime = 0;
                                                 var lastPunch = returnedData.start;
                                                 for (punch in returnedData.controlCodes) {
-                                                    elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
-                                                    lastPunch = returnedData.controlTimes[punch]
+
+                                                    if (returnedData.controlTimes[punch] > lastPunch) {
+                                                        elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
+                                                        lastPunch = returnedData.controlTimes[punch]
+                                                    }
+                                                    else {
+
+
+                                                        elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
+
+                                                        lastPunch = returnedData.controlTimes[punch] + 43200
+                                                    }
                                                 }
-                                                displayControlPunch('F', returnedData.finish)
+                                                if (returnedData.finish < lastPunch) {
+                                                    displayControlPunchwithElapsedTime('F', '', (returnedData.finish + 43200) - lastPunch, elapsedTime)
+                                                }
+                                                else {
+                                                    displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
+                                                }
+
                                                 currentDownload = new download();
                                             }
                                         };
