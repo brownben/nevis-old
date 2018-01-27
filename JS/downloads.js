@@ -635,7 +635,7 @@ connect.addEventListener('click', function () {
                                     var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
                                     returnedData.siid = returnedData.siid.toString();
                                     downloads.insert(returnedData);
-
+                                    db.saveDatabase();
 
                                     var linkedEntry = competitors.findOne({ 'siid': returnedData.siid.toString() });
 
