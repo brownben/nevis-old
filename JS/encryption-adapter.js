@@ -20,7 +20,7 @@ function encrypt(input, key) {
         var result = {
             version: "Nevis 2.0.0 : Pre-Release",
             type: "Full Database",
-            date: new Date(),
+            date: new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''),
             value: encryptedValue
         };
         return result;
