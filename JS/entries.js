@@ -3,6 +3,42 @@
 //////////////////////////////////////////////////////////////////
 
 // Add and View Entries                                         //
+function calculateTime(startRaw, finishRaw) {
+    // Calculate time taken from start to finish from the raw start and finish times
+    // Make sure numbers have 2 digits
+    if (startRaw > finishRaw) {
+        finishRaw = finishRaw + 43200
+    }
+    var timeRaw = finishRaw - startRaw;
+    var timeMinutes = (timeRaw - (timeRaw % 60)) / 60;
+    var timeSeconds = timeRaw % 60;
+    if (timeSeconds <= 9) {
+        timeSeconds = '0' + timeSeconds;
+    }
+    if (timeMinutes <= 9) {
+        timeMinutes = '0' + timeMinutes;
+    }
+    return [timeMinutes, timeSeconds, timeRaw];
+
+}
+function displayTime(time) {
+    // Display Control Code and Time of punch in a human readable format
+    // Make sure numbers have 2 digits
+
+
+    var timeMinutes = (time - (time % 60)) / 60;
+    var timeSeconds = time % 60;
+    if (timeSeconds <= 9 && timeSeconds >= 0) {
+        timeSeconds = '0' + timeSeconds;
+    }
+    if (timeMinutes <= 9 && timeMinutes >= 0) {
+        timeMinutes = '0' + timeMinutes;
+    }
+
+
+    return timeMinutes + ":" + timeSeconds;
+
+}
 
 function blankEntry() {
     document.getElementById('entries-name').value = "";
@@ -54,6 +90,7 @@ function viewEditEntry() {
     document.getElementById('entries').setAttribute('style', 'display:block;')
     document.getElementById('entry-search').setAttribute('style', 'display:none;')
 
+
     var entryToUpdate = competitors.findOne({ $loki: lokiEntryID });
     if (entryToUpdate.name != null) {
         document.getElementById('entries-name').value = entryToUpdate.name;
@@ -71,10 +108,49 @@ function viewEditEntry() {
     if (entryToUpdate.membershipNumber != null) {
         document.getElementById('entries-mem-no').value = entryToUpdate.membershipNumber;
     }
-    if (entryToUpdate.course != null) {
+    if (entryToUpdate.course != null || entryToUpdate.course != "undefined") {
         document.getElementById('entries-course').innerText = entryToUpdate.course;
         document.getElementById('search-course-button').setAttribute('style', 'color:black')
-        document.getElementById('entries-nc').value = entryToUpdate.nonCompetitive;
+        document.getElementById('search-course-button').setAttribute('class', '')
+    }
+    else {
+        document.getElementById('entries-course').innerText = "Course";
+
+    }
+    document.getElementById('entries-nc').value = entryToUpdate.nonCompetitive;
+    if (entryToUpdate.downloadID != null) {
+        document.getElementById('entry-download').setAttribute('style', 'display:block')
+        releventDownload = downloads.findOne({ $loki: entryToUpdate.downloadID })
+
+        if (releventDownload.time == null || releventDownload.time == "") {
+            document.getElementById('entry-download-time').innerText = "Time: " + calculateTime(releventDownload.start, releventDownload.finish)[0] + ":" + calculateTime(releventDownload.start, releventDownload.finish)[1];
+
+        }
+        else {
+
+            if (releventDownload.time.type == "string") {
+                document.getElementById('entry-download-time').innerText = "Time: " + releventDownload.time;
+
+            }
+            else {
+                document.getElementById('entry-download-time').innerText = "Time: " + displayTime(parseInt(releventDownload.time));
+
+            }
+
+        }
+        document.getElementById('entry-download-controls').innerText = "Controls: "
+        var controlCounter = 1;
+        for (var control of releventDownload.controlCodes) {
+            if (controlCounter < releventDownload.controlCodes.length) {
+                document.getElementById('entry-download-controls').innerText = document.getElementById('entry-download-controls').innerText + control.toString() + ", "
+
+            }
+            else {
+                document.getElementById('entry-download-controls').innerText = document.getElementById('entry-download-controls').innerText + control.toString()
+            }
+            controlCounter++
+        }
+
     }
 }
 
@@ -84,6 +160,7 @@ document.getElementById('add-entry').addEventListener('click', function () {
     document.getElementById('entries-add-menu').setAttribute('style', 'display:block;')
     document.getElementById('entries').setAttribute('style', 'display:block;')
     document.getElementById('entry-search').setAttribute('style', 'display:none;')
+    document.getElementById('entry-download').setAttribute('style', 'display:none')
     blankEntry()
 })
 
@@ -155,6 +232,7 @@ document.getElementById('entries-update').addEventListener('click', function () 
         document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
         document.getElementById('entries-update-menu').setAttribute('style', 'display:none;')
         document.getElementById('entry-search').setAttribute('style', 'display:block;')
+        document.getElementById('entry-download').setAttribute('style', 'display:none')
         currentViewEntry = 0;
 
 
@@ -171,6 +249,7 @@ document.getElementById('entries-delete').addEventListener('click', function () 
     document.getElementById('entries-add-menu').setAttribute('style', 'display:none;')
     document.getElementById('entries-update-menu').setAttribute('style', 'display:none;')
     document.getElementById('entry-search').setAttribute('style', 'display:block;')
+    document.getElementById('entry-download').setAttribute('style', 'display:none')
     currentViewEntry = 0;
 });
 //Blank Entry
@@ -233,7 +312,14 @@ document.getElementById('search-entries').addEventListener('click', function () 
         card.className = '';
         card.id = "E" + entry.$loki;
         card.onclick = viewEditEntry;
-        card.innerHTML = "<td>" + entry.name + "</td><td>" + entry.siid + '</td><td>' + entry.course + "</td>"
+        if (entry.course == "undefined" || entry.course == null) {
+            card.innerHTML = "<td>" + entry.name + "</td><td>" + entry.siid + '</td><td> - </td>';
+
+        }
+        else {
+            card.innerHTML = "<td>" + entry.name + "</td><td>" + entry.siid + '</td><td>' + entry.course + "</td>"
+
+        }
         document.getElementById('search-output-table').appendChild(card)
         document.getElementById('search-output').setAttribute('class', '')
         entryCounter++

@@ -19,6 +19,7 @@ function encrypt(input, key) {
 
         var result = {
             version: "Nevis 2.0.0 : Pre-Release",
+            type: "Full Database",
             date: new Date(),
             value: encryptedValue
         };

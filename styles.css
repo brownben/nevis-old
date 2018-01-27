@@ -324,6 +324,14 @@ main {
   margin-top: 5px;
 }
 
+#entry-download {
+  margin-left: 15px;
+}
+
+#entry-download #entry-download-controls {
+  overflow-wrap: break-word;
+}
+
 #entry-search {
   margin-left: 10px;
 }
@@ -745,13 +753,13 @@ main {
   margin-bottom: 15px !important;
 }
 
-@media (max-width: 440px) {
+@media (max-width: 500px) {
   .class {
     display: none;
   }
 }
 
-@media (max-width: 490px) {
+@media (max-width: 550px) {
   .club {
     display: none;
   }
