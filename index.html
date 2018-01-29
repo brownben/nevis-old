@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Nevis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 
@@ -42,6 +43,7 @@
                 <p id="menu-about">About</p>
             </div>
             <div id="database-menu">
+                <button id="database-new">New Database</button>
                 <button id="database-select">Select Database</button>
                 <button id="database-open">Open Database</button>
             </div>
@@ -287,6 +289,9 @@
         document.getElementById('database-select').addEventListener('click', function () {
             ipc.send('select-database')
         })
+        document.getElementById('database-new').addEventListener('click', function () {
+            ipc.send('new-database')
+        })
         ipc.on('database-file', function (event, path) {
             document.getElementById('database-path').innerText = path
         })
@@ -301,12 +306,30 @@
             document.getElementById('database').setAttribute('class', 'card database-hidden')
             document.getElementById('database-menu').setAttribute('style', 'display:none;')
         })
-        cryptedFileAdapter.setKey('orienteer');
+        ipc.on('database-file-create', function (event, arg) {
+            document.getElementById('database-path').innerText = arg[0]
+            cryptedFileAdapter.setKey(arg[3]);
+            db = new loki(document.getElementById('database-path').innerText, {
+                adapter: cryptedFileAdapter,
+                autoload: true,
+                autoloadCallback: databaseInitialize
+            });
+            document.getElementById('main-menu').setAttribute('style', 'display:block;')
+            document.getElementById('database').setAttribute('class', 'card database-hidden')
+            document.getElementById('database-menu').setAttribute('style', 'display:none;')
+            eventData = db.addCollection("eventData");
+            eventData.insert({
+                name: arg[1],
+                date: arg[2]
+            })
+
+        })
+        /*cryptedFileAdapter.setKey('orienteer');
         db = new loki('./nevis.db', {
             adapter: cryptedFileAdapter,
             autoload: true,
             autoloadCallback: databaseInitialize
-        });
+        });*/
 
         function databaseInitialize() {
             downloads = db.getCollection("downloads");
@@ -380,9 +403,9 @@
         //Main Menu
         require('./JS/main-menu.js')
 
-        document.getElementById('main-menu').setAttribute('style', 'display:block;')
+        /*document.getElementById('main-menu').setAttribute('style', 'display:block;')
         document.getElementById('database').setAttribute('class', 'card database-hidden')
-        document.getElementById('database-menu').setAttribute('style', 'display:none;')
+        document.getElementById('database-menu').setAttribute('style', 'display:none;')*/
 
 
 

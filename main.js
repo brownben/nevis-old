@@ -156,7 +156,7 @@ ipc.on('select-database', function (event) {
             { name: 'JSON', extensions: ['json'] },
             { name: 'All Files', extensions: ['*'] }
         ],
-        properties: ['openFile', 'promptToCreate']
+        properties: ['openFile']
     }, function (files) {
         if (files) event.sender.send('database-file', files)
     })
@@ -200,6 +200,13 @@ ipc.on('pdf-results-start', function (event, data) {
 })
 
 
+ipc.on('new-database', function (event, arg) {
+
+    let winNewDB = new BrowserWindow({ width: 370, height: 215, frame: false, icon: __dirname + './Nevis Logo.png', show: false })
+    winNewDB.loadURL(path.join('file://', __dirname, '/new-event.html'))
+    winNewDB.show()
+    winNewDB.on('close', function () { winNewDB = null })
+})
 
 
 ipc.on('pdf-window-ready', function (event, arg) {
@@ -224,5 +231,26 @@ ipc.on('pdf-window-loaded', function (event, arg) {
             winPDF.close()
         })
     })
+
+})
+
+ipc.on('create-database-data', function (event, arg) {
+    const winNewDB = BrowserWindow.fromWebContents(event.sender)
+
+    dialog.showSaveDialog({
+        title: 'Nevis - Create Database',
+        buttonLabel: 'Create',
+        icon: './nevis.ico',
+        filters: [
+            { name: 'Nevis Database', extensions: ['db'] },
+            { name: 'All Files', extensions: ['*'] }
+        ],
+    },
+        function (file) {
+            if (file) win.webContents.send('database-file-create', [file, arg[0], arg[1], arg[2]])
+            winNewDB.close();
+        })
+
+
 
 })

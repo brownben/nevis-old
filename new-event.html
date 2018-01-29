@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Nevis</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <header>
+        <img src="Nevis Logo.png" id="logo" />
+        <p>Nevis</p>
+        <a id="close" href="javascript:window.close()">
+            <svg color="white" width="10" height="10">
+                <path d="M 0,0 0,0.7 4.3,5 0,9.3 0,10 0.7,10 5,5.7 9.3,10 10,10 10,9.3 5.7,5 10,0.7 10,0 9.3,0 5,4.3 0.7,0 Z"></path>
+            </svg>
+        </a>
+        <a id="maximize">
+            <svg color="white" id="icon-min" width="10" height="10">
+                <path d="M 0,0 0,10 10,10 10,0 Z M 1,1 9,1 9,9 1,9 Z"></path>
+            </svg>
+            <svg color="white" id="icon-max" width="10" height="10">
+                <path d="m 2,1e-5 0,2 -2,0 0,8 8,0 0,-2 2,0 0,-8 z m 1,1 6,0 0,6 -1,0 0,-5 -5,0 z m -2,2 6,0 0,6 -6,0 z"></path>
+            </svg>
+        </a>
+        <a id="minimize">
+            <svg color="white" width="10" height="10">
+                <path d="M 0,5 10,5 10,6 0,6 Z"></path>
+            </svg>
+        </a>
+    </header>
+    <style>
+        .text-input {
+            margin-top: 20px;
+        }
+
+        main {
+            margin-left: 10px;
+        }
+
+        button {
+            float: right;
+            margin-right: 25px;
+            margin-top: 10px;
+            color: #29B6F6;
+            border: 0;
+            background-color: white;
+            transition: .5s;
+            padding: 5px 7px;
+            font-size: 16px;
+            outline: 0;
+        }
+
+        button:hover {
+            background-color: #29B6F6;
+            color: white;
+
+        }
+    </style>
+    <main>
+
+        <div class="text-input">
+
+            <input id="event-name" type="text" required/>
+            <label for="event-name">Event Name</label>
+        </div>
+        <div class="text-input">
+
+            <input id="event-date" type="text" required/>
+            <label for="event-date">Event Date (DD/MM/YYYY)
+            </label>
+        </div>
+        <div class="text-input">
+
+            <input id="database-password" type="password" required/>
+            <label for="database-password">Database Password</label>
+        </div>
+        <button id="create-database">Create Database</button>
+
+
+
+
+    </main>
+    <script>
+        const ipc = require('electron').ipcRenderer
+
+        document.getElementById('icon-min').setAttribute('style', 'display:inline');
+        document.getElementById('icon-max').setAttribute('style', 'display:none');
+
+        document.getElementById('maximize').addEventListener('click', function () {
+            ipc.send('window', 'maximize')
+        })
+
+        document.getElementById('minimize').addEventListener('click', function () {
+            ipc.send('window', 'minimize')
+        })
+
+        ipc.on('window', function (event, arg) {
+            if (arg == 'minimized') {
+                document.getElementById('icon-min').setAttribute('style', 'display:inline')
+                document.getElementById('icon-max').setAttribute('style', 'display:none')
+            }
+            else if (arg == 'maximized') {
+                document.getElementById('icon-min').setAttribute('style', 'display:none')
+                document.getElementById('icon-max').setAttribute('style', 'display:inline')
+            }
+        })
+
+
+        document.getElementById('create-database').addEventListener('click', function () {
+            var name = document.getElementById('event-name').value
+            var date = document.getElementById('event-date').value
+            var password = document.getElementById('database-password').value
+            ipc.send('create-database-data', [name, date, password])
+        })
+
+
+    </script>
+</body>
+
+</html>
