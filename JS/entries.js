@@ -108,13 +108,13 @@ function viewEditEntry() {
     if (entryToUpdate.membershipNumber != null) {
         document.getElementById('entries-mem-no').value = entryToUpdate.membershipNumber;
     }
-    if (entryToUpdate.course != null || entryToUpdate.course != "undefined") {
+    if (entryToUpdate.course == null || entryToUpdate.course.toString() == "undefined" || entryToUpdate.course.toString() == "") {
+        document.getElementById('entries-course').innerText = "Course";
+    }
+    else {
         document.getElementById('entries-course').innerText = entryToUpdate.course;
         document.getElementById('search-course-button').setAttribute('style', 'color:black')
         document.getElementById('search-course-button').setAttribute('class', '')
-    }
-    else {
-        document.getElementById('entries-course').innerText = "Course";
 
     }
     document.getElementById('entries-nc').value = entryToUpdate.nonCompetitive;
