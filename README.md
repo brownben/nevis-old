@@ -7,3 +7,6 @@ The Fast, Easy, Simple Software to Process Results from the SportIdent Timing Sy
 
 ## License
 Release under the [MIT License](https://bonalybob.github.io/Nevis/license)
+
+
+#### This project is not connected to or endorsed by SportIdent
