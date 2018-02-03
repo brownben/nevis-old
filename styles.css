@@ -21,9 +21,25 @@ body {
   overflow: hidden;
 }
 
-* {
+p,
+a,
+button,
+input,
+label,
+td {
   font-family: Roboto;
   font-weight: 100;
+}
+
+th,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Roboto;
+  font-weight: 300;
 }
 
 button,
@@ -276,10 +292,9 @@ main {
   width: calc(100% - 40px);
   min-height: calc(100% - 40px);
   float: left;
-  margin-top: 10px !important;
+  margin-top: 10px;
   margin-left: 20px;
   font-size: 12px;
-  margin-top: 5px;
 }
 
 #download-output p {
@@ -297,13 +312,13 @@ main {
 #download-output .connection {
   color: #29B6F6;
   font-size: 14px;
-  margin-top: 4px !important;
-  margin-bottom: 4px !important;
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 #download-output .big {
   font-size: 13px;
-  margin-top: 5px !important;
+  margin-top: 5px;
   margin-bottom: 3px;
 }
 
@@ -319,7 +334,6 @@ main {
 #about h3,
 #about h5,
 #about h4 {
-  font-weight: 300 !important;
   margin-bottom: 15px;
   margin-top: 5px;
 }
@@ -340,7 +354,6 @@ main {
   margin-left: 0px;
   margin-top: 5px;
   margin-bottom: 5px;
-  font-weight: 300 !important;
 }
 
 #entry-search .text-input {
@@ -614,13 +627,12 @@ main {
 
 #results table tr th {
   padding: 7px;
-  font-weight: 300 !important;
+  font-weight: 300;
 }
 
 .card {
   box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
   padding: 10px;
-  margin: 5px;
   margin-top: 10px;
   transition: .5s;
 }
@@ -629,7 +641,7 @@ main {
   background: linear-gradient(37deg, #DC281E, #F00000);
   color: white;
   font-family: Roboto;
-  font-weight: 300 !important;
+  font-weight: 300;
 }
 
 #main-screen {
@@ -645,7 +657,7 @@ main {
 
 #main-screen h1 {
   font-family: Roboto;
-  font-weight: 300 !important;
+  font-weight: 300;
   font-size: 35px;
   margin: 10px;
   margin-bottom: 5px;
@@ -736,21 +748,21 @@ main {
   margin-top: 25px;
 }
 
-#main-screen .database-hidden {
-  height: 60px !important;
+#main-screen #database.database-hidden {
+  height: 60px;
 }
 
-#main-screen .database-hidden .text-input {
+#main-screen #database.database-hidden .text-input {
   display: none;
 }
 
-#main-screen .database-hidden #current-database {
-  display: block !important;
+#main-screen #database.database-hidden #current-database {
+  display: block;
 }
 
-#main-screen .database-hidden #database-path {
-  margin-top: 15px !important;
-  margin-bottom: 15px !important;
+#main-screen #database.database-hidden #database-path {
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 @media (max-width: 500px) {
@@ -766,11 +778,10 @@ main {
 }
 
 #scroll {
-  overflow-y: auto !important;
+  overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
   margin: 0;
-  height: auto;
   padding-right: 10px;
 }
 

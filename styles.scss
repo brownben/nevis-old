@@ -30,9 +30,26 @@ body {
     overflow: hidden;
 }
 
-* {
+p,
+a,
+button,
+input,
+label,
+td {
     font-family: Roboto;
     font-weight: 100;
+}
+
+th,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+{
+    font-family: Roboto;
+    font-weight: 300;
 }
 
 button,
@@ -259,10 +276,9 @@ main {
     width: calc(100% - 40px);
     min-height: calc(100% - 40px);
     float: left;
-    margin-top: 10px!important;
+    margin-top: 10px;
     margin-left: 20px;
     font-size: 12px;
-    margin-top: 5px;
     p {
         margin-top: 0px;
         margin-bottom: 0px;
@@ -276,12 +292,12 @@ main {
     .connection {
         color: $nevis-blue;
         font-size: 14px;
-        margin-top: 4px!important;
-        margin-bottom: 4px!important;
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
     .big {
         font-size: 13px;
-        margin-top: 5px!important;
+        margin-top: 5px;
         margin-bottom: 3px;
     }
 }
@@ -293,7 +309,6 @@ main {
     h3,
     h5,
     h4 {
-        font-weight: 300!important;
         margin-bottom: 15px;
         margin-top: 5px;
     }
@@ -315,7 +330,6 @@ main {
         margin-left: 0px;
         margin-top: 5px;
         margin-bottom: 5px;
-        font-weight: 300!important;
     }
     .text-input {
         margin-top: 20px;
@@ -546,7 +560,7 @@ main {
             }
             th {
                 padding: 7px;
-                font-weight: 300!important;
+                font-weight: 300;
             }
         }
     }
@@ -555,7 +569,6 @@ main {
 .card {
     box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.14), 0 1px 7px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -1px rgba(0, 0, 0, 0.2);
     padding: 10px;
-    margin: 5px;
     margin-top: 10px;
     transition: .5s;
 }
@@ -564,7 +577,7 @@ main {
     background: linear-gradient(37deg, #DC281E, #F00000);
     color: white;
     font-family: Roboto;
-    font-weight: 300!important;
+    font-weight: 300;
 }
 
 #main-screen {
@@ -577,7 +590,7 @@ main {
     }
     h1 {
         font-family: Roboto;
-        font-weight: 300!important;
+        font-weight: 300;
         font-size: 35px;
         margin: 10px;
         margin-bottom: 5px;
@@ -655,18 +668,18 @@ main {
             margin-top: 25px;
         }
     }
-    .database-hidden {
+    #database.database-hidden {
         .text-input {
             display: none;
         }
         #current-database {
-            display: block!important;
+            display: block;
         }
         #database-path {
-            margin-top: 15px!important;
-            margin-bottom: 15px!important;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
-        height:60px!important;
+        height: 60px;
     }
 }
 
@@ -683,11 +696,10 @@ main {
 }
 
 #scroll {
-    overflow-y: auto!important;
+    overflow-y: auto;
     overflow-x: hidden;
     height: 100%;
     margin: 0;
-    height: auto;
     padding-right: 10px;
 }
 
