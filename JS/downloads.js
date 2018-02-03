@@ -1,32 +1,27 @@
-
-
 //////////////////////////////////////////////////////////////////
 //                          downloads.js                        //
 //////////////////////////////////////////////////////////////////
-
 // Read and display the data coming from punches to a station   //
 // Setup the whole Download screen                              //
-
-
 /* ------ Import and Set Up Variables ----- */
-
 // Libraries for reading Serialport and Data Verification
-
 const crc = require('./CRC.js');
 const course = require('./Course-Check.js')
-
 // Variables for Reading Cards
 const si = require('./SI-Variables.js');
 const card5 = new si.card5();
 const card8 = new si.card8(); // Card 8,9 & P
 const card10 = new si.card10(); //Card 10, 11 & SIAC
-
-
-
+function lessThan2(object) {
+    if (object.length < 2) {
+        return "0" + object
+    }
+    else {
+        return object
+    }
+}
 /* ------ HTML Elements ----- */
-
 const connect = document.getElementById('connect');
-
 /* ------ Download Class for Database ----- */
 var download = function () {
     this.siid = '';
@@ -39,14 +34,10 @@ var download = function () {
     this.complete = false;
     this.cardType = '';
 }
-
 /* ----- Functions -----*/
-
 function output(data, type) {
     // Display the data fromm download in #download-output as <p> with different stylings given by classes
-
     const downloadOutput = document.getElementById('download-output');
-
     if (type == 'error') {
         downloadOutput.innerHTML = downloadOutput.innerHTML + "<p class='error'>" + data + "</p>";
     }
@@ -58,18 +49,14 @@ function output(data, type) {
     }
     else {
         downloadOutput.innerHTML = downloadOutput.innerHTML + "<p>" + data + "</p>";
-
     }
     document.getElementById('scroll').scrollTop = downloadOutput.scrollHeight;
 }
 
-
 function calculateSIID(data) {
     // Turn the bytes transmitted from the station into a human readable and idenifiable SIID (SI Number)
-
     var siid = parseInt(data[0].toString(16) + data[1].toString(16) + data[2].toString(16) + data[3].toString(16), 16);
     // SI Card 5
-
     if ((data[0] == 0x00) && (data[1] == 0x01)) {
         siid = siid - 65536;
     }
@@ -80,7 +67,6 @@ function calculateSIID(data) {
         siid = siid + 103392;
     }
     else if ((data[0] == 0x00) && (data[1] == 0x04)) {
-
         siid = siid + 137856;
     }
     else if ((siid >= 3000000) && (siid <= 3999999)) {
@@ -110,10 +96,8 @@ function calculateSIID(data) {
     else if ((siid >= 258658240) && (siid <= 261658239)) {
         siid = siid - 251658240;
     }
-
     return siid
 }
-
 
 function calculateTime(startRaw, finishRaw) {
     // Calculate time taken from start to finish from the raw start and finish times
@@ -131,14 +115,11 @@ function calculateTime(startRaw, finishRaw) {
         timeMinutes = '0' + timeMinutes;
     }
     return [timeMinutes, timeSeconds, timeRaw];
-
 }
-
 
 function displayControlPunch(controlCode, time) {
     // Display Control Code and Time of punch in a human readable format
     // Make sure numbers have 2 digits
-
     var timeHours = (time - (time % 3600)) / 3600;
     var timeMinutes = ((time % 3600) - (time % 60)) / 60;
     var timeSeconds = time % 60;
@@ -152,23 +133,17 @@ function displayControlPunch(controlCode, time) {
         timeHours = '0' + timeHours;
     }
     output(controlCode + " - " + timeHours + ":" + timeMinutes + ":" + timeSeconds);
-
 }
+
 function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTime, elapsedTime) {
-
-
     if (splitTime == "---") {
         output(controlCounter + " " + controlCode + " - --- - ---");
         if (controlCounterOutput.toString().length > 1) {
             splitToPrint.push(controlCounterOutput.toString() + " " + controlCode + "                     " + "--:--     --:--");
-
         }
-
         else {
             splitToPrint.push(controlCounterOutput.toString() + "  " + controlCode + "                     " + "--:--     --:--");
-
         }
-
     }
     else {
         var splitTimeMinutes = (splitTime - (splitTime % 60)) / 60;
@@ -179,9 +154,7 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
         if (splitTimeMinutes <= 9 && splitTimeMinutes >= 0) {
             splitTimeMinutes = '0' + splitTimeMinutes;
         }
-
         elapsedTime = elapsedTime + splitTime
-
         var elapsedTimeMinutes = (elapsedTime - (elapsedTime % 60)) / 60;
         var elapsedTimeSeconds = elapsedTime % 60;
         if (elapsedTimeSeconds <= 9 && elapsedTimeSeconds >= 0) {
@@ -191,39 +164,28 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
             elapsedTimeMinutes = '0' + elapsedTimeMinutes;
         }
         if (controlCounter == "F") {
-
-
             output("F - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
-
             splitToPrint.push("F" + "                          " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds)
         }
-
         else {
             var controlCounterOutput = parseInt(controlCounter) + 1
-
             output(controlCounterOutput.toString() + " - " + controlCode + " - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
             if (controlCounterOutput.toString().length > 1) {
                 splitToPrint.push(controlCounterOutput.toString() + " " + controlCode + "                     " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
-
             }
             else {
                 splitToPrint.push(controlCounterOutput.toString() + "  " + controlCode + "                     " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
-
             }
         }
-
     }
     return elapsedTime
 }
 
-
 function getName(personalData) {
     // Get name from the personal data on the card
     // Data is separated by colons, first name then surname; so two colons
-
     var name = "";
     colonCounter = 0;
-
     for (character of personalData) {
         if (character != 0x3B && colonCounter <= 1) {
             name = name + String.fromCharCode(character);
@@ -239,23 +201,15 @@ function getName(personalData) {
     }
 }
 
-
 function processCard10Punches(data, blockNumber, currentCard) {
     // Process the raw data inn Blocks 4-7 on Card10+ into readable data
     // CRC Check, read the punches, finish off
-
     if (parseInt(data[134].toString(16) + data[135].toString(16), 16) == parseInt(crc.compute(data.slice(1, 134)).toString(16), 16)) {
-
         var position = 6;
         while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-
             currentCard.controlCodes.push(parseInt(data[position + 1]));
-            if (data[position + 3].toString(16).length < 2) {
-                currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
-            }
-            else {
-                currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
-            }
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + lessThan2(data[position + 3].toString(16)), 16));
+            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
             position = position + 4;
         }
         if (blockNumber == 7) {
@@ -264,7 +218,6 @@ function processCard10Punches(data, blockNumber, currentCard) {
         }
         else {
             if (position != 134) {
-
                 port.write(si.beep);
                 return true;
             }
@@ -288,19 +241,13 @@ function processCard10Punches(data, blockNumber, currentCard) {
         return "Error: Problem with data transmission - Please Re-insert Card"
     }
 }
+
 function processCard8Punches(data, blockNumber, currentCard) {
     var endOfPunches = data.length - 1;
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
         currentCard.controlCodes.push(parseInt(data[position + 1]));
-        if (data[position + 3].toString(16).length < 2) {
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
-
-        }
-        else {
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
-
-        }
+        currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + lessThan2(data[position + 3].toString(16)), 16));
         position = position + 4;
     }
     if (blockNumber == 1) {
@@ -318,16 +265,7 @@ function processCardPunches(data, blockNumber, currentCard) {
     var position = 0;
     while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
         currentCard.controlCodes.push(parseInt(data[position + 1]));
-
-        if (data[position + 3].toString(16).length < 2) {
-
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + "0" + data[position + 3].toString(16), 16));
-
-        }
-        else {
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
-
-        }
+        currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + lessThan2(data[position + 3].toString(16)), 16));
         position = position + 4;
     }
     if (position != 134) {
@@ -354,32 +292,24 @@ function processCardPunches(data, blockNumber, currentCard) {
         port.write(card10.readBlock7);
         return false;
     }
-
-
 }
-
 
 function dataTranslation(serialData, currentData) {
     // Turn raw data into times
     // Each type for packet is a seperate If and all have a CRC check
-
     // If Card5 just been inserted
     if ((serialData[0] == 0x02) && (serialData[1] == 0xE5)) { //If SI 5 inserted send signal to read SI5 data
-
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
             currentData = new download();
             currentData.siid = calculateSIID(serialData.slice(5, 9));
             port.write(card5.read);
             currentData.cardType = 5;
             return currentData
-
         }
         else {
             return "Error: Problem with data transmission - Please Re-insert Card"
         }
     }
-
-
     // If Card 8,9,10,11 or SIAC have been inserted
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xE8) && (serialData[2] == 0x06)) {
         if (parseInt(serialData[9].toString(16) + serialData[10].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 9)))) {
@@ -408,38 +338,17 @@ function dataTranslation(serialData, currentData) {
             return "Error: Problem with data transmission - Please Re-insert Card";
         }
     }
-
     // Read block of Card 5 data
-
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xB1) && (serialData[2] == 0x82) && (serialData.length == 136)) {
-
-
         if (parseInt(serialData[133].toString(16) + serialData[134].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 133)).toString(16), 16)) {
-
             if (currentData.cardType == 5) {
-                if (serialData[card5.startByte2].toString(16).length < 2) {
-                    currentData.start = parseInt(serialData[card5.startByte1].toString(16) + "0" + serialData[card5.startByte2].toString(16), 16);
-                }
-                else {
-                    currentData.start = parseInt(serialData[card5.startByte1].toString(16) + serialData[card5.startByte2].toString(16), 16);
-                }
-                if (serialData[card5.finishByte2].toString(16).length < 2) {
-                    currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + "0" + serialData[card5.finishByte2].toString(16), 16);
-                }
-                else {
-                    currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + serialData[card5.finishByte2].toString(16), 16);
-                }
-
+                currentData.start = parseInt(serialData[card5.startByte1].toString(16) + lessThan2(serialData[card5.startByte2].toString(16)), 16);
+                currentData.finish = parseInt(serialData[card5.finishByte1].toString(16) + lessThan2(serialData[card5.finishByte2].toString(16)), 16);
                 var position = 38;
                 var blockPosition = 0;
                 while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
                     currentData.controlCodes.push(parseInt(serialData[position]));
-                    if (serialData[position + 2].toString(16).length < 2) {
-                        currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + "0" + serialData[position + 2].toString(16), 16));
-                    }
-                    else {
-                        currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16));
-                    }
+                    currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + lessThan2(serialData[position + 2].toString(16)), 16));
                     if (blockPosition < 4) {
                         position = position + 3;
                         blockPosition++;
@@ -457,62 +366,26 @@ function dataTranslation(serialData, currentData) {
         else {
             return "Error: Problem with data transmission - Please Re-insert Card"
         }
-
     }
-
     // Read Block 0 of Card 8,9,10,11 or SIAC data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x00) && (serialData.length == 137)) {
-
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
-
             if (currentData.cardType == 10) {
-                if (serialData[card10.startByte2].toString(16).length < 2) {
-                    currentData.start = parseInt(serialData[card10.startByte1].toString(16) + "0" + serialData[card10.startByte2].toString(16), 16);
-                }
-                else {
-                    currentData.start = parseInt(serialData[card10.startByte1].toString(16) + serialData[card10.startByte2].toString(16), 16);
-                }
-                if (serialData[card10.finishByte2].toString(16).length < 2) {
-                    currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + "0" + serialData[card10.finishByte2].toString(16), 16);
-                }
-                else {
-                    currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + serialData[card10.finishByte2].toString(16), 16);
-                }
-
+                currentData.start = parseInt(serialData[card10.startByte1].toString(16) + lessThan2(serialData[card10.startByte2].toString(16)), 16);
+                currentData.finish = parseInt(serialData[card10.finishByte1].toString(16) + lessThan2(serialData[card10.finishByte2].toString(16)), 16);
                 currentData.name = getName(serialData.slice(38, 133));
                 port.write(card10.readBlock4);
             }
             else if (currentData.cardType == 9) {
-                if (serialData[card8.startByte2].toString(16).length < 2) {
-                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + "0" + serialData[card8.startByte2].toString(16), 16);
-                }
-                else {
-                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                }
-                if (serialData[card8.finishByte2].toString(16).length < 2) {
-                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + "0" + serialData[card8.finishByte2].toString(16), 16);
-                }
-                else {
-                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                }
-
+                currentData.start = parseInt(serialData[card8.startByte1].toString(16) + lessThan2(serialData[card8.startByte2].toString(16)), 16);
+                currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + lessThan2(serialData[card8.finishByte2].toString(16)), 16);
                 currentData.name = getName(serialData.slice(38, 58));
                 processCard8Punches(serialdata.slice(59, 133), 0, currentData)
                 port.write(card8.readBlock1);
             }
             else if (currentData.cardType == 8 || currentData.cardType == 'p') {
-                if (serialData[card8.startByte2].toString(16).length < 2) {
-                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + "0" + serialData[card8.startByte2].toString(16), 16);
-                }
-                else {
-                    currentData.start = parseInt(serialData[card8.startByte1].toString(16) + serialData[card8.startByte2].toString(16), 16);
-                }
-                if (serialData[card8.finishByte2].toString(16).length < 2) {
-                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + "0" + serialData[card8.finishByte2].toString(16), 16);
-                }
-                else {
-                    currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + serialData[card8.finishByte2].toString(16), 16);
-                }
+                currentData.start = parseInt(serialData[card8.startByte1].toString(16) + lessThan2(serialData[card8.startByte2].toString(16)), 16);
+                currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + lessThan2(serialData[card8.finishByte2].toString(16)), 16);
                 currentData.name = getName(serialData.slice(38, 133));
                 port.write(card8.readBlock1);
             }
@@ -521,12 +394,10 @@ function dataTranslation(serialData, currentData) {
         else {
             return "Error: Problem with data transmission - Please Re-insert Card"
         }
-
     }
     // Read Block 1 of Card 8 + 9
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x01) && (serialData.length == 137)) {
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
-
             if (currentData.cardType == 8) {
                 processCard8Punches(serialData.slice(6, 134), 1, currentData)
             }
@@ -536,7 +407,6 @@ function dataTranslation(serialData, currentData) {
             if (currentData.cardType == 'p') {
                 processCard8Punches(serialData.slice(54, 134), 1, currentData)
             }
-
             currentData.complete = true;
             return currentData
         }
@@ -545,59 +415,46 @@ function dataTranslation(serialData, currentData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
             if (processCard10Punches(serialData, 4, currentData) == true) {
-
                 currentData.complete = true;
                 return currentData
             }
         }
     }
-
     // Read Block 5 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
             if (processCard10Punches(serialData, 5, currentData) == true) {
-
                 currentData.complete = true;
                 return currentData
             }
         }
     }
-
     // Read Block 6 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
             if (processCard10Punches(serialData, 6, currentData) == true) {
-
                 currentData.complete = true;
                 return currentData
             }
         }
     }
-
     // Read Block 7 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
             if (processCard10Punches(serialData, 7, currentData) == true) {
-
                 currentData.complete = true;
                 return currentData
             }
         }
     }
-
 }
-
-
 /* ------ Connect Button to Enable Download ----- */
 var currentDownload = new download();
 var splitToPrint = [];
 connect.addEventListener('click', function () {
-
     // Open the port
     if (connect.textContent == "Connect" && document.getElementById('port-content').innerText != '') {
-
         /* ----- Set up Port ----- */
-
         port = new SerialPort(document.getElementById('port-content').innerText, {
             baudRate: parseInt(document.getElementById('baud-content').innerText),
             dataBits: 8,
@@ -605,25 +462,19 @@ connect.addEventListener('click', function () {
             parity: 'none',
             autoOpen: false
         })
-
         port.on('open', function () {
             output(portName + " Opened", 'connection');
             port.write(new Buffer(0xff, 0x02, 0xf9, 0x01, 0x02, 0x14, 0x0a, 0x03))
         });
-
         port.on('close', function () {
             output(portName + " Closed", 'connection');
             connect.textContent = "Connect";
-
         });
-
         port.on('error', function (err) {
             output('Error: ' + err.message, 'error');
             connect.textContent = "Connect";
         })
-
         // Turn random lengths of packets in to one long readable full length
-
         var dataInList = []
         port.on('data', function (data) {
             for (byte of data) {
@@ -632,16 +483,13 @@ connect.addEventListener('click', function () {
                 }
                 else if (byte != 0x03) {
                     dataInList.push(byte);
-
                 }
                 else {
                     if (dataInList.length == 135 || dataInList.length == 136 || dataInList.length == 11) {
                         dataInList.push(0x03)
-
                         var returnedData = dataTranslation(dataInList, currentDownload);
                         dataInList = []
                         if (returnedData != null) {
-
                             if (typeof returnedData == 'string') {
                                 output(returnedData, 'error')
                             }
@@ -653,21 +501,20 @@ connect.addEventListener('click', function () {
                                     downloads.insert(returnedData);
                                     db.saveDatabase();
                                     splitToPrint = [];
-                                    var linkedEntry = competitors.findOne({ 'siid': returnedData.siid.toString() });
-
+                                    var linkedEntry = competitors.findOne({
+                                        'siid': returnedData.siid.toString()
+                                    });
                                     if (linkedEntry == null) {
-
                                         competitors.insert({
                                             name: returnedData.name,
                                             siid: returnedData.siid.toString(),
-                                            downloadID: downloads.findOne({ 'siid': returnedData.siid }).$loki
+                                            downloadID: downloads.findOne({
+                                                'siid': returnedData.siid
+                                            }).$loki
                                         })
-
                                         var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
-
                                         output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                         displayControlPunch('S', returnedData.start);
-
                                         var elapsedTime = 0;
                                         var lastPunch = returnedData.start;
                                         for (punch in returnedData.controlCodes) {
@@ -686,45 +533,48 @@ connect.addEventListener('click', function () {
                                         else {
                                             displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
                                         }
-
-
                                         printSplits(returnedData.name, calculatedTime[0] + ":" + calculatedTime[1], returnedData.siid, "Unknown", splitToPrint)
                                         currentDownload = new download();
                                     }
                                     else {
                                         var errors = "";
                                         if (returnedData.course != "") {
-                                            var courseFile = courses.findOne({ 'name': linkedEntry.course })
+                                            var courseFile = courses.findOne({
+                                                'name': linkedEntry.course
+                                            })
                                             if (courseFile != null) {
                                                 if (courseFile.type == "linear") {
                                                     courseCheckData = course.check(returnedData.controlCodes, returnedData.controlTimes, courseFile.controls, returnedData.finish)
                                                     errors = courseCheckData[0]
                                                     splitList = courseCheckData[1]
-                                                    linkedEntry.downloadID = downloads.findOne({ 'siid': returnedData.siid }).$loki;
-
+                                                    linkedEntry.downloadID = downloads.findOne({
+                                                        'siid': returnedData.siid
+                                                    }).$loki;
                                                     var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
                                                     if (errors == "") {
                                                         output(linkedEntry.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
-                                                        downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime[2]
+                                                        downloads.findOne({
+                                                            'siid': returnedData.siid
+                                                        }).time = calculatedTime[2]
                                                         time = calculatedTime[0] + ":" + calculatedTime[1]
                                                     }
                                                     else {
                                                         output(linkedEntry.name + " (" + returnedData.siid + ") - " + errors, 'big');
-                                                        downloads.findOne({ 'siid': returnedData.siid }).time = errors
+                                                        downloads.findOne({
+                                                            'siid': returnedData.siid
+                                                        }).time = errors
                                                         time = errors
                                                     }
                                                     displayControlPunch('S', returnedData.start);
                                                     var elapsedTime = 0;
                                                     var lastPunch = returnedData.start;
                                                     for (punch in splitList) {
-
                                                         if (returnedData.controlTimes[punch] > lastPunch) {
                                                             elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
                                                             lastPunch = returnedData.controlTimes[punch]
                                                         }
                                                         else {
                                                             elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
-
                                                             lastPunch = returnedData.controlTimes[punch] + 43200
                                                         }
                                                     }
@@ -737,27 +587,23 @@ connect.addEventListener('click', function () {
                                                     printSplits(linkedEntry.name, time, returnedData.siid, linkedEntry.course, splitToPrint)
                                                     currentDownload = new download();
                                                 }
-
                                             }
                                             else {
                                                 var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
-
                                                 output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                                 displayControlPunch('S', returnedData.start);
-                                                downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime
+                                                downloads.findOne({
+                                                    'siid': returnedData.siid
+                                                }).time = calculatedTime
                                                 var elapsedTime = 0;
                                                 var lastPunch = returnedData.start;
                                                 for (punch in returnedData.controlCodes) {
-
                                                     if (returnedData.controlTimes[punch] > lastPunch) {
                                                         elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
                                                         lastPunch = returnedData.controlTimes[punch]
                                                     }
                                                     else {
-
-
                                                         elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
-
                                                         lastPunch = returnedData.controlTimes[punch] + 43200
                                                     }
                                                 }
@@ -771,12 +617,8 @@ connect.addEventListener('click', function () {
                                                 currentDownload = new download();
                                             }
                                         };
-
-
                                     }
-
                                     db.saveDatabase();
-
                                 }
                                 else {
                                     currentDownload = returnedData
@@ -801,13 +643,11 @@ connect.addEventListener('click', function () {
 })
 
 function printSplits(name, time, sicard, course, splits) {
-
     if (document.getElementById('printer-content').innerText != "No Printing") {
         thermalPrinter.init({
             type: 'epson',
             interface: "printer:" + document.getElementById('printer-content').innerText
         });
-
         thermalPrinter.isPrinterConnected(function (isConnected) {
             thermalPrinter.setTypeFontA();
             thermalPrinter.alignLeft();
@@ -846,20 +686,18 @@ function printSplits(name, time, sicard, course, splits) {
             thermalPrinter.execute(function (err) {
                 if (err) {
                     console.error("Print failed", err);
-                } else {
+                }
+                else {
                     console.log("Print done");
                 }
             });
         })
-
     }
 }
 /* ----- Baud and Port Menus ----- */
-
 const portMenu = document.getElementById('port-menu');
 const baudMenu = document.getElementById('baud-menu');
 const printerMenu = document.getElementById('printer-menu');
-
 // Baud Menu
 document.getElementById('baud').addEventListener('click', function () {
     if (baudMenu.getAttribute('class') == 'hidden') {
@@ -869,19 +707,16 @@ document.getElementById('baud').addEventListener('click', function () {
         baudMenu.setAttribute('class', 'hidden')
     }
 })
-
 document.getElementById('baud-usb').addEventListener('click', function () {
     document.getElementById('baud-content').innerText = "38400";
     port.baudrate = 38400
     baudMenu.setAttribute('class', 'hidden')
 })
-
 document.getElementById('baud-serial').addEventListener('click', function () {
     document.getElementById('baud-content').innerText = "4800";
     port.baudrate = 4800
     baudMenu.setAttribute('class', 'hidden')
 })
-
 // Port Menu & Autogenerated Menu Items
 function assignPortMenuHandler() {
     document.getElementById('port-content').innerText = this.innerText;
@@ -900,7 +735,6 @@ document.getElementById('port').addEventListener('click', function () {
                 p.innerHTML = port.comName;
                 p.onclick = assignPortMenuHandler;
                 document.getElementById('port-menu').appendChild(p);
-
                 noOfPorts++;
             });
             if (ports.length < 1) {
@@ -911,19 +745,16 @@ document.getElementById('port').addEventListener('click', function () {
                 })
             }
         });
-
         portMenu.setAttribute('class', '')
     }
     else {
         portMenu.setAttribute('class', 'hidden')
     }
 })
-
 // Printer Menu & Autogenerated Menu Items
 function assignPrintMenuHandler() {
     document.getElementById('printer-content').innerText = this.innerText;
     printerMenu.setAttribute('class', 'hidden')
-
 }
 document.getElementById('printer').addEventListener('click', function () {
     if (printerMenu.getAttribute('class') == 'hidden') {
@@ -931,21 +762,16 @@ document.getElementById('printer').addEventListener('click', function () {
         printersList = ""
         noOfPrinters = 1
         printers = printer.getPrinters()
-
         printers.forEach(function (printer) {
-
             if (printer.status[0] != "NOT-AVAILABLE") {
                 var p = document.createElement('p');
                 p.className = 'printer-list-item';
                 p.innerHTML = printer.name;
                 p.onclick = assignPrintMenuHandler;
                 document.getElementById('printer-menu').appendChild(p);
-
                 noOfPrinters++;
             }
-
         });
-
         var p = document.createElement('p');
         p.id = 'NoPrint';
         p.innerHTML = 'No Printing';
@@ -954,7 +780,6 @@ document.getElementById('printer').addEventListener('click', function () {
             document.getElementById('printer-content').innerText = "No Printing";
             printerMenu.setAttribute('class', 'hidden')
         })
-
         printerMenu.setAttribute('class', '')
     }
     else {
