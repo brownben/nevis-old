@@ -1,12 +1,14 @@
 {
   "name": "nevis",
-  "description": "A app to read SI Cards to create results",
+  "description": "The Fast, Easy, Simple Software to Process Results from the SportIdent Timing System",
   "repository": "https://github.com/bonalybob/Nevis.git",
   "license": "MIT",
   "version": "0.2.0",
   "main": "main.js",
   "dependencies": {
     "lokijs": "^1.5.1",
+    "node-thermal-printer": "^2.0.0",
+    "printer": "^0.2.2",
     "serialport": "^6.0.4"
   },
   "devDependencies": {

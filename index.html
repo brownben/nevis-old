@@ -18,7 +18,7 @@
             </svg>
         </a>
         <a id="maximize">
-            <svg color="white" id="icon-min" width="10" height="10">
+            <svg color="white" id="icon-min" width="10" height="10" style="display:none">
                 <path d="M 0,0 0,10 10,10 10,0 Z M 1,1 9,1 9,9 1,9 Z"></path>
             </svg>
             <svg color="white" id="icon-max" width="10" height="10">
@@ -35,19 +35,20 @@
 
     <main>
         <div id="menu-panel">
-            <div id="main-menu">
+            <div id="main-menu" style="display:none;">
                 <p id="menu-download">Download</p>
                 <p id="menu-entries">Entries</p>
                 <p id="menu-results">Results</p>
                 <p id="menu-courses">Courses</p>
                 <p id="menu-about">About</p>
             </div>
-            <div id="database-menu">
-                <button id="database-new">New Database</button>
-                <button id="database-select">Select Database</button>
-                <button id="database-open">Open Database</button>
-            </div>
+
             <div id="scroll-menu">
+                <div id="database-menu">
+                    <button id="database-new">New Database</button>
+                    <button id="database-select">Select Database</button>
+                    <button id="database-open">Open Database</button>
+                </div>
                 <div id="download-menu" style="display:none;">
                     <p class="label">Port:</p>
                     <div id='port'>
@@ -74,7 +75,19 @@
                         <p id="baud-serial">4800 (Serial)</p>
                         <p id="baud-usb">38400 (USB)</p>
                     </div>
+                    <p class="label">Printer:</p>
+                    <div id="printer">
+                        <p id="printer-content" class="content">No Printing</p>
+                        <svg fill="#000000" viewBox="0 0 24 24" width="20">
+                            <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z" />
+                            <path d="M0-.75h24v24H0z" fill="none" />
+                        </svg>
 
+                    </div>
+                    <div id="printer-menu" class="hidden">
+
+
+                    </div>
                     <button id="connect">Connect</button>
 
                 </div>
@@ -129,7 +142,7 @@
 
             <div id="download-output" style="display:none;" class="card">
             </div>
-            <div id="entry-search">
+            <div id="entry-search" style="display:none;">
                 <div class="card">
                     <div class="text-input">
                         <input id="name-search" required/>
@@ -193,7 +206,7 @@
                     </form>
                 </div>
             </div>
-            <div id="entry-download" class="card">
+            <div id="entry-download" class="card" style="display:none;">
                 <h2 id="entry-download-time">Time :</h2>
                 <h4 id="entry-download-controls">Controls:</h4>
             </div>
@@ -275,15 +288,49 @@
 
         </div>
     </main>
+    <script>
+        const ipc = require('electron').ipcRenderer
+        /* ----- Window Commands & Icons ----- */
+        // Title Bar (Max and Min) + Scrollbar
 
+        document.getElementById('icon-min').setAttribute('style', 'display:inline');
+        document.getElementById('icon-max').setAttribute('style', 'display:none');
+
+        document.getElementById('maximize').addEventListener('click', function () {
+            ipc.send('window', 'maximize')
+        })
+
+        document.getElementById('minimize').addEventListener('click', function () {
+            ipc.send('window', 'minimize')
+        })
+
+        ipc.on('window', function (event, arg) {
+            if (arg == 'minimized') {
+                document.getElementById('icon-min').setAttribute('style', 'display:inline')
+                document.getElementById('icon-max').setAttribute('style', 'display:none')
+            }
+            else if (arg == 'maximized') {
+                document.getElementById('icon-min').setAttribute('style', 'display:none')
+                document.getElementById('icon-max').setAttribute('style', 'display:inline')
+            }
+        })
+
+        ipc.on('resize', function (event, arg) {
+            var pixels = arg[1] - 30
+            var minusBackButtonPixels = pixels - 45
+            document.getElementById('scroll').setAttribute('style', "height:" + pixels + "px")
+            document.getElementById('scroll-menu').setAttribute('style', "height:" + minusBackButtonPixels + "px")
+        })
+    </script>
     <script>
 
-        // Require
-        const ipc = require('electron').ipcRenderer
         var fs = require('fs');
         const loki = require('lokijs');
         const BrowserWindow = require('electron').remote.BrowserWindow
         const path = require('path')
+        const SerialPort = require('serialport');
+        const printer = require('printer');
+        const thermalPrinter = require('node-thermal-printer');
         var cryptedFileAdapter = require('./JS/encryption-adapter.js');
 
         document.getElementById('database-select').addEventListener('click', function () {
@@ -296,15 +343,18 @@
             document.getElementById('database-path').innerText = path
         })
         document.getElementById('database-open').addEventListener('click', function () {
-            cryptedFileAdapter.setKey(document.getElementById('database-password').value);
-            db = new loki(document.getElementById('database-path').innerText, {
-                adapter: cryptedFileAdapter,
-                autoload: true,
-                autoloadCallback: databaseInitialize
-            });
-            document.getElementById('main-menu').setAttribute('style', 'display:block;')
-            document.getElementById('database').setAttribute('class', 'card database-hidden')
-            document.getElementById('database-menu').setAttribute('style', 'display:none;')
+            if (document.getElementById('database-path').innerText != 'Select a Database') {
+                cryptedFileAdapter.setKey(document.getElementById('database-password').value);
+                db = new loki(document.getElementById('database-path').innerText, {
+                    adapter: cryptedFileAdapter,
+                    autoload: true,
+                    autoloadCallback: databaseInitialize
+                });
+                document.getElementById('main-menu').setAttribute('style', 'display:block;')
+                document.getElementById('database').setAttribute('class', 'card database-hidden')
+                document.getElementById('database-menu').setAttribute('style', 'display:none;')
+            }
+
         })
         ipc.on('database-file-create', function (event, arg) {
             document.getElementById('database-path').innerText = arg[0]
@@ -356,37 +406,6 @@
 
 
 
-        /* ----- Window Commands & Icons ----- */
-        // Title Bar (Max and Min) + Scrollbar
-
-        document.getElementById('icon-min').setAttribute('style', 'display:inline');
-        document.getElementById('icon-max').setAttribute('style', 'display:none');
-
-        document.getElementById('maximize').addEventListener('click', function () {
-            ipc.send('window', 'maximize')
-        })
-
-        document.getElementById('minimize').addEventListener('click', function () {
-            ipc.send('window', 'minimize')
-        })
-
-        ipc.on('window', function (event, arg) {
-            if (arg == 'minimized') {
-                document.getElementById('icon-min').setAttribute('style', 'display:inline')
-                document.getElementById('icon-max').setAttribute('style', 'display:none')
-            }
-            else if (arg == 'maximized') {
-                document.getElementById('icon-min').setAttribute('style', 'display:none')
-                document.getElementById('icon-max').setAttribute('style', 'display:inline')
-            }
-        })
-
-        ipc.on('resize', function (event, arg) {
-            var pixels = arg[1] - 30
-            var minusBackButtonPixels = pixels - 45
-            document.getElementById('scroll').setAttribute('style', "height:" + pixels + "px")
-            document.getElementById('scroll-menu').setAttribute('style', "height:" + minusBackButtonPixels + "px")
-        })
 
 
 

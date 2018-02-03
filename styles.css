@@ -189,6 +189,7 @@ main {
   position: absolute;
   background-color: white;
   margin-top: 0px;
+  z-index: 5;
   padding-bottom: 10px;
 }
 
@@ -244,37 +245,63 @@ main {
 }
 
 #baud,
-#port {
+#port,
+#printer {
   transition: .5s;
 }
 
 #baud:hover,
-#port:hover {
+#port:hover,
+#printer:hover {
   background-color: #E1F5FE;
 }
 
 #baud-menu p,
 #port-menu p,
-#main-menu p {
+#main-menu p,
+#printer-menu p {
   margin: 0;
   padding-top: 5px;
   padding-bottom: 5px;
   transition: .5s;
 }
 
-#main-menu p {
-  margin-bottom: 5px;
-}
-
 #baud-menu p:hover,
 #port-menu p:hover,
-#main-menu p:hover {
+#main-menu p:hover,
+#printer-menu p:hover {
   color: white;
   background-color: #29B6F6;
 }
 
+#main-menu p {
+  margin-bottom: 5px;
+}
+
+#printer-menu p {
+  font-size: 12px;
+  text-overflow: clip;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: 2px;
+  padding-right: 2px;
+  width: calc(100% - 4px);
+}
+
+#printer #printer-content {
+  text-overflow: clip;
+  overflow: hidden;
+  white-space: nowrap;
+  padding-left: 2px;
+  padding-right: 2px;
+  text-align: center;
+  max-width: calc(100% - 44px);
+  font-size: 14px;
+}
+
 #baud-menu,
-#port-menu {
+#port-menu,
+#printer-menu {
   transition: transform .3s;
   transform: scaleY(100%);
   transform-origin: top;
@@ -282,7 +309,7 @@ main {
 
 .hidden {
   transform: scaleY(0);
-  transition: transform .3s;
+  transition: transform .4s;
   transform-origin: bottom;
   height: 0px;
   font-size: 0px;
@@ -294,6 +321,7 @@ main {
   float: left;
   margin-top: 10px;
   margin-left: 20px;
+  margin-bottom: 10px;
   font-size: 12px;
 }
 
@@ -785,21 +813,44 @@ main {
   padding-right: 10px;
 }
 
-::-webkit-scrollbar {
+#scroll::-webkit-scrollbar {
   width: 10px;
 }
 
-::-webkit-scrollbar-thumb {
+#scroll::-webkit-scrollbar-thumb {
   background: #ECEFF1;
   transition: .3s;
 }
 
-::-webkit-scrollbar-thumb:hover {
+#scroll::-webkit-scrollbar-thumb:hover {
   background: #CFD8DC;
 }
 
-::-webkit-scrollbar-thumb:active {
+#scroll::-webkit-scrollbar-thumb:active {
   background: #B0BEC5;
+}
+
+#download-menu {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: calc(100% - 15px);
+}
+
+#download-menu::-webkit-scrollbar {
+  width: 0px;
+}
+
+#download-menu::-webkit-scrollbar-thumb {
+  background: #ffffff00;
+  transition: .3s;
+}
+
+#download-menu::-webkit-scrollbar-thumb:hover {
+  background: #ffffff00;
+}
+
+#download-menu::-webkit-scrollbar-thumb:active {
+  background: #ffffff00;
 }
 
 @media (max-width: 205px) {

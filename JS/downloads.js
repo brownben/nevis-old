@@ -11,7 +11,7 @@
 /* ------ Import and Set Up Variables ----- */
 
 // Libraries for reading Serialport and Data Verification
-const SerialPort = require('serialport');
+
 const crc = require('./CRC.js');
 const course = require('./Course-Check.js')
 
@@ -159,6 +159,15 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
 
     if (splitTime == "---") {
         output(controlCounter + " " + controlCode + " - --- - ---");
+        if (controlCounterOutput.toString().length > 1) {
+            splitToPrint.push(controlCounterOutput.toString() + " " + controlCode + "                     " + "--:--     --:--");
+
+        }
+
+        else {
+            splitToPrint.push(controlCounterOutput.toString() + "  " + controlCode + "                     " + "--:--     --:--");
+
+        }
 
     }
     else {
@@ -186,13 +195,21 @@ function displayControlPunchwithElapsedTime(controlCounter, controlCode, splitTi
 
             output("F - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
 
+            splitToPrint.push("F" + "                          " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds)
         }
 
         else {
             var controlCounterOutput = parseInt(controlCounter) + 1
 
             output(controlCounterOutput.toString() + " - " + controlCode + " - " + splitTimeMinutes + ":" + splitTimeSeconds + " - " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
+            if (controlCounterOutput.toString().length > 1) {
+                splitToPrint.push(controlCounterOutput.toString() + " " + controlCode + "                     " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
 
+            }
+            else {
+                splitToPrint.push(controlCounterOutput.toString() + "  " + controlCode + "                     " + splitTimeMinutes + ":" + splitTimeSeconds + "     " + elapsedTimeMinutes + ":" + elapsedTimeSeconds);
+
+            }
         }
 
     }
@@ -417,13 +434,11 @@ function dataTranslation(serialData, currentData) {
                 var blockPosition = 0;
                 while (serialData[position] != 0x00 && position != 130 && serialData[position + 1] != 0xEE) {
                     currentData.controlCodes.push(parseInt(serialData[position]));
-                    if (serialData[position + 3].toString(16).length < 2) {
+                    if (serialData[position + 2].toString(16).length < 2) {
                         currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + "0" + serialData[position + 2].toString(16), 16));
-
                     }
                     else {
                         currentData.controlTimes.push(parseInt(serialData[position + 1].toString(16) + serialData[position + 2].toString(16), 16));
-
                     }
                     if (blockPosition < 4) {
                         position = position + 3;
@@ -575,6 +590,7 @@ function dataTranslation(serialData, currentData) {
 
 /* ------ Connect Button to Enable Download ----- */
 var currentDownload = new download();
+var splitToPrint = [];
 connect.addEventListener('click', function () {
 
     // Open the port
@@ -636,7 +652,7 @@ connect.addEventListener('click', function () {
                                     returnedData.siid = returnedData.siid.toString();
                                     downloads.insert(returnedData);
                                     db.saveDatabase();
-
+                                    splitToPrint = [];
                                     var linkedEntry = competitors.findOne({ 'siid': returnedData.siid.toString() });
 
                                     if (linkedEntry == null) {
@@ -647,35 +663,33 @@ connect.addEventListener('click', function () {
                                             downloadID: downloads.findOne({ 'siid': returnedData.siid }).$loki
                                         })
 
-                                        var calculatedTime = calculateTime(returnedData.start, returnedData.finish)[2];
+                                        var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+
                                         output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                         displayControlPunch('S', returnedData.start);
 
                                         var elapsedTime = 0;
                                         var lastPunch = returnedData.start;
                                         for (punch in returnedData.controlCodes) {
-
                                             if (returnedData.controlTimes[punch] > lastPunch) {
-
                                                 elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], returnedData.controlTimes[punch] - lastPunch, elapsedTime)
                                                 lastPunch = returnedData.controlTimes[punch]
-
-
                                             }
                                             else {
-
                                                 elapsedTime = displayControlPunchwithElapsedTime(punch, returnedData.controlCodes[punch], (returnedData.controlTimes[punch] + 43200) - lastPunch, elapsedTime)
-
                                                 lastPunch = returnedData.controlTimes[punch] + 43200
                                             }
-
                                         }
                                         if (returnedData.finish < lastPunch) {
                                             displayControlPunchwithElapsedTime('F', '', (returnedData.finish + 43200) - lastPunch, elapsedTime)
                                         }
                                         else {
                                             displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
-                                        } currentDownload = new download();
+                                        }
+
+
+                                        printSplits(returnedData.name, calculatedTime[0] + ":" + calculatedTime[1], returnedData.siid, "Unknown", splitToPrint)
+                                        currentDownload = new download();
                                     }
                                     else {
                                         var errors = "";
@@ -692,10 +706,12 @@ connect.addEventListener('click', function () {
                                                     if (errors == "") {
                                                         output(linkedEntry.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                                         downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime[2]
+                                                        time = calculatedTime[0] + ":" + calculatedTime[1]
                                                     }
                                                     else {
                                                         output(linkedEntry.name + " (" + returnedData.siid + ") - " + errors, 'big');
                                                         downloads.findOne({ 'siid': returnedData.siid }).time = errors
+                                                        time = errors
                                                     }
                                                     displayControlPunch('S', returnedData.start);
                                                     var elapsedTime = 0;
@@ -718,13 +734,14 @@ connect.addEventListener('click', function () {
                                                     else {
                                                         displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
                                                     }
-
+                                                    printSplits(linkedEntry.name, time, returnedData.siid, linkedEntry.course, splitToPrint)
                                                     currentDownload = new download();
                                                 }
 
                                             }
                                             else {
                                                 var calculatedTime = calculateTime(returnedData.start, returnedData.finish);
+
                                                 output(returnedData.name + " (" + returnedData.siid + ") - " + calculatedTime[0] + ":" + calculatedTime[1], 'big');
                                                 displayControlPunch('S', returnedData.start);
                                                 downloads.findOne({ 'siid': returnedData.siid }).time = calculatedTime
@@ -750,7 +767,7 @@ connect.addEventListener('click', function () {
                                                 else {
                                                     displayControlPunchwithElapsedTime('F', '', returnedData.finish - lastPunch, elapsedTime)
                                                 }
-
+                                                printSplits(returnedData.name, calculatedTime[0] + ":" + calculatedTime[1], returnedData.siid, "unknown", splitToPrint)
                                                 currentDownload = new download();
                                             }
                                         };
@@ -783,10 +800,65 @@ connect.addEventListener('click', function () {
     }
 })
 
+function printSplits(name, time, sicard, course, splits) {
+
+    if (document.getElementById('printer-content').innerText != "No Printing") {
+        thermalPrinter.init({
+            type: 'epson',
+            interface: "printer:" + document.getElementById('printer-content').innerText
+        });
+
+        thermalPrinter.isPrinterConnected(function (isConnected) {
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.alignLeft();
+            thermalPrinter.println(eventData.findOne().name + " - " + eventData.findOne().date)
+            thermalPrinter.newLine();
+            thermalPrinter.setTextQuadArea()
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println(name)
+            thermalPrinter.setTextNormal()
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.newLine();
+            thermalPrinter.println("SI Card: " + sicard)
+            thermalPrinter.println("Course: " + course)
+            thermalPrinter.newLine();
+            thermalPrinter.setTextQuadArea()
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println("Time: " + time.toString())
+            thermalPrinter.setTextNormal()
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.newLine();
+            thermalPrinter.bold(true)
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println('Control                             Leg          Elapsed')
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.bold(false)
+            thermalPrinter.println("S                          00:00     00:00")
+            for (split of splits) {
+                thermalPrinter.println(split)
+            }
+            thermalPrinter.newLine();
+            thermalPrinter.alignRight();
+            thermalPrinter.bold(true)
+            thermalPrinter.println('Results created by Nevis')
+            thermalPrinter.bold(false)
+            thermalPrinter.cut()
+            thermalPrinter.execute(function (err) {
+                if (err) {
+                    console.error("Print failed", err);
+                } else {
+                    console.log("Print done");
+                }
+            });
+        })
+
+    }
+}
 /* ----- Baud and Port Menus ----- */
 
 const portMenu = document.getElementById('port-menu');
 const baudMenu = document.getElementById('baud-menu');
+const printerMenu = document.getElementById('printer-menu');
 
 // Baud Menu
 document.getElementById('baud').addEventListener('click', function () {
@@ -839,11 +911,53 @@ document.getElementById('port').addEventListener('click', function () {
                 })
             }
         });
-        var listItems = document.getElementsByClassName('ports-list-item');
 
         portMenu.setAttribute('class', '')
     }
     else {
         portMenu.setAttribute('class', 'hidden')
+    }
+})
+
+// Printer Menu & Autogenerated Menu Items
+function assignPrintMenuHandler() {
+    document.getElementById('printer-content').innerText = this.innerText;
+    printerMenu.setAttribute('class', 'hidden')
+
+}
+document.getElementById('printer').addEventListener('click', function () {
+    if (printerMenu.getAttribute('class') == 'hidden') {
+        printerMenu.innerHTML = "";
+        printersList = ""
+        noOfPrinters = 1
+        printers = printer.getPrinters()
+
+        printers.forEach(function (printer) {
+
+            if (printer.status[0] != "NOT-AVAILABLE") {
+                var p = document.createElement('p');
+                p.className = 'printer-list-item';
+                p.innerHTML = printer.name;
+                p.onclick = assignPrintMenuHandler;
+                document.getElementById('printer-menu').appendChild(p);
+
+                noOfPrinters++;
+            }
+
+        });
+
+        var p = document.createElement('p');
+        p.id = 'NoPrint';
+        p.innerHTML = 'No Printing';
+        document.getElementById('printer-menu').appendChild(p);
+        document.getElementById('NoPrint').addEventListener('click', function () {
+            document.getElementById('printer-content').innerText = "No Printing";
+            printerMenu.setAttribute('class', 'hidden')
+        })
+
+        printerMenu.setAttribute('class', '')
+    }
+    else {
+        printerMenu.setAttribute('class', 'hidden')
     }
 })

@@ -151,6 +151,7 @@ ipc.on('select-database', function (event) {
     dialog.showOpenDialog({
         title: 'Nevis - Select Database',
         icon: './nevis.ico',
+        buttonLabel: 'Select',
         filters: [
             { name: 'Database', extensions: ['db'] },
             { name: 'JSON', extensions: ['json'] },
