@@ -3,25 +3,14 @@
 //////////////////////////////////////////////////////////////////
 // Read and display the data coming from punches to a station   //
 // Setup the whole Download screen                              //
+
+
 /* ------ Import and Set Up Variables ----- */
-// Libraries for reading Serialport and Data Verification
+// Libraries for reading  Data Verification
 const crc = require('./CRC.js');
 const course = require('./Course-Check.js')
-// Variables for Reading Cards
 const si = require('./SI-Variables.js');
-const card5 = new si.card5();
-const card8 = new si.card8(); // Card 8,9 & P
-const card10 = new si.card10(); //Card 10, 11 & SIAC
-function lessThan2(object) {
-    if (object.length < 2) {
-        return "0" + object
-    }
-    else {
-        return object
-    }
-}
-/* ------ HTML Elements ----- */
-const connect = document.getElementById('connect');
+
 /* ------ Download Class for Database ----- */
 var download = function () {
     this.siid = '';
@@ -34,6 +23,27 @@ var download = function () {
     this.complete = false;
     this.cardType = '';
 }
+
+// Variables for Reading Cards
+const card5 = new si.card5();
+const card8 = new si.card8(); // Card 8,9 & P
+const card10 = new si.card10(); //Card 10, 11 & SIAC
+var currentDownload = new download();
+var splitToPrint = [];
+
+// Lengthen byteswhich start with 0
+function lessThan2(object) {
+    if (object.length < 2) {
+        return "0" + object
+    }
+    else {
+        return object
+    }
+}
+
+/* ------ HTML Elements ----- */
+const connect = document.getElementById('connect');
+
 /* ----- Functions -----*/
 function output(data, type) {
     // Display the data fromm download in #download-output as <p> with different stylings given by classes
@@ -51,6 +61,59 @@ function output(data, type) {
         downloadOutput.innerHTML = downloadOutput.innerHTML + "<p>" + data + "</p>";
     }
     document.getElementById('scroll').scrollTop = downloadOutput.scrollHeight;
+}
+
+function printSplits(name, time, sicard, course, splits) {
+    if (document.getElementById('printer-content').innerText != "No Printing") {
+        thermalPrinter.init({
+            type: 'epson',
+            interface: "printer:" + document.getElementById('printer-content').innerText
+        });
+        thermalPrinter.isPrinterConnected(function (isConnected) {
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.alignLeft();
+            thermalPrinter.println(eventData.findOne().name + " - " + eventData.findOne().date)
+            thermalPrinter.newLine();
+            thermalPrinter.setTextQuadArea()
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println(name)
+            thermalPrinter.setTextNormal()
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.newLine();
+            thermalPrinter.println("SI Card: " + sicard)
+            thermalPrinter.println("Course: " + course)
+            thermalPrinter.newLine();
+            thermalPrinter.setTextQuadArea()
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println("Time: " + time.toString())
+            thermalPrinter.setTextNormal()
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.newLine();
+            thermalPrinter.bold(true)
+            thermalPrinter.setTypeFontB();
+            thermalPrinter.println('Control                             Leg          Elapsed')
+            thermalPrinter.setTypeFontA();
+            thermalPrinter.bold(false)
+            thermalPrinter.println("S                          00:00     00:00")
+            for (split of splits) {
+                thermalPrinter.println(split)
+            }
+            thermalPrinter.newLine();
+            thermalPrinter.alignRight();
+            thermalPrinter.bold(true)
+            thermalPrinter.println('Results created by Nevis')
+            thermalPrinter.bold(false)
+            thermalPrinter.cut()
+            thermalPrinter.execute(function (err) {
+                if (err) {
+                    console.error("Print failed", err);
+                }
+                else {
+                    console.log("Print done");
+                }
+            });
+        })
+    }
 }
 
 function calculateSIID(data) {
@@ -448,9 +511,8 @@ function dataTranslation(serialData, currentData) {
         }
     }
 }
+
 /* ------ Connect Button to Enable Download ----- */
-var currentDownload = new download();
-var splitToPrint = [];
 connect.addEventListener('click', function () {
     // Open the port
     if (connect.textContent == "Connect" && document.getElementById('port-content').innerText != '') {
@@ -642,62 +704,11 @@ connect.addEventListener('click', function () {
     }
 })
 
-function printSplits(name, time, sicard, course, splits) {
-    if (document.getElementById('printer-content').innerText != "No Printing") {
-        thermalPrinter.init({
-            type: 'epson',
-            interface: "printer:" + document.getElementById('printer-content').innerText
-        });
-        thermalPrinter.isPrinterConnected(function (isConnected) {
-            thermalPrinter.setTypeFontA();
-            thermalPrinter.alignLeft();
-            thermalPrinter.println(eventData.findOne().name + " - " + eventData.findOne().date)
-            thermalPrinter.newLine();
-            thermalPrinter.setTextQuadArea()
-            thermalPrinter.setTypeFontB();
-            thermalPrinter.println(name)
-            thermalPrinter.setTextNormal()
-            thermalPrinter.setTypeFontA();
-            thermalPrinter.newLine();
-            thermalPrinter.println("SI Card: " + sicard)
-            thermalPrinter.println("Course: " + course)
-            thermalPrinter.newLine();
-            thermalPrinter.setTextQuadArea()
-            thermalPrinter.setTypeFontB();
-            thermalPrinter.println("Time: " + time.toString())
-            thermalPrinter.setTextNormal()
-            thermalPrinter.setTypeFontA();
-            thermalPrinter.newLine();
-            thermalPrinter.bold(true)
-            thermalPrinter.setTypeFontB();
-            thermalPrinter.println('Control                             Leg          Elapsed')
-            thermalPrinter.setTypeFontA();
-            thermalPrinter.bold(false)
-            thermalPrinter.println("S                          00:00     00:00")
-            for (split of splits) {
-                thermalPrinter.println(split)
-            }
-            thermalPrinter.newLine();
-            thermalPrinter.alignRight();
-            thermalPrinter.bold(true)
-            thermalPrinter.println('Results created by Nevis')
-            thermalPrinter.bold(false)
-            thermalPrinter.cut()
-            thermalPrinter.execute(function (err) {
-                if (err) {
-                    console.error("Print failed", err);
-                }
-                else {
-                    console.log("Print done");
-                }
-            });
-        })
-    }
-}
 /* ----- Baud and Port Menus ----- */
 const portMenu = document.getElementById('port-menu');
 const baudMenu = document.getElementById('baud-menu');
 const printerMenu = document.getElementById('printer-menu');
+
 // Baud Menu
 document.getElementById('baud').addEventListener('click', function () {
     if (baudMenu.getAttribute('class') == 'hidden') {
@@ -717,6 +728,7 @@ document.getElementById('baud-serial').addEventListener('click', function () {
     port.baudrate = 4800
     baudMenu.setAttribute('class', 'hidden')
 })
+
 // Port Menu & Autogenerated Menu Items
 function assignPortMenuHandler() {
     document.getElementById('port-content').innerText = this.innerText;
@@ -751,6 +763,7 @@ document.getElementById('port').addEventListener('click', function () {
         portMenu.setAttribute('class', 'hidden')
     }
 })
+
 // Printer Menu & Autogenerated Menu Items
 function assignPrintMenuHandler() {
     document.getElementById('printer-content').innerText = this.innerText;
