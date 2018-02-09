@@ -264,65 +264,6 @@ function getName(personalData) {
     }
 }
 
-function processCard10Punches(data, blockNumber, currentCard) {
-    // Process the raw data inn Blocks 4-7 on Card10+ into readable data
-    // CRC Check, read the punches, finish off
-    if (parseInt(data[134].toString(16) + data[135].toString(16), 16) == parseInt(crc.compute(data.slice(1, 134)).toString(16), 16)) {
-        var position = 6;
-        while (position != 134 && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-            currentCard.controlCodes.push(parseInt(data[position + 1]));
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + lessThan2(data[position + 3].toString(16)), 16));
-            currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + data[position + 3].toString(16), 16));
-            position = position + 4;
-        }
-        if (blockNumber == 7) {
-            port.write(si.beep);
-            return true;
-        }
-        else {
-            if (position != 134) {
-                port.write(si.beep);
-                return true;
-            }
-            else {
-                if (blockNumber == 4) {
-                    port.write(card10.readBlock5);
-                    return false;
-                }
-                else if (blockNumber == 5) {
-                    port.write(card10.readBlock6);
-                    return false;
-                }
-                else if (blockNumber == 6) {
-                    port.write(card10.readBlock7);
-                    return false;
-                }
-            }
-        }
-    }
-    else {
-        return "Error: Problem with data transmission - Please Re-insert Card"
-    }
-}
-
-function processCard8Punches(data, blockNumber, currentCard) {
-    var endOfPunches = data.length - 1;
-    var position = 0;
-    while (position != endOfPunches && data[position + 1] != 0xEE && data[position + 2] != 0xEE) {
-        currentCard.controlCodes.push(parseInt(data[position + 1]));
-        currentCard.controlTimes.push(parseInt(data[position + 2].toString(16) + lessThan2(data[position + 3].toString(16)), 16));
-        position = position + 4;
-    }
-    if (blockNumber == 1) {
-        port.write(si.beep);
-        return true;
-    }
-    else {
-        port.write(card8.readBlock1);
-        return false;
-    }
-}
-
 function processCardPunches(data, blockNumber, currentCard) {
     var endOfPunches = data.length - 1;
     var position = 0;
@@ -443,7 +384,7 @@ function dataTranslation(serialData, currentData) {
                 currentData.start = parseInt(serialData[card8.startByte1].toString(16) + lessThan2(serialData[card8.startByte2].toString(16)), 16);
                 currentData.finish = parseInt(serialData[card8.finishByte1].toString(16) + lessThan2(serialData[card8.finishByte2].toString(16)), 16);
                 currentData.name = getName(serialData.slice(38, 58));
-                processCard8Punches(serialdata.slice(59, 133), 0, currentData)
+                processCardPunches(serialdata.slice(59, 133), 0, currentData)
                 port.write(card8.readBlock1);
             }
             else if (currentData.cardType == 8 || currentData.cardType == 'p') {
@@ -462,13 +403,13 @@ function dataTranslation(serialData, currentData) {
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x01) && (serialData.length == 137)) {
         if (parseInt(serialData[134].toString(16) + serialData[135].toString(16), 16) == parseInt(crc.compute(serialData.slice(1, 134)).toString(16), 16)) {
             if (currentData.cardType == 8) {
-                processCard8Punches(serialData.slice(6, 134), 1, currentData)
+                processCardPunches(serialData.slice(6, 134), 1, currentData)
             }
             if (currentData.cardType == 9) {
-                processCard8Punches(serialData.slice(18, 134), 1, currentData)
+                processCardPunches(serialData.slice(18, 134), 1, currentData)
             }
             if (currentData.cardType == 'p') {
-                processCard8Punches(serialData.slice(54, 134), 1, currentData)
+                processCardPunches(serialData.slice(54, 134), 1, currentData)
             }
             currentData.complete = true;
             return currentData
@@ -477,7 +418,7 @@ function dataTranslation(serialData, currentData) {
     // Read Block 4 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x04) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
-            if (processCard10Punches(serialData, 4, currentData) == true) {
+            if (processCardPunches(serialData.slice(6, 134), 4, currentData) == true) {
                 currentData.complete = true;
                 return currentData
             }
@@ -486,7 +427,7 @@ function dataTranslation(serialData, currentData) {
     // Read Block 5 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x05) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
-            if (processCard10Punches(serialData, 5, currentData) == true) {
+            if (processCardPunches(serialData.slice(6, 134), 5, currentData) == true) {
                 currentData.complete = true;
                 return currentData
             }
@@ -495,7 +436,7 @@ function dataTranslation(serialData, currentData) {
     // Read Block 6 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x06) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
-            if (processCard10Punches(serialData, 6, currentData) == true) {
+            if (processCardPunches(serialData.slice(6, 134), 6, currentData) == true) {
                 currentData.complete = true;
                 return currentData
             }
@@ -504,7 +445,7 @@ function dataTranslation(serialData, currentData) {
     // Read Block 7 of Card 10+ data
     else if ((serialData[0] == 0x02) && (serialData[1] == 0xEF) && (serialData[2] == 0x83) && (serialData[5] == 0x07) && (serialData.length == 137)) {
         if (currentData.cardType == 10) {
-            if (processCard10Punches(serialData, 7, currentData) == true) {
+            if (processCardPunches(serialData.slice(6, 134), 7, currentData) == true) {
                 currentData.complete = true;
                 return currentData
             }
