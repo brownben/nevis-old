@@ -1,7 +1,7 @@
 {
-  "name": "nevis",
+  "name": "nevis-old",
   "description": "The Fast, Easy, Simple Software to Process Results from the SportIdent Timing System",
-  "repository": "https://github.com/bonalybob/Nevis.git",
+  "repository": "https://github.com/brownben/nevis-old.git",
   "license": "MIT",
   "version": "2.0.0",
   "main": "main.js",
